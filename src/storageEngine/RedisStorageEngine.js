@@ -55,9 +55,14 @@ class RedisStorageEngine extends BaseStorageEngine {
         }
     }
 
-    async filter(fn) {
+    async filter(fn, ids) {
         let resolvedDataArray = [];
-        let data = await this.client.keysAsync(`${this.namespace}`);
+        let data = [];
+        if (!ids) {
+            data = await this.client.keysAsync(`${this.namespace}`);
+        } else {
+            data = ids;
+        }
         for (let key of data) {
             let resolvedData;
             if (this.useHash) {
@@ -71,8 +76,13 @@ class RedisStorageEngine extends BaseStorageEngine {
         return resolvedDataArray.filter(fn);
     }
 
-    async find(fn) {
-        let data = await this.client.keysAsync(`${this.namespace}`);
+    async find(fn, ids) {
+        let data = [];
+        if (!ids) {
+            data = await this.client.keysAsync(`${this.namespace}`);
+        } else {
+            data = ids;
+        }
         for (let key of data) {
             let resolvedData;
             if (this.useHash) {

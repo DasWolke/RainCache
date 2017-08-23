@@ -2,16 +2,21 @@
 let EventProcessor = require('./EventProcessor');
 let GuildCache = require('./cache/GuildCache');
 let ChannelCache = require('./cache/ChannelCache');
+let GuildChannelMap = require('./cache/ChannelMapCache');
 
 class RainCache {
     constructor(options, inboundConnector, outboundConnector) {
         if (!options.storage) {
             throw new Error('No storage engines were passed');
         }
+        if (!inboundConnector) {
+            throw new Error('Missing inbound connector, cache would not work without!');
+        }
         if (!options.cacheClasses) {
             options.cacheClasses = {
                 guild: GuildCache,
-                channel: ChannelCache
+                channel: ChannelCache,
+                guildChannelMap: GuildChannelMap
             };
         }
         if (!options.storage.default) {
@@ -38,12 +43,13 @@ class RainCache {
         } catch (e) {
             throw new Error('Failed to initialize storage engines');
         }
-        this.options.cache = this.createCaches(this.options.storage, this.options.cacheClasses);
+        this.cache = this.createCaches(this.options.storage, this.options.cacheClasses);
+        Object.assign(this, this.cache);
         this.eventProcessor = new EventProcessor({
             disabledEvents: this.options.disabledEvents,
             cache: {
-                guild: this.options.cache.guild,
-                channel: this.options.cache.channel
+                guild: this.cache.guild,
+                channel: this.cache.channel
             }
         });
         if (!this.inbound.ready) {

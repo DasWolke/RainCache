@@ -2,7 +2,7 @@
 const BaseCache = require('./BaseCache');
 
 class GuildCache extends BaseCache {
-    constructor(storageEngine, channelCache, roleCache, memberCache, emojiCache, boundObject) {
+    constructor(storageEngine, channelCache, roleCache, memberCache, emojiCache, guildToChannelCache = null, boundObject) {
         super();
         this.storageEngine = storageEngine;
         this.storageEngine.updateNamespace('guild.');
@@ -10,6 +10,9 @@ class GuildCache extends BaseCache {
         this.roles = roleCache;
         this.members = memberCache;
         this.emojis = emojiCache;
+        if (guildToChannelCache) {
+            this.guildChannelMap = guildToChannelCache;
+        }
         if (boundObject) {
             this.bindObject(boundObject);
         }
@@ -33,7 +36,16 @@ class GuildCache extends BaseCache {
             await this.update(this.boundObject.id, data);
             return this;
         }
-        delete data.channels;
+        if (data.channels) {
+            if (this.guildChannelMap) {
+                await this.guildChannelMap.update(id, data.channels);
+            }
+            for (let channel of data.channels) {
+                channel.owner_id = id;
+                await this.channels.update(channel.id, channel);
+                console.log(`Cached channel ${channel.id}|#${channel.name}`);
+            }
+        }
         delete data.members;
         delete data.voice_states;
         delete data.roles;

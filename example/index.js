@@ -9,4 +9,9 @@ let init = async () => {
 };
 init().then(() => {
     console.log('owo');
+    // setTimeout(async () => {
+    //     let guild = await cache.guild.get('154953124648321024');
+    //     console.log(guild);
+    //     console.log(guild.member_count);
+    // }, 10000);
 }).catch(e => console.error(e));
