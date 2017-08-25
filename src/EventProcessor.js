@@ -39,7 +39,6 @@ class EventProcessor extends EventEmitter {
                 await this.guildCache.update(event.d.id, event.d);
                 break;
             case 'CHANNEL_CREATE':
-                console.log(event);
                 await this.onChannelCreate(event);
                 break;
         }
