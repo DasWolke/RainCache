@@ -5,7 +5,7 @@ class ChannelMapCache extends BaseCache {
     constructor(storageEngine, boundObject) {
         super();
         this.storageEngine = storageEngine;
-        this.storageEngine.updateNamespace('channelMap.');
+        this.namespace = 'channelmap';
         if (boundObject) {
             this.bindObject(boundObject);
         }
@@ -15,7 +15,7 @@ class ChannelMapCache extends BaseCache {
         if (this.boundObject) {
             return this.boundObject;
         }
-        let channelMap = await this.storageEngine.get(this._buildId(id, type));
+        let channelMap = await this.storageEngine.get(this.buildId(this._buildMapId(id, type)));
         if (channelMap) {
             return new ChannelMapCache(this.storageEngine, channelMap);
         } else {
@@ -31,8 +31,8 @@ class ChannelMapCache extends BaseCache {
             return this;
         }
         let channelMap = this._buildMap(id, data, type);
-        await this.storageEngine.upsert(this._buildId(id, type), channelMap);
-        channelMap = await this.storageEngine.get(this._buildId(id, type));
+        await this.storageEngine.upsert(this.buildId(this._buildMapId(id, type)), channelMap);
+        channelMap = await this.storageEngine.get(this.buildId(this._buildMapId(id, type)));
         return new ChannelMapCache(this.storageEngine, channelMap);
     }
 
@@ -40,7 +40,7 @@ class ChannelMapCache extends BaseCache {
         if (this.boundObject) {
             return this.storageEngine.remove(this.boundObject.id);
         }
-        let channelMap = await this.storageEngine.get(this._buildId(id, type));
+        let channelMap = await this.storageEngine.get(this.buildId(this._buildMapId(id, type)));
         if (channelMap) {
             return this.storageEngine.remove(channelMap.id);
         } else {
@@ -48,12 +48,12 @@ class ChannelMapCache extends BaseCache {
         }
     }
 
-    _buildId(id, type) {
+    _buildMapId(id, type) {
         return `${type}.${id}`;
     }
 
     _buildMap(id, data, type) {
-        return {id: this._buildId(id, type), channels: data, type};
+        return {id: this._buildMapId(id, type), channels: data, type};
     }
 }
 

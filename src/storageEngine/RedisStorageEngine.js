@@ -29,7 +29,7 @@ class RedisStorageEngine extends BaseStorageEngine {
         if (this.useHash) {
             return this.client.hgetallAsync(id);
         } else {
-            let rawData = await this.client.getAsync(this.buildKey(id));
+            let rawData = await this.client.getAsync(id);
             return this.parseData(rawData);
         }
     }
@@ -37,67 +37,67 @@ class RedisStorageEngine extends BaseStorageEngine {
     async upsert(id, updateData) {
         let data;
         if (this.useHash) {
-            return this.client.hmsetAsync(this.buildKey(id), updateData);
+            return this.client.hmsetAsync(id, updateData);
         } else {
-            data = await this.get(this.buildKey(id));
+            data = await this.get(id);
             data = data || {};
             Object.assign(data, updateData);
-            return this.client.setAsync(this.buildKey(id), this.prepareData(data));
+            return this.client.setAsync(id, this.prepareData(data));
         }
     }
 
     async remove(id) {
         if (this.useHash) {
-            let hashKeys = await this.client.hkeysAsync(this.buildKey(id));
-            return this.client.hdelAsync(this.buildKey(id), hashKeys);
+            let hashKeys = await this.client.hkeysAsync(id);
+            return this.client.hdelAsync(id, hashKeys);
         } else {
-            return this.client.deleteAsync(this.buildKey(id));
+            return this.client.deleteAsync(id);
         }
     }
 
-    async filter(fn, ids) {
+    async filter(fn, ids, namespace) {
         let resolvedDataArray = [];
         let data = [];
         if (!ids) {
-            data = await this.client.keysAsync(`${this.namespace}`);
+            data = await this.client.keysAsync(namespace);
         } else {
             data = ids;
         }
         for (let key of data) {
             let resolvedData;
             if (this.useHash) {
-                resolvedData = await this.client.hgetallAsync(this.buildKey(key));
+                resolvedData = await this.client.hgetallAsync(key);
                 resolvedDataArray.push(resolvedData);
             } else {
-                resolvedData = await this.client.get(this.buildKey(key));
+                resolvedData = await this.client.get(key);
                 resolvedDataArray.push(resolvedData);
             }
         }
         return resolvedDataArray.filter(fn);
     }
 
-    async find(fn, ids) {
+    async find(fn, ids = null, namespace) {
         let data = [];
+        if (typeof ids === 'string' && !namespace) {
+            namespace = ids;
+            ids = null;
+        }
         if (!ids) {
-            data = await this.client.keysAsync(`${this.namespace}`);
+            data = await this.client.keysAsync(namespace);
         } else {
             data = ids;
         }
         for (let key of data) {
             let resolvedData;
             if (this.useHash) {
-                resolvedData = await this.client.hgetallAsync(this.buildKey(key));
+                resolvedData = await this.client.hgetallAsync(key);
             } else {
-                resolvedData = await this.client.get(this.buildKey(key));
+                resolvedData = await this.client.get(key);
             }
             if (fn(resolvedData)) {
                 return resolvedData;
             }
         }
-    }
-
-    buildKey(id) {
-        return `${this.namespace}${id}`;
     }
 
     prepareData(data) {

@@ -2,10 +2,17 @@
 let EventProcessor = require('./EventProcessor');
 let GuildCache = require('./cache/GuildCache');
 let ChannelCache = require('./cache/ChannelCache');
-let GuildChannelMap = require('./cache/ChannelMapCache');
+let ChannelMap = require('./cache/ChannelMapCache');
+let EventEmitter;
+try {
+    EventEmitter = require('eventemitter3');
+} catch (e) {
+    EventEmitter = require('events').EventEmitter;
+}
 
-class RainCache {
+class RainCache extends EventEmitter {
     constructor(options, inboundConnector, outboundConnector) {
+        super();
         if (!options.storage) {
             throw new Error('No storage engines were passed');
         }
@@ -16,7 +23,7 @@ class RainCache {
             options.cacheClasses = {
                 guild: GuildCache,
                 channel: ChannelCache,
-                guildChannelMap: GuildChannelMap
+                channelMap: ChannelMap
             };
         }
         if (!options.storage.default) {
@@ -49,7 +56,8 @@ class RainCache {
             disabledEvents: this.options.disabledEvents,
             cache: {
                 guild: this.cache.guild,
-                channel: this.cache.channel
+                channel: this.cache.channel,
+                channelMap: this.cache.channelMap
             }
         });
         if (!this.inbound.ready) {
@@ -64,6 +72,9 @@ class RainCache {
                 this.outbound.send(event);
             }
         });
+        if (this.options.debug) {
+            this.eventProcessor.on('debug', (log) => this.emit('debug', log));
+        }
         this.ready = true;
     }
 
@@ -89,13 +100,17 @@ class RainCache {
             let engine = this.getEngine(engines, 'member');
             caches['member'] = new cacheClasses['member'](engine);
         }
+        if (cacheClasses['channelMap']) {
+            let engine = this.getEngine(engines, 'channelMap');
+            caches['channelMap'] = new cacheClasses['channelMap'](engine);
+        }
         if (cacheClasses['channel']) {
             let engine = this.getEngine(engines, 'channel');
             caches['channel'] = new cacheClasses['channel'](engine, caches['permOverwrite'], caches['user']);
         }
         if (cacheClasses['guild']) {
             let engine = this.getEngine(engines, 'guild');
-            caches['guild'] = new cacheClasses['guild'](engine, caches['channel'], caches['role'], caches['member'], caches['emoji']);
+            caches['guild'] = new cacheClasses['guild'](engine, caches['channel'], caches['role'], caches['member'], caches['emoji'], caches['channelMap']);
         }
         return caches;
     }

@@ -5,7 +5,7 @@ class GuildCache extends BaseCache {
     constructor(storageEngine, channelCache, roleCache, memberCache, emojiCache, guildToChannelCache = null, boundObject) {
         super();
         this.storageEngine = storageEngine;
-        this.storageEngine.updateNamespace('guild.');
+        this.namespace = 'guild';
         this.channels = channelCache;
         this.roles = roleCache;
         this.members = memberCache;
@@ -22,7 +22,7 @@ class GuildCache extends BaseCache {
         if (this.boundObject) {
             return this.boundObject;
         }
-        let guild = await this.storageEngine.get(id);
+        let guild = await this.storageEngine.get(this.buildId(id));
         if (guild) {
             return new GuildCache(this.storageEngine, this.channels, this.roles, this.members, this.emojis, guild);
         } else {
@@ -38,12 +38,11 @@ class GuildCache extends BaseCache {
         }
         if (data.channels) {
             if (this.guildChannelMap) {
-                await this.guildChannelMap.update(id, data.channels);
+                await this.guildChannelMap.update(id, data.channels.map(c => c.id));
             }
             for (let channel of data.channels) {
-                channel.owner_id = id;
                 await this.channels.update(channel.id, channel);
-                console.log(`Cached channel ${channel.id}|#${channel.name}`);
+                console.log(`Cached channel ${channel.id}|#"${channel.name}"|${typeof channel.name}`);
             }
         }
         delete data.members;
@@ -52,8 +51,8 @@ class GuildCache extends BaseCache {
         delete data.presences;
         delete data.emojis;
         delete data.features;
-        await this.storageEngine.upsert(id, data);
-        let guild = await this.storageEngine.get(id);
+        await this.storageEngine.upsert(this.buildId(id), data);
+        let guild = await this.storageEngine.get(this.buildId(id));
         return new GuildCache(this.storageEngine, this.channels, this.roles, this.members, this.emojis, guild);
     }
 
@@ -61,21 +60,21 @@ class GuildCache extends BaseCache {
         if (this.boundObject) {
             return this.remove(this.boundObject.id);
         }
-        let guild = await this.storageEngine.get(id);
+        let guild = await this.storageEngine.get(this.buildId(id));
         if (guild) {
-            return this.storageEngine.remove(id);
+            return this.storageEngine.remove(this.buildId(id));
         } else {
             return null;
         }
     }
 
     async filter(fn) {
-        let guilds = await this.storageEngine.filter(fn);
+        let guilds = await this.storageEngine.filter(fn, this.namespace);
         return guilds.map(g => new GuildCache(this.storageEngine, this.channels, this.roles, this.members, this.presences, this.emojis, g));
     }
 
     async find(fn) {
-        let guild = await this.storageEngine.find(fn);
+        let guild = await this.storageEngine.find(fn, this.namespace);
         return new GuildCache(this.storageEngine, this.channels, this.roles, this.members, this.presences, this.emojis, guild);
     }
 }

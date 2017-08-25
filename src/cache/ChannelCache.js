@@ -5,7 +5,7 @@ class ChannelCache extends BaseCache {
     constructor(storageEngine, permissionOverwriteCache, userCache, boundObject) {
         super();
         this.storageEngine = storageEngine;
-        this.storageEngine.updateNamespace('channels.');
+        this.namespace = 'channel';
         this.permissionOverwrites = permissionOverwriteCache;
         this.recipients = userCache;
         if (boundObject) {
@@ -17,7 +17,7 @@ class ChannelCache extends BaseCache {
         if (this.boundObject) {
             return this.boundObject;
         }
-        let channel = await this.storageEngine.get(id);
+        let channel = await this.storageEngine.get(this.buildId(id));
         if (channel) {
             return new ChannelCache(this.storageEngine, this.permissionOverwrites, this.recipients, channel);
         } else {
@@ -33,8 +33,8 @@ class ChannelCache extends BaseCache {
         }
         delete data.permission_overwrites;
         delete data.recipients;
-        await this.storageEngine.upsert(id, data);
-        let channel = await this.storageEngine.get(id);
+        await this.storageEngine.upsert(this.buildId(id), data);
+        let channel = await this.storageEngine.get(this.buildId(id));
         return new ChannelCache(this.storageEngine, this.permissionOverwrites, this.recipients, channel);
     }
 
@@ -42,21 +42,17 @@ class ChannelCache extends BaseCache {
         if (this.boundObject) {
             return this.remove(this.boundObject.id);
         }
-        let channel = await this.storageEngine.get(id);
+        let channel = await this.storageEngine.get(this.buildId(id));
         if (channel) {
-            return this.storageEngine.remove(id);
+            return this.storageEngine.remove(this.buildId(id));
         } else {
             return null;
         }
     }
 
     async filter(fn, channelMap) {
-        let channels = await this.storageEngine.filter(fn, channelMap);
+        let channels = await this.storageEngine.filter(fn, channelMap, this.namespace);
         return channels.map(c => new ChannelCache(this.storageEngine, this.permissionOverwrites, this.recipients, c));
-    }
-
-    bindNamespace(namespace) {
-        this.storageEngine.updateNamespace(namespace);
     }
 }
 

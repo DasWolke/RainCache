@@ -1,6 +1,6 @@
 {
   "name": "raincache",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A pluggable discord cache worker",
   "main": "index.js",
   "scripts": {
