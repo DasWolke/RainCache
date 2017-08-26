@@ -2,7 +2,7 @@
 const BaseCache = require('./BaseCache');
 
 class GuildCache extends BaseCache {
-    constructor(storageEngine, channelCache, roleCache, memberCache, emojiCache, guildToChannelCache = null, boundObject) {
+    constructor(storageEngine, channelCache, roleCache, memberCache, emojiCache, guildToChannelCache, boundObject) {
         super();
         this.storageEngine = storageEngine;
         this.namespace = 'guild';
@@ -10,9 +10,7 @@ class GuildCache extends BaseCache {
         this.roles = roleCache;
         this.members = memberCache;
         this.emojis = emojiCache;
-        if (guildToChannelCache) {
-            this.guildChannelMap = guildToChannelCache;
-        }
+        this.guildChannelMap = guildToChannelCache;
         if (boundObject) {
             this.bindObject(boundObject);
         }
@@ -37,9 +35,7 @@ class GuildCache extends BaseCache {
             return this;
         }
         if (data.channels) {
-            if (this.guildChannelMap) {
-                await this.guildChannelMap.update(id, data.channels.map(c => c.id));
-            }
+            await this.guildChannelMap.update(id, data.channels.map(c => c.id));
             for (let channel of data.channels) {
                 await this.channels.update(channel.id, channel);
                 console.log(`Cached channel ${channel.id}|#"${channel.name}"|${typeof channel.name}`);
@@ -51,6 +47,7 @@ class GuildCache extends BaseCache {
         delete data.presences;
         delete data.emojis;
         delete data.features;
+        delete data.channels;
         await this.storageEngine.upsert(this.buildId(id), data);
         let guild = await this.storageEngine.get(this.buildId(id));
         return new GuildCache(this.storageEngine, this.channels, this.roles, this.members, this.emojis, guild);
@@ -62,6 +59,11 @@ class GuildCache extends BaseCache {
         }
         let guild = await this.storageEngine.get(this.buildId(id));
         if (guild) {
+            let channelMap = await this.guildChannelMap.get(id);
+            for (let channel of channelMap.data) {
+                await this.channels.remove(channel);
+            }
+            await this.guildChannelMap.remove(id);
             return this.storageEngine.remove(this.buildId(id));
         } else {
             return null;

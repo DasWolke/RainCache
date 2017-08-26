@@ -3,6 +3,7 @@ let EventProcessor = require('./EventProcessor');
 let GuildCache = require('./cache/GuildCache');
 let ChannelCache = require('./cache/ChannelCache');
 let ChannelMap = require('./cache/ChannelMapCache');
+const util = require('util');
 let EventEmitter;
 try {
     EventEmitter = require('eventemitter3');
@@ -121,3 +122,9 @@ class RainCache extends EventEmitter {
 }
 
 module.exports = RainCache;
+
+process.on('unhandledRejection', (reason, promise) => {
+    if (!reason) return;
+    console.error(`Unhandled rejection: ${reason} - ${util.inspect(promise)}`);
+
+});

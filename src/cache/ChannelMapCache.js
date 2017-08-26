@@ -23,12 +23,22 @@ class ChannelMapCache extends BaseCache {
         }
     }
 
-    async update(id, data, type = 'guild') {
+    async update(id, data, type = 'guild', remove = false) {
         if (this.boundObject) {
             data = this._buildMap(id, data, type);
             this.bindObject(data); //using bindobject() to assure the data of the class is valid
             await this.update(this.boundObject.id, data);
             return this;
+        }
+        let oldCacheData = await this.get(id, type);
+        if (oldCacheData && !remove) {
+            data = this._checkDupes(oldCacheData.channels, data);
+        }
+        if (remove) {
+            if (!oldCacheData) {
+                oldCacheData = {id: 'memes', channels: [], type};
+            }
+            data = this._removeOldChannels(oldCacheData.channels, data);
         }
         let channelMap = this._buildMap(id, data, type);
         await this.storageEngine.upsert(this.buildId(this._buildMapId(id, type)), channelMap);
@@ -46,6 +56,24 @@ class ChannelMapCache extends BaseCache {
         } else {
             return null;
         }
+    }
+
+    _removeOldChannels(oldChannels, removeChannels) {
+        for (let removeId of removeChannels) {
+            if (oldChannels.indexOf(removeId) > -1) {
+                oldChannels.splice(oldChannels.indexOf(removeId), 1);
+            }
+        }
+        return oldChannels;
+    }
+
+    _checkDupes(oldIds, newIds) {
+        for (let oldId of oldIds) {
+            if (newIds.indexOf(oldId) > -1) {
+                newIds.splice(newIds.indexOf(oldId), 1);
+            }
+        }
+        return oldIds.concat(newIds);
     }
 
     _buildMapId(id, type) {
