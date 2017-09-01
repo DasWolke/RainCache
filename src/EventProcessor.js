@@ -36,7 +36,7 @@ class EventProcessor extends EventEmitter {
                 break;
             case 'GUILD_CREATE':
             case 'GUILD_UPDATE':
-                this.emit('debug', `Cached guild ${event.d.id}`);
+                this.emit('debug', `Cached guild ${event.d.id}|${event.d.name}`);
                 await this.guildCache.update(event.d.id, event.d);
                 break;
             case 'GUILD_DELETE':
@@ -54,6 +54,21 @@ class EventProcessor extends EventEmitter {
             case 'CHANNEL_DELETE':
                 await this.onChannelDelete(event);
                 break;
+            case 'GUILD_MEMBER_ADD':
+            case 'GUILD_MEMBER_UPDATE':
+                await this.memberCache.update(event.d.user.id, event.d.guild_id, event.d);
+                break;
+            case 'GUILD_MEMBER_REMOVE':
+                await this.memberCache.remove(event.d.user.id, event.d.guild_id);
+                break;
+            case 'GUILD_MEMBER_CHUNK': {
+                let guildMemberChunkPromises = [];
+                for (let member of event.d.members) {
+                    guildMemberChunkPromises.push(this.memberCache.update(member.user.id, event.d.guild_id, member));
+                }
+                await Promise.all(guildMemberChunkPromises);
+                break;
+            }
             default:
                 if (event.t !== 'PRESENCE_UPDATE') {
                     this.emit('debug', `Unknown Event ${event.t}`);
@@ -76,6 +91,7 @@ class EventProcessor extends EventEmitter {
             case 0:
             case 2:
                 await this.channelMapCache.update(channelCreateEvent.d.guild_id, [channelCreateEvent.d.id], 'guild');
+                this.emit('debug', `Caching guild channel ${channelCreateEvent.d.id}`);
                 return this.channelCache.update(channelCreateEvent.d.id, channelCreateEvent.d);
             default:
                 break;
@@ -85,6 +101,7 @@ class EventProcessor extends EventEmitter {
                 console.error(`Empty Recipients array for dm ${channelCreateEvent.d.id}`);
                 return;
             }
+            this.emit('debug', `Caching dm channel ${channelCreateEvent.d.id}`);
             await this.channelMapCache.update(channelCreateEvent.d.recipients[0].id, [channelCreateEvent.d.id], 'user');
             return this.channelCache.update(channelCreateEvent.d.id, channelCreateEvent.d);
         }

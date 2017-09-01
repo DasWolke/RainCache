@@ -3,6 +3,7 @@ let EventProcessor = require('./EventProcessor');
 let GuildCache = require('./cache/GuildCache');
 let ChannelCache = require('./cache/ChannelCache');
 let ChannelMap = require('./cache/ChannelMapCache');
+let MemberCache = require('./cache/MemberCache');
 const util = require('util');
 let EventEmitter;
 try {
@@ -24,7 +25,8 @@ class RainCache extends EventEmitter {
             options.cacheClasses = {
                 guild: GuildCache,
                 channel: ChannelCache,
-                channelMap: ChannelMap
+                channelMap: ChannelMap,
+                member: MemberCache
             };
         }
         if (!options.storage.default) {
@@ -58,7 +60,8 @@ class RainCache extends EventEmitter {
             cache: {
                 guild: this.cache.guild,
                 channel: this.cache.channel,
-                channelMap: this.cache.channelMap
+                channelMap: this.cache.channelMap,
+                member: this.cache.member
             }
         });
         if (!this.inbound.ready) {

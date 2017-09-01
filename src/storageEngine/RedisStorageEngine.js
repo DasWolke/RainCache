@@ -51,7 +51,7 @@ class RedisStorageEngine extends BaseStorageEngine {
             let hashKeys = await this.client.hkeysAsync(id);
             return this.client.hdelAsync(id, hashKeys);
         } else {
-            return this.client.deleteAsync(id);
+            return this.client.delAsync(id);
         }
     }
 

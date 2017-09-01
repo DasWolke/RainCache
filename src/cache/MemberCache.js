@@ -18,7 +18,7 @@ class MemberCache extends BaseCache {
             this.boundObject.user = user;
             return this.boundObject;
         }
-        let member = await this.storageEngine.get(this.buildId(id));
+        let member = await this.storageEngine.get(this.buildId(id, guildId));
         if (!member) {
             return null;
         }
@@ -27,11 +27,39 @@ class MemberCache extends BaseCache {
     }
 
     async update(id, guildId, data) {
-
+        if (this.boundObject) {
+            this.bindObject(data);
+            await this.update(this.boundObject.id, this.boundObject.guild_id, data);
+            return this;
+        }
+        if (!guildId) {
+            console.error(`Empty guild id for member ${id}`);
+            return;
+        }
+        if (!data.guild_id) {
+            data.guild_id = guildId;
+        }
+        if (!data.id) {
+            data.id = id;
+        }
+        if (data.user) {
+            // await this.users.update(data.user.id, data.user);
+            delete data.user;
+        }
+        await this.storageEngine.upsert(this.buildId(id, guildId), data);
+        return new MemberCache(this.storageEngine, this.users, data);
     }
 
     async remove(id, guildId) {
-
+        if (this.boundObject) {
+            return this.remove(this.boundObject.id, this.boundObject.guild_id);
+        }
+        let member = await this.storageEngine.get(this.buildId(id, guildId));
+        if (member) {
+            return this.storageEngine.remove(this.buildId(id, guildId));
+        } else {
+            return null;
+        }
     }
 
     buildId(userId, guildId) {

@@ -41,6 +41,14 @@ class GuildCache extends BaseCache {
                 console.log(`Cached channel ${channel.id}|#"${channel.name}"|${typeof channel.name}`);
             }
         }
+        if (data.members) {
+            let membersPromiseBatch = [];
+            for (let member of data.members) {
+                membersPromiseBatch.push(this.members.update(member.user.id, id, member));
+            }
+            await Promise.all(membersPromiseBatch);
+            console.log(`Cached ${data.members.length} Guild Members from guild ${id}|${data.name}`);
+        }
         delete data.members;
         delete data.voice_states;
         delete data.roles;
