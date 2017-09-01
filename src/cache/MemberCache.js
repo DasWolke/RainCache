@@ -43,7 +43,7 @@ class MemberCache extends BaseCache {
             data.id = id;
         }
         if (data.user) {
-            // await this.users.update(data.user.id, data.user);
+            await this.users.update(data.user.id, data.user);
             delete data.user;
         }
         await this.storageEngine.upsert(this.buildId(id, guildId), data);

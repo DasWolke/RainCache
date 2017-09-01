@@ -4,6 +4,8 @@ let GuildCache = require('./cache/GuildCache');
 let ChannelCache = require('./cache/ChannelCache');
 let ChannelMap = require('./cache/ChannelMapCache');
 let MemberCache = require('./cache/MemberCache');
+let UserCache = require('./cache/UserCache');
+let PresenceCache = require('./cache/PresenceCache');
 const util = require('util');
 let EventEmitter;
 try {
@@ -26,7 +28,9 @@ class RainCache extends EventEmitter {
                 guild: GuildCache,
                 channel: ChannelCache,
                 channelMap: ChannelMap,
-                member: MemberCache
+                member: MemberCache,
+                user: UserCache,
+                presence: PresenceCache
             };
         }
         if (!options.storage.default) {
@@ -61,7 +65,9 @@ class RainCache extends EventEmitter {
                 guild: this.cache.guild,
                 channel: this.cache.channel,
                 channelMap: this.cache.channelMap,
-                member: this.cache.member
+                member: this.cache.member,
+                user: this.cache.user,
+                presence: this.cache.presence
             }
         });
         if (!this.inbound.ready) {
@@ -102,7 +108,11 @@ class RainCache extends EventEmitter {
         }
         if (cacheClasses['member']) {
             let engine = this.getEngine(engines, 'member');
-            caches['member'] = new cacheClasses['member'](engine);
+            caches['member'] = new cacheClasses['member'](engine, caches['user']);
+        }
+        if (cacheClasses['presence']) {
+            let engine = this.getEngine(engines, 'presence');
+            caches['presence'] = new cacheClasses['presence'](engine, caches['user']);
         }
         if (cacheClasses['channelMap']) {
             let engine = this.getEngine(engines, 'channelMap');
@@ -114,7 +124,7 @@ class RainCache extends EventEmitter {
         }
         if (cacheClasses['guild']) {
             let engine = this.getEngine(engines, 'guild');
-            caches['guild'] = new cacheClasses['guild'](engine, caches['channel'], caches['role'], caches['member'], caches['emoji'], caches['channelMap']);
+            caches['guild'] = new cacheClasses['guild'](engine, caches['channel'], caches['role'], caches['member'], caches['emoji'], caches['presence'], caches['channelMap']);
         }
         return caches;
     }

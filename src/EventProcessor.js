@@ -9,15 +9,22 @@ try {
 class EventProcessor extends EventEmitter {
     constructor(options) {
         super();
-        this.options = options || {disabledEvents: {}};
+        this.options = options || {disabledEvents: {}, presenceInterval: 1000 * 5};
+        if (!this.options.presenceInterval) {
+            this.options.presenceInterval = 1000 * 5;
+        }
         this.guildCache = options.cache.guild;
         this.channelCache = options.cache.channel;
         this.memberCache = options.cache.member;
         this.roleCache = options.cache.role;
         this.userCache = options.cache.user;
         this.channelMapCache = options.cache.channelMap;
+        this.presenceCache = options.cache.presence;
         this.ready = false;
-        this.queue = [];
+        this.presenceQueue = {};
+        this.presenceFlush = setInterval(async () => {
+            await this.flushQueue();
+        }, this.options.presenceInterval);
     }
 
     async inbound(event) {
@@ -69,11 +76,39 @@ class EventProcessor extends EventEmitter {
                 await Promise.all(guildMemberChunkPromises);
                 break;
             }
+            case 'USER_UPDATE':
+                await this.userCache.update(event.d.id, event.d);
+                break;
+            case 'PRESENCE_UPDATE':
+                this.handlePresenceUpdate(event.d);
+                break;
             default:
                 if (event.t !== 'PRESENCE_UPDATE') {
                     this.emit('debug', `Unknown Event ${event.t}`);
                 }
                 break;
+        }
+    }
+
+    handlePresenceUpdate(presenceEvent) {
+        if (presenceEvent.roles) {
+            delete presenceEvent.roles;
+        }
+        if (presenceEvent.guild_id) {
+            delete presenceEvent.guild_id;
+        }
+        if (this.presenceQueue[presenceEvent.user.id]) {
+            this.presenceQueue[presenceEvent.user.id] = Object.assign(this.presenceQueue[presenceEvent.user.id], {
+                status: presenceEvent.status,
+                game: presenceEvent.game,
+                id: presenceEvent.user.id
+            });
+        } else {
+            this.presenceQueue[presenceEvent.user.id] = {
+                status: presenceEvent.status,
+                game: presenceEvent.game,
+                id: presenceEvent.user.id
+            };
         }
     }
 
@@ -121,6 +156,19 @@ class EventProcessor extends EventEmitter {
             await this.channelMapCache.update(channelDeleteEvent.d.recipients[0].id, [channelDeleteEvent.d.id], 'user', true);
             return this.channelCache.remove(channelDeleteEvent.d.id);
         }
+    }
+
+    async flushQueue() {
+        let queue = this.presenceQueue;
+        this.presenceQueue = {};
+        let presenceUpdatePromises = [];
+        for (let key in queue) {
+            if (queue.hasOwnProperty(key)) {
+                presenceUpdatePromises.push(this.presenceCache.update(key, queue[key]));
+            }
+        }
+        await Promise.all(presenceUpdatePromises);
+        this.emit('debug', `Flushed presence update queue with ${presenceUpdatePromises.length} updates`);
     }
 }
 
