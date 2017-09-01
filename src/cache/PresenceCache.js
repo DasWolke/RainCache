@@ -32,6 +32,7 @@ class PresenceCache extends BaseCache {
         }
         if (data.user) {
             await this.users.update(data.user.id, data.user);
+            delete data.user;
         }
         await this.storageEngine.upsert(this.buildId(id), data);
         return new PresenceCache(this.storageEngine, this.users, data);
