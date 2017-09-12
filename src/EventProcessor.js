@@ -82,6 +82,13 @@ class EventProcessor extends EventEmitter {
             case 'PRESENCE_UPDATE':
                 this.handlePresenceUpdate(event.d);
                 break;
+            case 'GUILD_ROLE_CREATE':
+            case 'GUILD_ROLE_UPDATE':
+                await this.roleCache.update(event.d.role.id, event.d.guild_id, event.d.role);
+                break;
+            case 'GUILD_ROLE_DELETE':
+                await this.roleCache.remove(event.d.guild_id, event.d.role_id);
+                break;
             default:
                 if (event.t !== 'PRESENCE_UPDATE') {
                     this.emit('debug', `Unknown Event ${event.t}`);
@@ -126,7 +133,7 @@ class EventProcessor extends EventEmitter {
             case 0:
             case 2:
                 await this.channelMapCache.update(channelCreateEvent.d.guild_id, [channelCreateEvent.d.id], 'guild');
-                this.emit('debug', `Caching guild channel ${channelCreateEvent.d.id}`);
+                // this.emit('debug', `Caching guild channel ${channelCreateEvent.d.id}`);
                 return this.channelCache.update(channelCreateEvent.d.id, channelCreateEvent.d);
             default:
                 break;
@@ -136,7 +143,7 @@ class EventProcessor extends EventEmitter {
                 console.error(`Empty Recipients array for dm ${channelCreateEvent.d.id}`);
                 return;
             }
-            this.emit('debug', `Caching dm channel ${channelCreateEvent.d.id}`);
+            // this.emit('debug', `Caching dm channel ${channelCreateEvent.d.id}`);
             await this.channelMapCache.update(channelCreateEvent.d.recipients[0].id, [channelCreateEvent.d.id], 'user');
             return this.channelCache.update(channelCreateEvent.d.id, channelCreateEvent.d);
         }

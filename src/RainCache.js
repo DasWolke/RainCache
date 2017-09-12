@@ -5,6 +5,7 @@ let ChannelCache = require('./cache/ChannelCache');
 let ChannelMap = require('./cache/ChannelMapCache');
 let MemberCache = require('./cache/MemberCache');
 let UserCache = require('./cache/UserCache');
+let RoleCache = require('./cache/RoleCache');
 let PresenceCache = require('./cache/PresenceCache');
 const util = require('util');
 let EventEmitter;
@@ -30,6 +31,7 @@ class RainCache extends EventEmitter {
                 channelMap: ChannelMap,
                 member: MemberCache,
                 user: UserCache,
+                role: RoleCache,
                 presence: PresenceCache
             };
         }
@@ -67,6 +69,7 @@ class RainCache extends EventEmitter {
                 channelMap: this.cache.channelMap,
                 member: this.cache.member,
                 user: this.cache.user,
+                role: this.cache.role,
                 presence: this.cache.presence
             }
         });

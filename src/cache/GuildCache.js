@@ -17,7 +17,7 @@ class GuildCache extends BaseCache {
         }
     }
 
-    async get (id) {
+    async get(id) {
         if (this.boundObject) {
             return this.boundObject;
         }
@@ -39,7 +39,7 @@ class GuildCache extends BaseCache {
             await this.guildChannelMap.update(id, data.channels.map(c => c.id));
             for (let channel of data.channels) {
                 await this.channels.update(channel.id, channel);
-                console.log(`Cached channel ${channel.id}|#"${channel.name}"|${typeof channel.name}`);
+                // console.log(`Cached channel ${channel.id}|#"${channel.name}"|${typeof channel.name}`);
             }
         }
         if (data.members) {
@@ -57,6 +57,14 @@ class GuildCache extends BaseCache {
             }
             await Promise.all(presencePromiseBatch);
             console.log(`Cached ${data.presences.length} presences from guild ${id}|${data.name}`);
+        }
+        if (data.roles) {
+            let rolePromiseBatch = [];
+            for (let role of data.roles) {
+                rolePromiseBatch.push(this.roles.update(role.id, id, role));
+            }
+            await Promise.all(rolePromiseBatch);
+            console.log(`Cached ${data.roles.length} roles from guild ${id}|${data.name}`);
         }
         delete data.members;
         delete data.voice_states;
@@ -77,7 +85,7 @@ class GuildCache extends BaseCache {
         let guild = await this.storageEngine.get(this.buildId(id));
         if (guild) {
             let channelMap = await this.guildChannelMap.get(id);
-            for (let channel of channelMap.data) {
+            for (let channel of channelMap.channels) {
                 await this.channels.remove(channel);
             }
             await this.guildChannelMap.remove(id);
