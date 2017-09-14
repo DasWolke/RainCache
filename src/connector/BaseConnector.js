@@ -5,7 +5,6 @@ try {
 } catch (e) {
     EventEmitter = require('events').EventEmitter;
 }
-
 class BaseConnector extends EventEmitter {
     constructor() {
         super();

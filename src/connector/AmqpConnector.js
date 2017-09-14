@@ -19,6 +19,7 @@ class AqmpConnector extends BaseConnector {
             // console.log(event.content.toString());
             this.emit('event', JSON.parse(event.content.toString()));
         });
+
     }
 }
 
