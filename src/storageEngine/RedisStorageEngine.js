@@ -10,8 +10,7 @@ class RedisStorageEngine extends BaseStorageEngine {
         super();
         this.client = null;
         this.ready = false;
-        this.namespace = options.namespace;
-        this.useHash = options.useHash;
+        this.useHash = options.useHash || false;
     }
 
     initialize(options) {
@@ -25,7 +24,7 @@ class RedisStorageEngine extends BaseStorageEngine {
 
     }
 
-    async get (id) {
+    async get(id) {
         if (this.useHash) {
             return this.client.hgetallAsync(id);
         } else {
@@ -56,6 +55,7 @@ class RedisStorageEngine extends BaseStorageEngine {
     }
 
     async filter(fn, ids, namespace) {
+        namespace = this.prepareNamespace(namespace);
         let resolvedDataArray = [];
         let data = [];
         if (!ids) {
@@ -64,19 +64,14 @@ class RedisStorageEngine extends BaseStorageEngine {
             data = ids;
         }
         for (let key of data) {
-            let resolvedData;
-            if (this.useHash) {
-                resolvedData = await this.client.hgetallAsync(key);
-                resolvedDataArray.push(resolvedData);
-            } else {
-                resolvedData = await this.client.get(key);
-                resolvedDataArray.push(resolvedData);
-            }
+            let resolvedData = await this.get(key);
+            resolvedDataArray.push(resolvedData);
         }
         return resolvedDataArray.filter(fn);
     }
 
     async find(fn, ids = null, namespace) {
+        namespace = this.prepareNamespace(namespace);
         let data = [];
         if (typeof ids === 'string' && !namespace) {
             namespace = ids;
@@ -88,12 +83,7 @@ class RedisStorageEngine extends BaseStorageEngine {
             data = ids;
         }
         for (let key of data) {
-            let resolvedData;
-            if (this.useHash) {
-                resolvedData = await this.client.hgetallAsync(key);
-            } else {
-                resolvedData = await this.client.get(key);
-            }
+            let resolvedData = await this.get(key);
             if (fn(resolvedData)) {
                 return resolvedData;
             }
@@ -108,8 +98,8 @@ class RedisStorageEngine extends BaseStorageEngine {
         return data ? JSON.parse(data) : null;
     }
 
-    updateNamespace(namespace) {
-        this.namespace = namespace;
+    prepareNamespace(namespace) {
+        return namespace.endsWith('*') ? namespace : namespace + '*';
     }
 }
 

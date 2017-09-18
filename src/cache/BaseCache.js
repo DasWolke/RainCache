@@ -10,6 +10,11 @@ class BaseCache {
         Object.assign(this, boundObject);
     }
 
+    bindGuild(guildId) {
+        this.boundGuild = guildId;
+        return this;
+    }
+
     buildId(id) {
         return `${this.namespace}.${id}`;
     }

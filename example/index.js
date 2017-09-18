@@ -14,7 +14,14 @@ let init = async () => {
 cache.on('debug', (data) => {
     console.log(data);
 });
-init().then(() => {
+init().then(async () => {
     console.log('owo');
-
+    let testGuild = await cache.guild.get('356857607551582210');
+    console.log(testGuild);
+    let members = await testGuild.members.filter(() => {
+        return true;
+    });
+    console.log(members);
+    let user = await members[0].user.get();
+    console.log(user);
 }).catch(e => console.error(e));

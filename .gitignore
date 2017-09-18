@@ -2,4 +2,6 @@
 example/config.json
 node_modules
 .idea
-package.lock.json
+package-lock.json
+raincache.iml
+yarn.lock

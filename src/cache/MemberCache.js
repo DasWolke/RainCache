@@ -6,14 +6,15 @@ class MemberCache extends BaseCache {
         super();
         this.storageEngine = storageEngine;
         this.namespace = 'member';
-        this.users = userCache;
+        this.user = userCache;
+        this.boundGuild = '';
         if (boundObject) {
             this.bindObject(boundObject);
         }
     }
 
-    async get (id, guildId) {
-        let user = await this.users.get(id);
+    async get(id, guildId = this.boundGuild) {
+        let user = await this.user.get(id);
         if (this.boundObject) {
             this.boundObject.user = user;
             return this.boundObject;
@@ -23,10 +24,10 @@ class MemberCache extends BaseCache {
             return null;
         }
         member.user = user;
-        return new MemberCache(this.storageEngine, this.users, member);
+        return new MemberCache(this.storageEngine, this.user.bindUserId(member.id), member);
     }
 
-    async update(id, guildId, data) {
+    async update(id, guildId = this.boundGuild, data) {
         if (this.boundObject) {
             this.bindObject(data);
             await this.update(this.boundObject.id, this.boundObject.guild_id, data);
@@ -43,14 +44,14 @@ class MemberCache extends BaseCache {
             data.id = id;
         }
         if (data.user) {
-            await this.users.update(data.user.id, data.user);
+            await this.user.update(data.user.id, data.user);
             delete data.user;
         }
         await this.storageEngine.upsert(this.buildId(id, guildId), data);
-        return new MemberCache(this.storageEngine, this.users, data);
+        return new MemberCache(this.storageEngine, this.user.bindUserId(data.id), data);
     }
 
-    async remove(id, guildId) {
+    async remove(id, guildId = this.boundGuild) {
         if (this.boundObject) {
             return this.remove(this.boundObject.id, this.boundObject.guild_id);
         }
@@ -60,6 +61,16 @@ class MemberCache extends BaseCache {
         } else {
             return null;
         }
+    }
+
+    async filter(fn, guildId = this.boundGuild, ids = null) {
+        let members = await this.storageEngine.filter(fn, ids, super.buildId(guildId));
+        return members.map(m => new MemberCache(this.storageEngine, this.user.bindUserId(m.id), m).bindGuild(this.boundGuild));
+    }
+
+    async find(fn, guildId = this.boundGuild, ids = null) {
+        let member = await this.storageEngine.find(fn, ids, super.buildId(guildId));
+        return new MemberCache(this.storageEngine, this.user.bindUserId(member.id), member);
     }
 
     buildId(userId, guildId) {

@@ -54,6 +54,11 @@ class ChannelCache extends BaseCache {
         let channels = await this.storageEngine.filter(fn, channelMap, this.namespace);
         return channels.map(c => new ChannelCache(this.storageEngine, this.permissionOverwrites, this.recipients, c));
     }
+
+    async find(fn, channelMap) {
+        let channel = await this.storageEngine.find(fn, channelMap, this.namespace);
+        return new ChannelCache(this.storageEngine, this.permissionOverwrites, this.recipients, channel);
+    }
 }
 
 module.exports = ChannelCache;

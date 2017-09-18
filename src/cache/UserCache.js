@@ -11,7 +11,7 @@ class UserCache extends BaseCache {
         }
     }
 
-    async get(id) {
+    async get(id = this.id) {
         if (this.boundObject) {
             return this.boundObject;
         }
@@ -22,7 +22,7 @@ class UserCache extends BaseCache {
         return new UserCache(this.storageEngine, user);
     }
 
-    async update(id, data) {
+    async update(id = this.id, data) {
         if (this.boundObject) {
             this.bindObject(data);
             await this.update(id, data);
@@ -32,7 +32,7 @@ class UserCache extends BaseCache {
         return new UserCache(this.storageEngine, data);
     }
 
-    async remove(id) {
+    async remove(id = this.id) {
         if (this.boundObject) {
             return this.remove(this.boundObject.id);
         }
@@ -52,6 +52,11 @@ class UserCache extends BaseCache {
     async find(fn, ids = null) {
         let user = await this.storageEngine.find(fn, ids, this.namespace);
         return new UserCache(this.storageEngine, user);
+    }
+
+    bindUserId(userId) {
+        this.id = userId;
+        return this;
     }
 }
 

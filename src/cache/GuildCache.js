@@ -23,7 +23,7 @@ class GuildCache extends BaseCache {
         }
         let guild = await this.storageEngine.get(this.buildId(id));
         if (guild) {
-            return new GuildCache(this.storageEngine, this.channels, this.roles, this.members, this.emojis, guild);
+            return new GuildCache(this.storageEngine, this.channels.bindGuild(guild.id), this.roles.bindGuild(guild.id), this.members.bindGuild(guild.id), this.emojis, this.presences.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id), guild);
         } else {
             return null;
         }
@@ -75,7 +75,7 @@ class GuildCache extends BaseCache {
         delete data.channels;
         await this.storageEngine.upsert(this.buildId(id), data);
         let guild = await this.storageEngine.get(this.buildId(id));
-        return new GuildCache(this.storageEngine, this.channels, this.roles, this.members, this.emojis, guild);
+        return new GuildCache(this.storageEngine, this.channels.bindGuild(guild.id), this.roles.bindGuild(guild.id), this.members.bindGuild(guild.id), this.emojis.bindGuild(guild.id), this.presences.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id), guild);
     }
 
     async remove(id) {
@@ -97,12 +97,12 @@ class GuildCache extends BaseCache {
 
     async filter(fn) {
         let guilds = await this.storageEngine.filter(fn, this.namespace);
-        return guilds.map(g => new GuildCache(this.storageEngine, this.channels, this.roles, this.members, this.presences, this.emojis, g));
+        return guilds.map(g => new GuildCache(this.storageEngine, this.channels, this.roles.bindGuild(g.id), this.members.bindGuild(g.id), this.emojis.bindGuild(g.id), this.presences.bindGuild(g.id), this.guildChannelMap.bindGuild(g.id), g));
     }
 
     async find(fn) {
         let guild = await this.storageEngine.find(fn, this.namespace);
-        return new GuildCache(this.storageEngine, this.channels, this.roles, this.members, this.presences, this.emojis, guild);
+        return new GuildCache(this.storageEngine, this.channels.bindGuild(guild.id), this.roles.bindGuild(guild.id), this.members.bindGuild(guild.id), this.emojis.bindGuild(guild.id), this.presences.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id), guild);
     }
 }
 
