@@ -18,6 +18,7 @@ class EventProcessor extends EventEmitter {
         this.memberCache = options.cache.member;
         this.roleCache = options.cache.role;
         this.userCache = options.cache.user;
+        this.emojiCache = options.cache.emoji;
         this.channelMapCache = options.cache.channelMap;
         this.presenceCache = options.cache.presence;
         this.ready = false;
@@ -89,6 +90,25 @@ class EventProcessor extends EventEmitter {
             case 'GUILD_ROLE_DELETE':
                 await this.roleCache.remove(event.d.guild_id, event.d.role_id);
                 break;
+            case 'GUILD_EMOJIS_UPDATE': {
+                let oldEmotes = await this.emojiCache.filter(() => true, event.d.guild_id);
+                if (!oldEmotes || oldEmotes.length === 0) {
+                    oldEmotes = [];
+                }
+                for (let emoji of event.d.emojis) {
+                    let oldEmote = oldEmotes.find(e => e.id === emoji.id);
+                    if (!oldEmote || oldEmote !== emoji) {
+                        await this.emojiCache.update(emoji.id, event.d.guild_id, emoji);
+                    }
+                }
+                for (let oldEmote of oldEmotes) {
+                    let newEmote = event.d.emojis.find(e => e.id === oldEmote.id);
+                    if (!newEmote) {
+                        await this.emojiCache.remove(oldEmote.id, event.d.guild_id);
+                    }
+                }
+                break;
+            }
             default:
                 if (event.t !== 'PRESENCE_UPDATE') {
                     this.emit('debug', `Unknown Event ${event.t}`);

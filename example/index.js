@@ -17,11 +17,11 @@ cache.on('debug', (data) => {
 init().then(async () => {
     console.log('owo');
     let testGuild = await cache.guild.get('356857607551582210');
-    console.log(testGuild);
+    // console.log(testGuild);
     let members = await testGuild.members.filter(() => {
         return true;
     });
-    console.log(members);
+    // console.log(members);
     let user = await members[0].user.get();
-    console.log(user);
+    // console.log(user);
 }).catch(e => console.error(e));

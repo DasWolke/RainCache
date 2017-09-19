@@ -53,12 +53,12 @@ class RoleCache extends BaseCache {
         }
     }
 
-    async filter(guildId, ids = null, fn) {
+    async filter(fn, guildId = this.boundGuild, ids = null) {
         let roles = await this.storageEngine.filter(fn, ids, super.buildId(guildId));
         return roles.map(r => new RoleCache(this.storageEngine, r));
     }
 
-    async find(guildId, ids = null, fn) {
+    async find(fn, guildId = this.boundGuild, ids = null) {
         let role = await this.storageEngine.find(fn, ids, super.buildId(guildId));
         return new RoleCache(this.storageEngine, role);
     }

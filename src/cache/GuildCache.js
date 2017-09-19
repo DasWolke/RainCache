@@ -23,7 +23,7 @@ class GuildCache extends BaseCache {
         }
         let guild = await this.storageEngine.get(this.buildId(id));
         if (guild) {
-            return new GuildCache(this.storageEngine, this.channels.bindGuild(guild.id), this.roles.bindGuild(guild.id), this.members.bindGuild(guild.id), this.emojis, this.presences.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id), guild);
+            return new GuildCache(this.storageEngine, this.channels.bindGuild(guild.id), this.roles.bindGuild(guild.id), this.members.bindGuild(guild.id), this.emojis.bindGuild(guild.id), this.presences.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id), guild);
         } else {
             return null;
         }
