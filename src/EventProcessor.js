@@ -69,12 +69,13 @@ class EventProcessor extends EventEmitter {
             case 'GUILD_MEMBER_REMOVE':
                 await this.memberCache.remove(event.d.user.id, event.d.guild_id);
                 break;
-            case 'GUILD_MEMBER_CHUNK': {
+            case 'GUILD_MEMBERS_CHUNK': {
                 let guildMemberChunkPromises = [];
                 for (let member of event.d.members) {
                     guildMemberChunkPromises.push(this.memberCache.update(member.user.id, event.d.guild_id, member));
                 }
                 await Promise.all(guildMemberChunkPromises);
+                this.emit('debug', `Cached ${guildMemberChunkPromises.length} Members from Guild Member Chunk`);
                 break;
             }
             case 'USER_UPDATE':
