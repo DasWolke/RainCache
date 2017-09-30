@@ -23,7 +23,7 @@ class RainCache extends EventEmitter {
             throw new Error('No storage engines were passed');
         }
         if (!inboundConnector) {
-            throw new Error('Missing inbound connector, cache would not work without!');
+            throw new Error('RainCache will not work without a inboundConnector!');
         }
         if (!options.cacheClasses) {
             options.cacheClasses = {

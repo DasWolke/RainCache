@@ -38,6 +38,7 @@ class GuildCache extends BaseCache {
         if (data.channels) {
             await this.guildChannelMap.update(id, data.channels.map(c => c.id));
             for (let channel of data.channels) {
+                channel.guild_id = id;
                 await this.channels.update(channel.id, channel);
                 // console.log(`Cached channel ${channel.id}|#"${channel.name}"|${typeof channel.name}`);
             }
@@ -45,6 +46,7 @@ class GuildCache extends BaseCache {
         if (data.members) {
             let membersPromiseBatch = [];
             for (let member of data.members) {
+                member.guild_id = id;
                 membersPromiseBatch.push(this.members.update(member.user.id, id, member));
             }
             await Promise.all(membersPromiseBatch);
