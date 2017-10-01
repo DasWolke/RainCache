@@ -22,9 +22,6 @@ class RainCache extends EventEmitter {
         if (!options.storage) {
             throw new Error('No storage engines were passed');
         }
-        if (!inboundConnector) {
-            throw new Error('RainCache will not work without a inboundConnector!');
-        }
         if (!options.cacheClasses) {
             options.cacheClasses = {
                 guild: GuildCache,
