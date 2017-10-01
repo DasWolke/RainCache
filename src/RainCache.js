@@ -73,18 +73,20 @@ class RainCache extends EventEmitter {
                 presence: this.cache.presence
             }
         });
-        if (!this.inbound.ready) {
+        if (this.inbound && !this.inbound.ready) {
             await this.inbound.initialize();
         }
         if (this.outbound && !this.outbound.ready) {
             await this.outbound.initialize();
         }
-        this.inbound.on('event', async (event) => {
-            await this.eventProcessor.inbound(event);
-            if (this.outbound) {
-                this.outbound.send(event);
-            }
-        });
+        if (this.inbound) {
+            this.inbound.on('event', async (event) => {
+                await this.eventProcessor.inbound(event);
+                if (this.outbound) {
+                    this.outbound.send(event);
+                }
+            });
+        }
         if (this.options.debug) {
             this.eventProcessor.on('debug', (log) => this.emit('debug', log));
         }
@@ -137,10 +139,31 @@ class RainCache extends EventEmitter {
     }
 }
 
-module.exports = RainCache;
+module
+    .exports = RainCache;
 
-process.on('unhandledRejection', (reason, promise) => {
-    if (!reason) return;
-    console.error(`Unhandled rejection: ${reason} - ${util.inspect(promise)}`);
+process
+    .on(
+        'unhandledRejection'
+        , (reason
+            ,
+           promise) => {
+            if (
 
-});
+                !
+                    reason
+            )
+                return;
+            console
+                .error(
+                    `Unhandled rejection: $ {
+    reason
+}
+
+ - $
+{
+    util.inspect(promise)
+}
+`);
+
+        });
