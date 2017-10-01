@@ -1,7 +1,21 @@
 'use strict';
 const BaseCache = require('./BaseCache');
 
+/**
+ * Cache responsible for guilds
+ */
 class GuildCache extends BaseCache {
+    /**
+     * Create a new Guildcache
+     * @param storageEngine - Storage engine to use for this cache
+     * @param channelCache - Instantiated ChannelCache class
+     * @param roleCache - Instantiated RoleCache class
+     * @param memberCache - Instantiated MemberCache class
+     * @param emojiCache - Instantiated EmojiCache class
+     * @param presenceCache - Instantiated PresenceCache class
+     * @param guildToChannelCache - Instantiated ChannelMap class
+     * @param boundObject - Optional, may be used to bind a guild object to the cache
+     */
     constructor(storageEngine, channelCache, roleCache, memberCache, emojiCache, presenceCache, guildToChannelCache, boundObject) {
         super();
         this.storageEngine = storageEngine;
@@ -17,6 +31,11 @@ class GuildCache extends BaseCache {
         }
     }
 
+    /**
+     * Retrieves a guild via id
+     * @param id - Discord id of the guild
+     * @returns {Promise.<GuildCache|null>} Returns either a Guild Object or null if the guild does not exist.
+     */
     async get(id) {
         if (this.boundObject) {
             return this.boundObject;
@@ -29,6 +48,16 @@ class GuildCache extends BaseCache {
         }
     }
 
+    /**
+     * Upsert a guild object
+     * @param {String} id - id of the guild
+     * @param {Object} data - data received from the event
+     * @param {Array|} data.channels - Array of channels
+     * @param {Array|} data.members - Array of members
+     * @param {Array|} data.presences - Array of presences
+     * @param {Array|} data.roles - Array of roles
+     * @returns {Promise.<GuildCache>}
+     */
     async update(id, data) {
         if (this.boundObject) {
             this.bindObject(data); //using bindobject() to assure the data of the class is valid
@@ -80,6 +109,11 @@ class GuildCache extends BaseCache {
         return new GuildCache(this.storageEngine, this.channels.bindGuild(guild.id), this.roles.bindGuild(guild.id), this.members.bindGuild(guild.id), this.emojis.bindGuild(guild.id), this.presences.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id), guild);
     }
 
+    /**
+     * Removes a guild from the cache.
+     * @param {String} id - id of the guild to remove
+     * @returns {Promise.<null>}
+     */
     async remove(id) {
         if (this.boundObject) {
             return this.remove(this.boundObject.id);
@@ -97,11 +131,21 @@ class GuildCache extends BaseCache {
         }
     }
 
+    /**
+     * Filter through the collection of guilds
+     * @param fn - Filter function
+     * @returns {Promise.<Array>}
+     */
     async filter(fn) {
         let guilds = await this.storageEngine.filter(fn, this.namespace);
         return guilds.map(g => new GuildCache(this.storageEngine, this.channels, this.roles.bindGuild(g.id), this.members.bindGuild(g.id), this.emojis.bindGuild(g.id), this.presences.bindGuild(g.id), this.guildChannelMap.bindGuild(g.id), g));
     }
 
+    /**
+     * Filter through the collection of guilds and return the first match
+     * @param fn - Filter function
+     * @returns {Promise.<GuildCache>}
+     */
     async find(fn) {
         let guild = await this.storageEngine.find(fn, this.namespace);
         return new GuildCache(this.storageEngine, this.channels.bindGuild(guild.id), this.roles.bindGuild(guild.id), this.members.bindGuild(guild.id), this.emojis.bindGuild(guild.id), this.presences.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id), guild);
