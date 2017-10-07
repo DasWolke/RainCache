@@ -139,31 +139,4 @@ class RainCache extends EventEmitter {
     }
 }
 
-module
-    .exports = RainCache;
-
-process
-    .on(
-        'unhandledRejection'
-        , (reason
-            ,
-           promise) => {
-            if (
-
-                !
-                    reason
-            )
-                return;
-            console
-                .error(
-                    `Unhandled rejection: $ {
-    reason
-}
-
- - $
-{
-    util.inspect(promise)
-}
-`);
-
-        });
+module.exports = RainCache;
