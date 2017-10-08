@@ -37,6 +37,7 @@ class RoleCache extends BaseCache {
         if (!data.id) {
             data.id = id;
         }
+        await this.addToIndex(id, guildId);
         await this.storageEngine.upsert(this.buildId(id, guildId), data);
         return new RoleCache(this.storageEngine, data);
     }
@@ -47,6 +48,7 @@ class RoleCache extends BaseCache {
         }
         let role = await this.storageEngine.get(this.buildId(id, guildId));
         if (role) {
+            await this.removeFromIndex(id, guildId);
             return this.storageEngine.remove(this.buildId(id, guildId));
         } else {
             return null;

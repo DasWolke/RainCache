@@ -8,7 +8,6 @@ let UserCache = require('./cache/UserCache');
 let RoleCache = require('./cache/RoleCache');
 let EmojiCache = require('./cache/EmojiCache');
 let PresenceCache = require('./cache/PresenceCache');
-const util = require('util');
 let EventEmitter;
 try {
     EventEmitter = require('eventemitter3');
@@ -125,7 +124,7 @@ class RainCache extends EventEmitter {
         }
         if (cacheClasses['channel']) {
             let engine = this.getEngine(engines, 'channel');
-            caches['channel'] = new cacheClasses['channel'](engine, caches['permOverwrite'], caches['user']);
+            caches['channel'] = new cacheClasses['channel'](engine, caches['channelMap'], caches['permOverwrite'], caches['user']);
         }
         if (cacheClasses['guild']) {
             let engine = this.getEngine(engines, 'guild');

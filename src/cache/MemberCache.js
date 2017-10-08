@@ -47,6 +47,7 @@ class MemberCache extends BaseCache {
             await this.user.update(data.user.id, data.user);
             delete data.user;
         }
+        await this.addToIndex(id, guildId);
         await this.storageEngine.upsert(this.buildId(id, guildId), data);
         return new MemberCache(this.storageEngine, this.user.bindUserId(data.id), data);
     }
@@ -57,6 +58,7 @@ class MemberCache extends BaseCache {
         }
         let member = await this.storageEngine.get(this.buildId(id, guildId));
         if (member) {
+            await this.storageEngine.removeFromIndex(id, guildId);
             return this.storageEngine.remove(this.buildId(id, guildId));
         } else {
             return null;
@@ -76,6 +78,7 @@ class MemberCache extends BaseCache {
     buildId(userId, guildId) {
         return `${this.namespace}.${guildId}.${userId}`;
     }
+
 }
 
 module.exports = MemberCache;

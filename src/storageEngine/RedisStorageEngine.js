@@ -24,8 +24,8 @@ class RedisStorageEngine extends BaseStorageEngine {
 
     }
 
-    async get(id) {
-        if (this.useHash) {
+    async get(id, useHash = this.useHash) {
+        if (useHash) {
             return this.client.hgetallAsync(id);
         } else {
             let rawData = await this.client.getAsync(id);
@@ -33,9 +33,9 @@ class RedisStorageEngine extends BaseStorageEngine {
         }
     }
 
-    async upsert(id, updateData) {
+    async upsert(id, updateData, useHash = this.useHash) {
         let data;
-        if (this.useHash) {
+        if (useHash) {
             return this.client.hmsetAsync(id, updateData);
         } else {
             data = await this.get(id);
@@ -45,8 +45,8 @@ class RedisStorageEngine extends BaseStorageEngine {
         }
     }
 
-    async remove(id) {
-        if (this.useHash) {
+    async remove(id, useHash = this.useHash) {
+        if (useHash) {
             let hashKeys = await this.client.hkeysAsync(id);
             return this.client.hdelAsync(id, hashKeys);
         } else {
@@ -78,7 +78,7 @@ class RedisStorageEngine extends BaseStorageEngine {
             ids = null;
         }
         if (!ids) {
-            data = await this.client.keysAsync(namespace);
+            data = await this.getListMembers(namespace);
         } else {
             data = ids;
         }
@@ -88,6 +88,30 @@ class RedisStorageEngine extends BaseStorageEngine {
                 return resolvedData;
             }
         }
+    }
+
+    async getListMembers(listId) {
+        return this.client.smembersAsync(listId);
+    }
+
+    async addToList(listId, ids) {
+        return this.client.saddAsync(listId, ids);
+    }
+
+    async isListMember(id, listId) {
+        return this.client.sismemberAsync(listId, id);
+    }
+
+    async removeFromList(id, listId) {
+        return this.client.sremAsync(listId, id);
+    }
+
+    async removeList(listId) {
+        return this.remove(listId, false);
+    }
+
+    async getListCount(listId) {
+        return this.client.scardAsync(listId);
     }
 
     prepareData(data) {

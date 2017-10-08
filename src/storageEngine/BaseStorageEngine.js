@@ -9,7 +9,7 @@ class BaseStorageEngine {
         // Initializes the engine, e.g. db connection, etc..
     }
 
-    get (id) {
+    get(id) {
 
     }
 
@@ -18,6 +18,30 @@ class BaseStorageEngine {
     }
 
     remove(id) {
+
+    }
+
+    getListMembers(listid) {
+
+    }
+
+    addToList(ids, listId) {
+
+    }
+
+    isListMember(id, listId) {
+
+    }
+
+    removeFromList(id, listId) {
+
+    }
+
+    removeList(listId) {
+
+    }
+
+    getListCount(listId) {
 
     }
 }

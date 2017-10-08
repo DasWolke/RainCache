@@ -28,6 +28,7 @@ class UserCache extends BaseCache {
             await this.update(id, data);
             return this;
         }
+        await this.addToIndex(id);
         await this.storageEngine.upsert(this.buildId(id), data);
         return new UserCache(this.storageEngine, data);
     }
@@ -38,6 +39,7 @@ class UserCache extends BaseCache {
         }
         let user = await this.storageEngine.get(this.buildId(id));
         if (user) {
+            await this.removeFromIndex(id);
             return this.storageEngine.remove(this.buildId(id));
         } else {
             return null;
@@ -57,6 +59,26 @@ class UserCache extends BaseCache {
     bindUserId(userId) {
         this.id = userId;
         return this;
+    }
+
+    async addToIndex(id) {
+        return this.storageEngine.addToList(this.namespace, id);
+    }
+
+    async removeFromIndex(id) {
+        return this.storageEngine.removeFromList(this.namespace, id);
+    }
+
+    async isIndexed(id) {
+        return this.storageEngine.isListMember(this.namespace, id);
+    }
+
+    async getIndexMembers() {
+        return this.storageEngine.getListMembers(this.namespace);
+    }
+
+    async removeIndex() {
+        return this.storageEngine.removeList(this.namespace);
     }
 }
 

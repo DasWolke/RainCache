@@ -5,6 +5,7 @@ let Redis = require('../src/storageEngine/RedisStorageEngine');
 let con = new AmqpConnector({});
 let cache = new RainCache({storage: {default: new Redis({host: 'localhost'})}, debug: false}, con, con);
 let blocked = require('blocked');
+const util = require("util");
 blocked(ms => {
     console.log(`Blocked for ${ms}ms`);
 }, {threshold: 20});
@@ -16,11 +17,11 @@ cache.on('debug', (data) => {
 });
 init().then(async () => {
     console.log('owo');
-    let testGuild = await cache.guild.get('356857607551582210');
-    // console.log(testGuild);
-    let members = await testGuild.members.filter(() => {
-        return true;
-    });
-    // console.log(members);
-    let user = await members[0].user.get();
 }).catch(e => console.error(e));
+
+process.on('unhandledRejection', (reason, promise) => {
+    if (!reason) {
+        return;
+    }
+    console.error(`Unhandled Rejection ${util.inspect(promise)}`);
+});

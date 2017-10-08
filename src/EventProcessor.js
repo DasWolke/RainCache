@@ -57,6 +57,8 @@ class EventProcessor extends EventEmitter {
                 break;
             case 'CHANNEL_CREATE':
             case 'CHANNEL_UPDATE':
+                // console.log(event);
+                // console.log(event.d.permission_overwrites);
                 await this.onChannelCreate(event);
                 break;
             case 'CHANNEL_DELETE':

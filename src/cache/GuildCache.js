@@ -104,6 +104,7 @@ class GuildCache extends BaseCache {
         delete data.emojis;
         delete data.features;
         delete data.channels;
+        await this.addToIndex(id);
         await this.storageEngine.upsert(this.buildId(id), data);
         let guild = await this.storageEngine.get(this.buildId(id));
         return new GuildCache(this.storageEngine, this.channels.bindGuild(guild.id), this.roles.bindGuild(guild.id), this.members.bindGuild(guild.id), this.emojis.bindGuild(guild.id), this.presences.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id), guild);
@@ -121,10 +122,19 @@ class GuildCache extends BaseCache {
         let guild = await this.storageEngine.get(this.buildId(id));
         if (guild) {
             let channelMap = await this.guildChannelMap.get(id);
+            let roles = await this.roles.getIndexMembers(id);
+            let emojis = await this.emojis.getIndexMembers(id);
+            for (let emoji of emojis) {
+                await this.emojis.remove(id, emoji);
+            }
+            for (let role of roles) {
+                await this.roles.remove(id, role);
+            }
             for (let channel of channelMap.channels) {
                 await this.channels.remove(channel);
             }
             await this.guildChannelMap.remove(id);
+            await this.removeFromIndex(id);
             return this.storageEngine.remove(this.buildId(id));
         } else {
             return null;
@@ -149,6 +159,26 @@ class GuildCache extends BaseCache {
     async find(fn) {
         let guild = await this.storageEngine.find(fn, this.namespace);
         return new GuildCache(this.storageEngine, this.channels.bindGuild(guild.id), this.roles.bindGuild(guild.id), this.members.bindGuild(guild.id), this.emojis.bindGuild(guild.id), this.presences.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id), guild);
+    }
+
+    async addToIndex(id) {
+        return this.storageEngine.addToList(this.namespace, id);
+    }
+
+    async removeFromIndex(id) {
+        return this.storageEngine.removeFromList(this.namespace, id);
+    }
+
+    async isIndexed(id) {
+        return this.storageEngine.isListMember(this.namespace, id);
+    }
+
+    async getIndexMembers() {
+        return this.storageEngine.getListMembers(this.namespace);
+    }
+
+    async removeIndex() {
+        return this.storageEngine.removeList(this.namespace);
     }
 }
 

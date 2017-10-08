@@ -29,9 +29,10 @@ class ChannelMapCache extends BaseCache {
         if (this.boundObject) {
             return this.boundObject;
         }
-        let channelMap = await this.storageEngine.get(this.buildId(this._buildMapId(id, type)));
+        let channelMapId = this.buildId(this._buildMapId(id, type));
+        let channelMap = await this.storageEngine.getListMembers(channelMapId);
         if (channelMap) {
-            return new ChannelMapCache(this.storageEngine, channelMap);
+            return new ChannelMapCache(this.storageEngine, this._buildMap(id, channelMap, type));
         } else {
             return null;
         }
@@ -47,9 +48,8 @@ class ChannelMapCache extends BaseCache {
      */
     async update(id, data, type = 'guild', remove = false) {
         if (this.boundObject) {
-            data = this._buildMap(id, data, type);
-            this.bindObject(data); //using bindobject() to assure the data of the class is valid
-            await this.update(this.boundObject.id, data);
+            this.bindObject(this._buildMap(id, data, type)); //using bindobject() to assure the data of the class is valid
+            await this.update(this.boundObject.id, data, this.boundObject.type);
             return this;
         }
         let oldCacheData = await this.get(id, type);
@@ -58,14 +58,14 @@ class ChannelMapCache extends BaseCache {
         }
         if (remove) {
             if (!oldCacheData) {
-                oldCacheData = {id: 'memes', channels: [], type};
+                oldCacheData = {channels: []};
             }
             data = this._removeOldChannels(oldCacheData.channels, data);
         }
-        let channelMap = this._buildMap(id, data, type);
-        await this.storageEngine.upsert(this.buildId(this._buildMapId(id, type)), channelMap);
-        channelMap = await this.storageEngine.get(this.buildId(this._buildMapId(id, type)));
-        return new ChannelMapCache(this.storageEngine, channelMap);
+        let channelMapId = this.buildId(this._buildMapId(id, type));
+        await this.remove(id, type);
+        await this.storageEngine.addToList(channelMapId, data);
+        return new ChannelMapCache(this.storageEngine, this._buildMap(id, data, type));
     }
 
     /**
@@ -76,11 +76,12 @@ class ChannelMapCache extends BaseCache {
      */
     async remove(id, type = 'guild') {
         if (this.boundObject) {
-            return this.storageEngine.remove(this.boundObject.id);
+            return this.storageEngine.remove(this.boundObject.id, this.boundObject.type);
         }
-        let channelMap = await this.storageEngine.get(this.buildId(this._buildMapId(id, type)));
+        let channelMapId = this.buildId(this._buildMapId(id, type));
+        let channelMap = await this.storageEngine.getListMembers(channelMapId);
         if (channelMap) {
-            return this.storageEngine.remove(channelMap.id);
+            return this.storageEngine.remove(channelMapId);
         } else {
             return null;
         }
@@ -130,15 +131,15 @@ class ChannelMapCache extends BaseCache {
     }
 
     /**
-     * Build a map object to save in the storage engine
+     * Build a map object which is bound to the channelMapCache object
      * @param {String} id - Id of the guild/user
-     * @param {Array} data - Array of channel ids
+     * @param {Array} channels - Array of channel ids
      * @param {String} type - type of the map
-     * @returns {{id: String, channels: Array, type: String}}
+     * @returns {{id: *, channels: *, type: *}}
      * @private
      */
-    _buildMap(id, data, type) {
-        return {id: this._buildMapId(id, type), channels: data, type};
+    _buildMap(id, channels, type) {
+        return {id, channels, type};
     }
 }
 

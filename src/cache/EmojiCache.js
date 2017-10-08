@@ -29,6 +29,7 @@ class EmojiCache extends BaseCache {
             await this.update(id, guildId, data);
             return this;
         }
+        await this.addToIndex(id, guildId);
         await this.storageEngine.upsert(this.buildId(id, guildId), data);
         return new EmojiCache(this.storageEngine, this.users, data);
     }
@@ -39,6 +40,7 @@ class EmojiCache extends BaseCache {
         }
         let emoji = await this.storageEngine.get(this.buildId(id, guildId));
         if (emoji) {
+            await this.removeFromIndex(id, guildId);
             return this.storageEngine.remove(this.buildId(id, guildId));
         } else {
             return null;
