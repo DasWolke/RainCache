@@ -144,6 +144,8 @@ class EventProcessor extends EventEmitter {
 
     async processReady(readyEvent) {
         let updates = [];
+        updates.push(this.userCache.update('self', {id: readyEvent.d.user.id}));
+        updates.push(this.userCache.update(readyEvent.d.user.id, readyEvent.d.user));
         for (let guild of readyEvent.d.guilds) {
             this.emit('debug', `Caching guild ${guild.id} from ready`);
             updates.push(this.guildCache.update(guild.id, guild));

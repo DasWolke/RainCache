@@ -58,7 +58,7 @@ class MemberCache extends BaseCache {
         }
         let member = await this.storageEngine.get(this.buildId(id, guildId));
         if (member) {
-            await this.storageEngine.removeFromIndex(id, guildId);
+            await this.removeFromIndex(id, guildId);
             return this.storageEngine.remove(this.buildId(id, guildId));
         } else {
             return null;

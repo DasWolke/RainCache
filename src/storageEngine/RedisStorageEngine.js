@@ -11,11 +11,12 @@ class RedisStorageEngine extends BaseStorageEngine {
         this.client = null;
         this.ready = false;
         this.useHash = options.useHash || false;
+        this.options = options;
     }
 
-    initialize(options) {
+    initialize() {
         return new Promise((res) => {
-            this.client = redis.createClient(options);
+            this.client = redis.createClient(this.options);
             this.client.once('ready', () => {
                 this.ready = true;
                 return res();
