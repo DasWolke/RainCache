@@ -4,13 +4,13 @@ function RainCache(...args) {
     return new Raincache(...args);
 }
 
-RainCache.Connectors = {
+module.exports.Connectors = {
     AmqpConnector: require('./src/connector/AmqpConnector'),
     DirectConnector: require('./src/connector/DirectConnector'),
 };
 
-RainCache.Engines = {
+module.exports.Engines = {
     RedisStorageEngine: require('./src/storageEngine/RedisStorageEngine'),
 };
-RainCache.cache = RainCache;
+module.exports.RainCache = RainCache;
 module.exports = RainCache;
