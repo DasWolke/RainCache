@@ -12,5 +12,5 @@ module.exports.Connectors = {
 module.exports.Engines = {
     RedisStorageEngine: require('./src/storageEngine/RedisStorageEngine'),
 };
-module.exports.RainCache = RainCache;
+module.exports.RainCache = Raincache;
 module.exports = RainCache;
