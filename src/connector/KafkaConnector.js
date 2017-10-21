@@ -30,6 +30,7 @@ class KafkaConnector extends BaseConnector {
         this.channel = new Kafka.KafkaConsumer({
             //'debug': 'all',
             'metadata.broker.list': this.options.url,
+            'message.max.bytes': '200000000',
             'group.id': 'node-rdkafka-consumer',
             'enable.auto.commit': false
         });
