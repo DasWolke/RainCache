@@ -46,17 +46,17 @@ class KafkaConnector extends BaseConnector {
         //counter to commit offsets every numMessages are received
         var counter = 0;
         var numMessages = 5;
-
+        var thonk = this;
         this.channel.on('ready', function (arg) {
             console.log('consumer ready.' + JSON.stringify(arg));
-            this.channel.subscribe(['test-pre-cache']);
-            this.channel.consume();
+            thonk.channel.subscribe(['test-pre-cache']);
+            thonk.channel.consume();
         });
 
         this.channel.on('data', function (m) {
             counter++;
             //committing offsets every numMessages
-            if (counter % numMessages === 0) { this.channel.commit(m); }
+            if (counter % numMessages === 0) { thonk.channel.commit(m); }
 
             this.emit('event', JSON.parse(m.value.toString()));
         });
