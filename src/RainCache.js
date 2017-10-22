@@ -80,6 +80,7 @@ class RainCache extends EventEmitter {
         }
         if (this.inbound) {
             this.inbound.on('event', async (event) => {
+                console.log(event)
                 await this.eventProcessor.inbound(event);
                 if (this.outbound) {
                     this.outbound.send(event);
