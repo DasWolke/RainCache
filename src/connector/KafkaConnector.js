@@ -59,8 +59,9 @@ class KafkaConnector extends BaseConnector {
             counter++;
             //committing offsets every numMessages
             if (counter % numMessages === 0) { thonk.channel.commit(m); }
-
+            cosnole.log('emit')
             this.emit('event', JSON.parse(m.value.toString()));
+            console.log('emmited')
         });
 
         this.channel.on('disconnected', function (arg) { console.log('consumer disconnected. ' + JSON.stringify(arg)); });
