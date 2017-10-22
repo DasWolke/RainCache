@@ -79,7 +79,6 @@ class RainCache extends EventEmitter {
             await this.outbound.initialize();
         }
         if (this.inbound) {
-            console.log('this.inbound')
             this.inbound.on('event', async (event) => {
                 await this.eventProcessor.inbound(event);
                 if (this.outbound) {
@@ -88,7 +87,6 @@ class RainCache extends EventEmitter {
             });
         }
         if (this.options.debug) {
-            console.log('debug')
             this.eventProcessor.on('debug', (log) => this.emit('debug', log));
         }
         this.ready = true;
