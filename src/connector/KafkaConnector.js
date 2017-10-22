@@ -28,7 +28,7 @@ class KafkaConnector extends BaseConnector {
      */
     async initialize() {
         this.channel = new Kafka.KafkaConsumer({
-            //'debug': 'all',
+            'debug': 'all',
             'metadata.broker.list': this.options.url,
             'message.max.bytes': '200000000',
             'group.id': 'node-rdkafka-consumer',
@@ -55,6 +55,9 @@ class KafkaConnector extends BaseConnector {
         });
 
         this.channel.on('data', function (m) {
+            console.log(`data owo`);
+            console.log(m);
+
             counter++;
             //committing offsets every numMessages
             if (counter % numMessages === 0) { thonk.channel.commit(m); }
