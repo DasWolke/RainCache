@@ -26,16 +26,15 @@ class KafkaConnectorOutbound extends BaseConnector {
 
     async initialize() {
 
-        const scope = this;
         this.client = new Kafka.Producer(this.params);
 
-        this.client.on('event.log', (log) => { scope.emit('log', log); });
-        this.client.on('event.error', (err) => { scope.emit('error', err); });
+        this.client.on('event.log', (log) => { this.emit('log', log); });
+        this.client.on('event.error', (err) => { this.emit('error', err); });
         this.client.on('ready', async () => { console.log('producer ready'); });
 
         this.client.on('disconnected', (arg) => {
             console.log(`producer disconnected. ${JSON.stringify(arg)}`);
-            scope.emit('error', 'consumer disconnected. ' + JSON.stringify(arg));
+            this.emit('error', 'consumer disconnected. ' + JSON.stringify(arg));
         });
 
         await this.client.connect();
