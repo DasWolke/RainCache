@@ -37,23 +37,23 @@ class KafkaConnector extends BaseConnector {
         });
     
         // logging debug messages, if debug is enabled
-        producer.on('event.log', (log) => { console.log(log); });
+        this.producer.on('event.log', (log) => { console.log(log); });
     
         // logging all errors
-        producer.on('event.error', (err) => {
+        this.producer.on('event.error', (err) => {
             console.error('Error from producer');
             console.error(err);
         });
     
-        producer.on('ready', async () => {
+        this.producer.on('ready', async () => {
             console.log('producer ready')
         });
     
     
-        producer.on('disconnected', (arg) => {
+        this.producer.on('disconnected', (arg) => {
             console.log(`producer disconnected. ${JSON.stringify(arg)}`);
         });
-        producer.connect();
+        this.producer.connect();
 
         this.consumer = new Kafka.KafkaConsumer({
             // 'debug': 'all',
