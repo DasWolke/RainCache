@@ -28,7 +28,7 @@ class KafkaConnector extends BaseConnector {
      */
     async initialize() {
         this.channel = new Kafka.KafkaConsumer({
-            'debug': 'all',
+            // 'debug': 'all',
             'metadata.broker.list': this.options.url,
             'message.max.bytes': '200000000',
             'group.id': 'node-rdkafka-consumer',
