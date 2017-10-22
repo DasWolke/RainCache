@@ -56,7 +56,7 @@ class KafkaConnector extends BaseConnector {
 
         this.channel.on('data', function (m) {
             console.log(`data owo`);
-            console.log(m);
+            console.log(m.toString());
 
             counter++;
             //committing offsets every numMessages
