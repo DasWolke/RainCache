@@ -29,7 +29,7 @@ class KafkaConnector extends BaseConnector {
      */
     async initialize() {
 
-        let producer = new Kafka.Producer({
+        this.producer = new Kafka.Producer({
             // 'debug': 'all',
             'metadata.broker.list': 'localhost:9092',
             'message.max.bytes': '200000000',
