@@ -13,7 +13,7 @@ class KafkaConnectorInbound extends BaseConnector {
         Object.assign(this.options, options);
 
         this.params = {
-            // 'debug': 'all',
+            'debug': 'all',
             'metadata.broker.list': this.options.url,
             'message.max.bytes': '200000000',
             'group.id': 'node-rdkafka-consumer',
