@@ -18,7 +18,8 @@ class KafkaConnector extends BaseConnector {
         this.options = {url: 'localhost:9092', queue: 'test-pre-cache', sendQueue: 'test-post-cache'};
         Object.assign(this.options, options);
         this.client = null;
-        this.channel = null;
+        this.consumer = null;
+        this.producer = null;
         this.ready = false;
     }
 
@@ -27,7 +28,34 @@ class KafkaConnector extends BaseConnector {
      * @returns {Promise.<void>}
      */
     async initialize() {
-        this.channel = new Kafka.KafkaConsumer({
+
+        let producer = new Kafka.Producer({
+            // 'debug': 'all',
+            'metadata.broker.list': 'localhost:9092',
+            'message.max.bytes': '200000000',
+            'dr_cb': true, // delivery report callback
+        });
+    
+        // logging debug messages, if debug is enabled
+        producer.on('event.log', (log) => { console.log(log); });
+    
+        // logging all errors
+        producer.on('event.error', (err) => {
+            console.error('Error from producer');
+            console.error(err);
+        });
+    
+        producer.on('ready', async () => {
+            console.log('producer ready')
+        });
+    
+    
+        producer.on('disconnected', (arg) => {
+            console.log(`producer disconnected. ${JSON.stringify(arg)}`);
+        });
+        producer.connect();
+
+        this.consumer = new Kafka.KafkaConsumer({
             // 'debug': 'all',
             'metadata.broker.list': this.options.url,
             'message.max.bytes': '200000000',
@@ -36,10 +64,10 @@ class KafkaConnector extends BaseConnector {
         });
 
         //logging debug messages, if debug is enabled
-        this.channel.on('event.log', function (log) { console.log(log); });
+        this.consumer.on('event.log', function (log) { console.log(log); });
 
         //logging all errors
-        this.channel.on('event.error', function (err) {
+        this.consumer.on('event.error', function (err) {
             console.error('Error from consumer');
             console.error(err);
         });
@@ -48,26 +76,26 @@ class KafkaConnector extends BaseConnector {
         var counter = 0;
         var numMessages = 5;
         var thonk = this;
-        this.channel.on('ready', function (arg) {
+        this.consumer.on('ready', function (arg) {
             console.log('consumer ready.' + JSON.stringify(arg));
-            thonk.channel.subscribe(['test-pre-cache']);
-            thonk.channel.consume();
+            thonk.consumer.subscribe(['test-pre-cache']);
+            thonk.consumer.consume();
         });
 
-        this.channel.on('data', function (m) {
+        this.consumer.on('data', function (m) {
 
             counter++;
             //committing offsets every numMessages
-            if (counter % numMessages === 0) { thonk.channel.commit(m); }
+            if (counter % numMessages === 0) { thonk.consumer.commit(m); }
             // console.log('emit')
             thonk.emit('event', JSON.parse(m.value.toString()));
             // console.log('emmited')
         });
 
-        this.channel.on('disconnected', function (arg) { console.log('consumer disconnected. ' + JSON.stringify(arg)); });
+        this.consumer.on('disconnected', function (arg) { console.log('consumer disconnected. ' + JSON.stringify(arg)); });
 
         //starting the consumer
-        await this.channel.connect();
+        await this.consumer.connect();
         this.ready = true;
     }
 
@@ -78,7 +106,7 @@ class KafkaConnector extends BaseConnector {
      */
     async send(event) {
         // this.channel.sendToQueue(this.options.sendQueue, Buffer.from(JSON.stringify(event)));
-        this.channel.produce(this.options.sendQueue, -1, Buffer.from(JSON.stringify(event)));
+        this.producer.produce(this.options.sendQueue, -1, Buffer.from(JSON.stringify(event)));
     }
 }
 
