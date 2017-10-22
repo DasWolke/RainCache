@@ -2,7 +2,7 @@
 const BaseConnector = require('./BaseConnector');
 const Kafka = require('node-rdkafka');
 
-class KafkaConnector extends BaseConnector {
+class KafkaConnectorInbound extends BaseConnector {
 
     constructor(options, params) {
         super();
@@ -50,5 +50,5 @@ class KafkaConnector extends BaseConnector {
     }
 }
 
-module.exports = KafkaConnector;
+module.exports = KafkaConnectorInbound;
 
