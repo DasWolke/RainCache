@@ -30,10 +30,10 @@ class KafkaConnectorInbound extends BaseConnector {
         this.client = new Kafka.KafkaConsumer(this.params);
 
         // logging debug messages, if debug is enabled
-        connection.on('event.log', (log) => { console.log(log); });
+        this.client.on('event.log', (log) => { console.log(log); });
 
         // logging all errors
-        connection.on('event.error', (err) => {
+        this.client.on('event.error', (err) => {
             console.error('Error from consumer');
             console.error(err);
         });
