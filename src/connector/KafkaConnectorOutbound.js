@@ -29,8 +29,15 @@ class KafkaConnectorOutbound extends BaseConnector {
 
         this.client = new Kafka.Producer(this.params);
 
-        this.client.on('event.log', (log) => { this.emit('log', log); });
-        this.client.on('event.error', (err) => { this.emit('error', err); });
+        // logging debug messages, if debug is enabled
+        this.client.on('event.log', (log) => { console.log(log); });
+
+        // logging all errors
+        this.client.on('event.error', (err) => {
+            console.error('Error from consumer');
+            console.error(err);
+        });
+        
         this.client.on('ready', async () => { console.log('producer ready'); });
 
         this.client.on('disconnected', (arg) => {
