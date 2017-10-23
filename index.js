@@ -6,6 +6,8 @@ function RainCache(...args) {
 
 RainCache.Connectors = {
     AmqpConnector: require('./src/connector/AmqpConnector'),
+    KafkaConnectorInbound: require('./src/connector/KafkaConnectorInbound'),
+    KafkaConnectorOutbound: require('./src/connector/KafkaConnectorOutbound'),
     DirectConnector: require('./src/connector/DirectConnector'),
 };
 
