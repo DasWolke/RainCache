@@ -17,6 +17,7 @@ class KafkaConnectorOutbound extends BaseConnector {
             'metadata.broker.list': this.options.url,
             'message.max.bytes': '200000000',
             'dr_cb': true,
+            'enable.auto.commit': true,
         };
         Object.assign(this.params, params);
 
