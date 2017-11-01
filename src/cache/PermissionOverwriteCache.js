@@ -6,6 +6,7 @@ class PermissionOverwriteCache extends BaseCache {
         super();
         this.storageEngine = storageEngine;
         this.namespace = 'permissionoverwrite';
+        this.boundChannel = '';
         if (boundObject) {
             this.bindObject(boundObject);
         }
@@ -29,9 +30,9 @@ class PermissionOverwriteCache extends BaseCache {
             await this.update(id, channelId, data);
             return this;
         }
-        await this.addToIndex(id, channelId);
+        await super.addToIndex(id, channelId);
         await this.storageEngine.upsert(this.buildId(id, channelId), data);
-        return new PermissionOverwriteCache(this.storageEngine, this.users, data);
+        return new PermissionOverwriteCache(this.storageEngine, data);
     }
 
     async remove(id, channelId = this.boundChannel) {
@@ -40,7 +41,7 @@ class PermissionOverwriteCache extends BaseCache {
         }
         let permissionOverwrite = await this.storageEngine.get(this.buildId(id, channelId));
         if (permissionOverwrite) {
-            await this.removeFromIndex(id, channelId);
+            await super.removeFromIndex(id, channelId);
             return this.storageEngine.remove(this.buildId(id, channelId));
         } else {
             return null;
@@ -58,7 +59,10 @@ class PermissionOverwriteCache extends BaseCache {
     }
 
     buildId(permissionId, channelId) {
-        return `${this.namespace}.${permissionId}.${channelId}`;
+        if (!channelId) {
+            return super.buildId(permissionId);
+        }
+        return `${this.namespace}.${channelId}.${permissionId}`;
     }
 
     bindChannel(channelId) {

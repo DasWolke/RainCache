@@ -66,6 +66,9 @@ class RoleCache extends BaseCache {
     }
 
     buildId(roleId, guildId) {
+        if (!guildId) {
+            return super.buildId(roleId);
+        }
         return `${this.namespace}.${guildId}.${roleId}`;
     }
 }

@@ -31,7 +31,7 @@ class EmojiCache extends BaseCache {
         }
         await this.addToIndex(id, guildId);
         await this.storageEngine.upsert(this.buildId(id, guildId), data);
-        return new EmojiCache(this.storageEngine, this.users, data);
+        return new EmojiCache(this.storageEngine, data);
     }
 
     async remove(id, guildId = this.boundGuild) {
@@ -58,6 +58,9 @@ class EmojiCache extends BaseCache {
     }
 
     buildId(emojiId, guildId) {
+        if (!guildId) {
+            return super.buildId(emojiId);
+        }
         return `${this.namespace}.${guildId}.${emojiId}`;
     }
 }

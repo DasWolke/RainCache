@@ -103,6 +103,9 @@ class MemberCache extends BaseCache {
     }
 
     buildId(userId, guildId) {
+        if (!guildId) {
+            return super.buildId(userId);
+        }
         return `${this.namespace}.${guildId}.${userId}`;
     }
 
