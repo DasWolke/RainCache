@@ -157,6 +157,7 @@ class EventProcessor extends EventEmitter {
         switch (channelCreateEvent.d.type) {
             case 0:
             case 2:
+            case 4:
                 await this.channelMapCache.update(channelCreateEvent.d.guild_id, [channelCreateEvent.d.id], 'guild');
                 // this.emit('debug', `Caching guild channel ${channelCreateEvent.d.id}`);
                 return this.channelCache.update(channelCreateEvent.d.id, channelCreateEvent.d);

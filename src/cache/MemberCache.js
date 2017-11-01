@@ -1,7 +1,21 @@
 'use strict';
 const BaseCache = require('./BaseCache');
 
+/**
+ * Cache responsible for storing guild members
+ * @extends BaseCache
+ * @property {Object} storageEngine - storage engine of this cache
+ * @property {String} namespace=member - namespace of this cache
+ * @property {UserCache} user - user cache
+ * @property {String} boundGuild - id of a guild this cache is bound to
+ */
 class MemberCache extends BaseCache {
+    /**
+     * Create a new Membercache
+     * @param {Object} storageEngine - storage engine to use
+     * @param {UserCache} userCache - user cache instance
+     * @param {Object} [boundObject] - Bind an object to this instance
+     */
     constructor(storageEngine, userCache, boundObject) {
         super();
         this.storageEngine = storageEngine;
@@ -13,6 +27,12 @@ class MemberCache extends BaseCache {
         }
     }
 
+    /**
+     * Get a member via id
+     * @param {String} id - id of the member
+     * @param {String} [guildId=this.boundGuild] - id of the guild of the member, defaults to the bound guild of the cache
+     * @returns {Promise.<MemberCache|null>} - bound member cache with properties of the member or null if no member is cached
+     */
     async get(id, guildId = this.boundGuild) {
         let user = await this.user.get(id);
         if (this.boundObject) {
@@ -27,6 +47,13 @@ class MemberCache extends BaseCache {
         return new MemberCache(this.storageEngine, this.user.bindUserId(member.id), member);
     }
 
+    /**
+     *
+     * @param id
+     * @param guildId
+     * @param data
+     * @returns {Promise.<*>}
+     */
     async update(id, guildId = this.boundGuild, data) {
         if (this.boundObject) {
             this.bindObject(data);

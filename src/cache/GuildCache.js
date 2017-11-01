@@ -64,7 +64,7 @@ class GuildCache extends BaseCache {
             await this.update(this.boundObject.id, data);
             return this;
         }
-        if (data.channels) {
+        if (data.channels && data.channels.length > 0) {
             await this.guildChannelMap.update(id, data.channels.map(c => c.id));
             for (let channel of data.channels) {
                 channel.guild_id = id;
@@ -72,30 +72,30 @@ class GuildCache extends BaseCache {
                 // console.log(`Cached channel ${channel.id}|#"${channel.name}"|${typeof channel.name}`);
             }
         }
-        if (data.members) {
+        if (data.members && data.members.length > 0) {
             let membersPromiseBatch = [];
             for (let member of data.members) {
                 member.guild_id = id;
                 membersPromiseBatch.push(this.members.update(member.user.id, id, member));
             }
             await Promise.all(membersPromiseBatch);
-            console.log(`Cached ${data.members.length} Guild Members from guild ${id}|${data.name}`);
+            // console.log(`Cached ${data.members.length} Guild Members from guild ${id}|${data.name}`);
         }
-        if (data.presences) {
+        if (data.presences && data.presences.length > 0) {
             let presencePromiseBatch = [];
             for (let presence of data.presences) {
                 presencePromiseBatch.push(this.presences.update(presence.user.id, presence));
             }
             await Promise.all(presencePromiseBatch);
-            console.log(`Cached ${data.presences.length} presences from guild ${id}|${data.name}`);
+            // console.log(`Cached ${data.presences.length} presences from guild ${id}|${data.name}`);
         }
-        if (data.roles) {
+        if (data.roles && data.roles.length > 0) {
             let rolePromiseBatch = [];
             for (let role of data.roles) {
                 rolePromiseBatch.push(this.roles.update(role.id, id, role));
             }
             await Promise.all(rolePromiseBatch);
-            console.log(`Cached ${data.roles.length} roles from guild ${id}|${data.name}`);
+            // console.log(`Cached ${data.roles.length} roles from guild ${id}|${data.name}`);
         }
         delete data.members;
         delete data.voice_states;

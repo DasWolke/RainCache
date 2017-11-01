@@ -8,6 +8,7 @@ let UserCache = require('./cache/UserCache');
 let RoleCache = require('./cache/RoleCache');
 let EmojiCache = require('./cache/EmojiCache');
 let PresenceCache = require('./cache/PresenceCache');
+let PermissionsOverwriteCache = require('./cache/PermissionOverwriteCache');
 let EventEmitter;
 try {
     EventEmitter = require('eventemitter3');
@@ -30,7 +31,8 @@ class RainCache extends EventEmitter {
                 user: UserCache,
                 role: RoleCache,
                 emoji: EmojiCache,
-                presence: PresenceCache
+                presence: PresenceCache,
+                permOverwrite: PermissionsOverwriteCache
             };
         }
         if (!options.storage.default) {
@@ -57,7 +59,7 @@ class RainCache extends EventEmitter {
         } catch (e) {
             throw new Error('Failed to initialize storage engines');
         }
-        this.cache = this.createCaches(this.options.storage, this.options.cacheClasses);
+        this.cache = this._createCaches(this.options.storage, this.options.cacheClasses);
         Object.assign(this, this.cache);
         this.eventProcessor = new EventProcessor({
             disabledEvents: this.options.disabledEvents,
@@ -69,7 +71,8 @@ class RainCache extends EventEmitter {
                 user: this.cache.user,
                 role: this.cache.role,
                 emoji: this.cache.emoji,
-                presence: this.cache.presence
+                presence: this.cache.presence,
+                permOverwrite: this.cache.permOverwrite
             }
         });
         if (this.inbound && !this.inbound.ready) {
@@ -80,9 +83,14 @@ class RainCache extends EventEmitter {
         }
         if (this.inbound) {
             this.inbound.on('event', async (event) => {
-                await this.eventProcessor.inbound(event);
-                if (this.outbound) {
-                    this.outbound.send(event);
+                try {
+                    await this.eventProcessor.inbound(event);
+                    if (this.outbound) {
+                        await this.outbound.send(event);
+                    }
+                }
+                catch (e) {
+                    this.emit('error', e);
                 }
             });
         }
@@ -92,48 +100,48 @@ class RainCache extends EventEmitter {
         this.ready = true;
     }
 
-    createCaches(engines, cacheClasses) {
+    _createCaches(engines, cacheClasses) {
         let caches = {};
         if (cacheClasses['role']) {
-            let engine = this.getEngine(engines, 'role');
+            let engine = this._getEngine(engines, 'role');
             caches['role'] = new cacheClasses['role'](engine);
         }
         if (cacheClasses['emoji']) {
-            let engine = this.getEngine(engines, 'emoji');
+            let engine = this._getEngine(engines, 'emoji');
             caches['emoji'] = new cacheClasses['emoji'](engine);
         }
         if (cacheClasses['permOverwrite']) {
-            let engine = this.getEngine(engines, 'permOverwrite');
+            let engine = this._getEngine(engines, 'permOverwrite');
             caches['permOverwrite'] = new cacheClasses['permOverwrite'](engine);
         }
         if (cacheClasses['user']) {
-            let engine = this.getEngine(engines, 'user');
+            let engine = this._getEngine(engines, 'user');
             caches['user'] = new cacheClasses['user'](engine);
         }
         if (cacheClasses['member']) {
-            let engine = this.getEngine(engines, 'member');
+            let engine = this._getEngine(engines, 'member');
             caches['member'] = new cacheClasses['member'](engine, caches['user']);
         }
         if (cacheClasses['presence']) {
-            let engine = this.getEngine(engines, 'presence');
+            let engine = this._getEngine(engines, 'presence');
             caches['presence'] = new cacheClasses['presence'](engine, caches['user']);
         }
         if (cacheClasses['channelMap']) {
-            let engine = this.getEngine(engines, 'channelMap');
+            let engine = this._getEngine(engines, 'channelMap');
             caches['channelMap'] = new cacheClasses['channelMap'](engine);
         }
         if (cacheClasses['channel']) {
-            let engine = this.getEngine(engines, 'channel');
+            let engine = this._getEngine(engines, 'channel');
             caches['channel'] = new cacheClasses['channel'](engine, caches['channelMap'], caches['permOverwrite'], caches['user']);
         }
         if (cacheClasses['guild']) {
-            let engine = this.getEngine(engines, 'guild');
+            let engine = this._getEngine(engines, 'guild');
             caches['guild'] = new cacheClasses['guild'](engine, caches['channel'], caches['role'], caches['member'], caches['emoji'], caches['presence'], caches['channelMap']);
         }
         return caches;
     }
 
-    getEngine(engines, engine) {
+    _getEngine(engines, engine) {
         return engines[engine] || engines['default'];
     }
 }

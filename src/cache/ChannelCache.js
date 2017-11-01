@@ -1,7 +1,6 @@
 'use strict';
 let BaseCache = require('./BaseCache');
 
-//TODO add permission overwrites and recipients
 class ChannelCache extends BaseCache {
     constructor(storageEngine, channelMap, permissionOverwriteCache, userCache, boundObject) {
         super();
@@ -21,7 +20,7 @@ class ChannelCache extends BaseCache {
         }
         let channel = await this.storageEngine.get(this.buildId(id));
         if (channel) {
-            return new ChannelCache(this.storageEngine, this.permissionOverwrites, this.recipients, channel);
+            return new ChannelCache(this.storageEngine, this.channelMap, this.permissionOverwrites.bindChannel(channel.id), this.recipients, channel);
         } else {
             return null;
         }
@@ -40,12 +39,17 @@ class ChannelCache extends BaseCache {
                 await this.channelMap.update(data.recipients[0].id, [data.id], 'user');
             }
         }
+        if (data.permission_overwrites) {
+            for (let overwrite of data.permission_overwrites) {
+                await this.permissionOverwrites.update(overwrite.id, id, overwrite);
+            }
+        }
         delete data.permission_overwrites;
         delete data.recipients;
         await this.addToIndex(id);
         await this.storageEngine.upsert(this.buildId(id), data);
         let channel = await this.storageEngine.get(this.buildId(id));
-        return new ChannelCache(this.storageEngine, this.permissionOverwrites, this.recipients, channel);
+        return new ChannelCache(this.storageEngine, this.channelMap, this.permissionOverwrites.bindChannel(channel.id), this.recipients, channel);
     }
 
     async remove(id) {
@@ -63,12 +67,12 @@ class ChannelCache extends BaseCache {
 
     async filter(fn, channelMap) {
         let channels = await this.storageEngine.filter(fn, channelMap, this.namespace);
-        return channels.map(c => new ChannelCache(this.storageEngine, this.permissionOverwrites, this.recipients, c));
+        return channels.map(c => new ChannelCache(this.storageEngine, this.channelMap, this.permissionOverwrites.bindChannel(c.id), this.recipients, c));
     }
 
     async find(fn, channelMap) {
         let channel = await this.storageEngine.find(fn, channelMap, this.namespace);
-        return new ChannelCache(this.storageEngine, this.permissionOverwrites, this.recipients, channel);
+        return new ChannelCache(this.storageEngine, this.channelMap, this.permissionOverwrites.bindChannel(channel.id), this.recipients, channel);
     }
 
     async addToIndex(id) {

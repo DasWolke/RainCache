@@ -2,6 +2,7 @@
 
 class BaseCache {
     constructor() {
+        this.storageEngine = null;
         this.namespace = 'base';
     }
 
