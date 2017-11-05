@@ -12,4 +12,5 @@ cache.on('debug', (data) => {
 });
 init().then(async () => {
     console.log('owo');
+
 }).catch(e => console.error(e));

@@ -2,7 +2,8 @@
 let BaseConnector = require('./BaseConnector');
 
 /**
- * Direct Connector, useful when using raincache with an existing solution like rawWs
+ * Direct Connector, useful when using raincache with an existing solution library that runs in the same process
+ * @extends BaseConnector
  */
 class DirectConnector extends BaseConnector {
     /**

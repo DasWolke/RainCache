@@ -9,6 +9,7 @@ try {
 /**
  * BaseConnector class, provides a common structure for connectors
  * @extends EventEmitter
+ * @private
  */
 class BaseConnector extends EventEmitter {
     constructor() {

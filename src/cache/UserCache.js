@@ -82,4 +82,12 @@ class UserCache extends BaseCache {
     }
 }
 
+/**
+ * @typedef {Object} User
+ * @property {String} id - id of the user
+ * @property {String} username - username of the user
+ * @property {String} discriminator - 4 digit long discord tag
+ * @property {String} avatar - avatar hash of the user
+ */
+
 module.exports = UserCache;

@@ -73,4 +73,16 @@ class RoleCache extends BaseCache {
     }
 }
 
+/**
+ * @typedef {Object} Role
+ * @property {String} id - role id
+ * @property {String} name - role name
+ * @property {Number} color - integer representation of hexadecimal color code
+ * @property {Boolean} hoist - if this role is hoisted
+ * @property {Number} position - position of the role
+ * @property {Number} permissions - permission bit set
+ * @property {Boolean} managed - if this role is managed by an integration
+ * @property {Boolean} mentionable - if this role can be mentioned
+ */
+
 module.exports = RoleCache;

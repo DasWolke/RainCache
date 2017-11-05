@@ -65,4 +65,14 @@ class EmojiCache extends BaseCache {
     }
 }
 
+/**
+ * @typedef {Object} Emoji
+ * @property {String} id - id of the emoji
+ * @property {String} name - name of the emoji
+ * @property {Array} [roles] - array of roles whitelisted to use the emoji (whitelisted apps only)
+ * @property {User} [user] - User that created this emoji
+ * @property {Boolean} require_colons - whether this emoji must be wrapped in colons
+ * @property {Boolean} managed - whether this emoji is managed
+ */
+
 module.exports = EmojiCache;

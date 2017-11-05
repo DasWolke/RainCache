@@ -30,7 +30,7 @@ class BaseCache {
     }
 
     async isIndexed(id, guildId = this.boundGuild) {
-        return this.storageEngine.isListMember(this.buildId(id, guildId));
+        return this.storageEngine.isListMember(this.buildId(guildId), id);
     }
 
     async getIndexMembers(guildId = this.boundGuild) {

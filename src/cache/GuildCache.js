@@ -3,18 +3,26 @@ const BaseCache = require('./BaseCache');
 
 /**
  * Cache responsible for guilds
+ * @property {StorageEngine} storageEngine - Storage engine to use for this cache
+ * @property {String} namespace=guild - namespace of the cache
+ * @property {ChannelCache} channels - Instantiated ChannelCache class
+ * @property {RoleCache} roles - Instantiated RoleCache class
+ * @property {MemberCache} members - Instantiated MemberCache class
+ * @property {EmojiCache} emojis - Instantiated EmojiCache class
+ * @property {PresenceCache} presences - Instantiated PresenceCache class
+ * @property {ChannelMapCache} guildChannelMap - Instantiated ChannelMap class
  */
 class GuildCache extends BaseCache {
     /**
      * Create a new Guildcache
-     * @param storageEngine - Storage engine to use for this cache
-     * @param channelCache - Instantiated ChannelCache class
-     * @param roleCache - Instantiated RoleCache class
-     * @param memberCache - Instantiated MemberCache class
-     * @param emojiCache - Instantiated EmojiCache class
-     * @param presenceCache - Instantiated PresenceCache class
-     * @param guildToChannelCache - Instantiated ChannelMap class
-     * @param boundObject - Optional, may be used to bind a guild object to the cache
+     * @param {StorageEngine} storageEngine - Storage engine to use for this cache
+     * @param {ChannelCache} channelCache - Instantiated ChannelCache class
+     * @param {RoleCache} roleCache - Instantiated RoleCache class
+     * @param {MemberCache} memberCache - Instantiated MemberCache class
+     * @param {EmojiCache} emojiCache - Instantiated EmojiCache class
+     * @param {PresenceCache} presenceCache - Instantiated PresenceCache class
+     * @param {ChannelMapCache} guildToChannelCache - Instantiated ChannelMap class
+     * @param {Guild} boundObject - Optional, may be used to bind a guild object to the cache
      */
     constructor(storageEngine, channelCache, roleCache, memberCache, emojiCache, presenceCache, guildToChannelCache, boundObject) {
         super();
@@ -52,10 +60,11 @@ class GuildCache extends BaseCache {
      * Upsert a guild object
      * @param {String} id - id of the guild
      * @param {Object} data - data received from the event
-     * @param {Array|} data.channels - Array of channels
-     * @param {Array|} data.members - Array of members
-     * @param {Array|} data.presences - Array of presences
-     * @param {Array|} data.roles - Array of roles
+     * @param {?Channel[]} data.channels - Array of channels
+     * @param {?Array} data.members - Array of members
+     * @param {?Array} data.presences - Array of presences
+     * @param {?Role[]} data.roles - Array of roles
+     * @param {?Emoji[]} data.emojis - Array of emojis
      * @returns {Promise.<GuildCache>}
      */
     async update(id, data) {
@@ -96,6 +105,13 @@ class GuildCache extends BaseCache {
             }
             await Promise.all(rolePromiseBatch);
             // console.log(`Cached ${data.roles.length} roles from guild ${id}|${data.name}`);
+        }
+        if (data.emojis && data.emojis.length > 0) {
+            let emojiPromiseBatch = [];
+            for (let emoji of data.emojis) {
+                emojiPromiseBatch.push(this.emojis.update(emoji.id, id, emoji));
+            }
+            await Promise.all(emojiPromiseBatch);
         }
         delete data.members;
         delete data.voice_states;
@@ -143,8 +159,8 @@ class GuildCache extends BaseCache {
 
     /**
      * Filter through the collection of guilds
-     * @param fn - Filter function
-     * @returns {Promise.<Array>}
+     * @param {Function} fn - Filter function
+     * @returns {Promise.<Array<GuildCache>>}
      */
     async filter(fn) {
         let guilds = await this.storageEngine.filter(fn, this.namespace);
@@ -153,7 +169,7 @@ class GuildCache extends BaseCache {
 
     /**
      * Filter through the collection of guilds and return the first match
-     * @param fn - Filter function
+     * @param {Function} fn - Filter function
      * @returns {Promise.<GuildCache>}
      */
     async find(fn) {
@@ -161,25 +177,73 @@ class GuildCache extends BaseCache {
         return new GuildCache(this.storageEngine, this.channels.bindGuild(guild.id), this.roles.bindGuild(guild.id), this.members.bindGuild(guild.id), this.emojis.bindGuild(guild.id), this.presences.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id), guild);
     }
 
+    /**
+     * Add a guild to the guild index
+     * @param {String} id - id of the guild
+     * @returns {Promise.<void>}
+     */
     async addToIndex(id) {
         return this.storageEngine.addToList(this.namespace, id);
     }
 
+    /**
+     * Remove a guild from the guild index
+     * @param {String} id - id of the guild
+     * @returns {Promise.<void>}
+     */
     async removeFromIndex(id) {
         return this.storageEngine.removeFromList(this.namespace, id);
     }
 
+    /**
+     * Check if a guild is indexed
+     * @param {String} id - id of the guild
+     * @returns {Promise.<Boolean>}
+     */
     async isIndexed(id) {
         return this.storageEngine.isListMember(this.namespace, id);
     }
 
+    /**
+     * Get all guild ids currently indexed
+     * @returns {Promise.<String[]>}
+     */
     async getIndexMembers() {
         return this.storageEngine.getListMembers(this.namespace);
     }
 
+    /**
+     * Remove the guild index, you should probably not call this at all :<
+     * @returns {Promise.<*>}
+     */
     async removeIndex() {
         return this.storageEngine.removeList(this.namespace);
     }
 }
+
+/**
+ * @typedef {Object} Guild
+ * @property {String} id - guild id
+ * @property {String} name - guild name
+ * @property {String} icon - icon hash
+ * @property {String} splash - splash image hash
+ * @property {String} owner_id - id of the owner
+ * @property {String} region - id of the voice region
+ * @property {String} afk_channel_id - id of the afk channel
+ * @property {Number} afk_timeout - afk timeout in seconds
+ * @property {Boolean} embed_enabled - if the guild is embeddable
+ * @property {String} embed_channel_id - id of embedded channel
+ * @property {Number} verification level - [verification level](https://discordapp.com/developers/docs/resources/guild#guild-object-verification-level) of the guild
+ * @property {Number} default_message_notifications - default
+ * [notification level](https://discordapp.com/developers/docs/resources/guild#guild-object-default-message-notification-level) of the guild
+ * @property {Number} explicit_content_filter - default [filter level](https://discordapp.com/developers/docs/resources/guild#guild-object-explicit-content-filter-level)
+ * @property {Role[]} roles - Array of roles
+ * @property {Emoji[]} emojis - Array of emojis
+ * @property {String[]} features - Array of enabled guild features
+ * @property {Number} mfa_level - required [mfa level](https://discordapp.com/developers/docs/resources/guild#guild-object-mfa-level) for the guild
+ * @property {String} [application_id] - application id of the guild creator, if the guild was created by a bot
+ * @property {Boolean} widget_enabled - if the server widget is enabled
+ * @property {String} widget_channel_id - channel id of the server widget
+ */
 
 module.exports = GuildCache;

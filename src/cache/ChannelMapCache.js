@@ -3,12 +3,14 @@ let BaseCache = require('./BaseCache');
 
 /**
  * Cache for providing a guild/user -> channels map
+ * @property {StorageEngine} storageEngine - storage engine to use for this cache
+ * @property {String} namespace=channelmap - namespace of this cache
  */
 class ChannelMapCache extends BaseCache {
     /**
      * Create a new ChannelMapCache
-     * @param storageEngine - storage engine to use for this cache
-     * @param boundObject - Optional, may be used to bind the map object to the cache
+     * @param {StorageEngine} storageEngine - storage engine to use for this cache
+     * @param {Object} boundObject - Optional, may be used to bind the map object to the cache
      */
     constructor(storageEngine, boundObject) {
         super();

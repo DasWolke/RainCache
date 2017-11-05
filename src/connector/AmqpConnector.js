@@ -4,6 +4,7 @@ let amqp = require('amqp');
 
 /**
  * Amqp Connector, used for receiving and sending messages to an amqp based message queue
+ * @extends BaseConnector
  */
 class AqmpConnector extends BaseConnector {
     /**
