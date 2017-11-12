@@ -1,0 +1,51 @@
+{
+  "src": [
+    {
+      "RainCache": [
+        "./src/**/*.js"
+      ]
+    },
+    {
+      "index": "./README.md"
+    }
+  ],
+  "dest": "./RainCache",
+  "app": {
+    "title": "RainCache",
+    "base": "/RainCache",
+    "entrance": "content:index",
+    "routing": "query",
+    "server": "github"
+  },
+  "jsdoc": {
+    "access": "public",
+    "plugins": [
+      "plugins/markdown"
+    ]
+  },
+  "markdown": {
+    "gfm": true,
+    "tables": true,
+    "breaks": true,
+    "pedantic": false,
+    "sanitize": false,
+    "smartLists": false,
+    "smartypants": false,
+    "tasks": false,
+    "emoji": true
+  },
+  "template": {
+    "options": {
+      "navItems": [
+        {
+          "label": "Home",
+          "href": "?content=index"
+        },
+        {
+          "label": "Documentation",
+          "href": "?api=RainCache#RainCache"
+        }
+      ]
+    }
+  }
+}

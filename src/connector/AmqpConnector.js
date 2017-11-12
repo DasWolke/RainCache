@@ -39,7 +39,8 @@ class AqmpConnector extends BaseConnector {
                 let q = connection.queue(this.options.amqpQueue, (queue) => {
                     queue.bind('#');
                     this.ready = true;
-                    queue.subscribe((event) => {
+                    queue.subscribe((event, headers, deliveryInfo, messageObject) => {
+                        messageObject.acknowledge(false);
                         this.emit('event', event);
                     });
                     return res();
