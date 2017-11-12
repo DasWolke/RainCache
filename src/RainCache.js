@@ -16,7 +16,48 @@ try {
     EventEmitter = require('events').EventEmitter;
 }
 
+/**
+ * @typedef {class} RainCache - Main class used for accessing caches via subclasses and initializing the whole library
+ * @extends EventEmitter
+ * @property {Object} options - options that the user passed through the constructor
+ * @property {Boolean} ready=false - whether the cache is ready to process events
+ * @property {Connector} inbound - Connector used for receiving events
+ * @property {Connector} outbound - Connector used for forwarding events
+ * @property {Object} cache - Instantiated cache classes
+ * @property {GuildCache} cache.guild - Instantiated Guild Cache
+ */
 class RainCache extends EventEmitter {
+    /**
+     * Create a new Cache instance
+     * @param {Object} options Options that should be used by RainCache
+     * @param {Object} options.storage - object with storage engines to use for the different cache classes
+     * @param {StorageEngine} [options.storage.default] - default storage engine to use when no special storage engine was passed for a class.
+     *
+     * **Use this option if you do not want to use a different type of storage engine for certain caches**
+     *
+     * You may also combine options: e.g. a RedisStorageEngine for presence and the rest within mongo, that's no issue.
+     *
+     * The cache type specific storage engine takes priority over the default one.
+     * @param {StorageEngine} [options.storage.guild=options.storage.default] - storage engine used by the guild cache
+     * @param {StorageEngine} [options.storage.channel=options.storage.default] - storage engine used by the channel cache
+     * @param {StorageEngine} [options.storage.channelMap=options.storage.default] - storage engine used by the channelMap cache
+     * @param {StorageEngine} [options.storage.member=options.storage.default] - storage engine used by the member cache
+     * @param {StorageEngine} [options.storage.user=options.storage.default] - storage engine used by the user cache
+     * @param {StorageEngine} [options.storage.role=options.storage.default] - storage engine used by the role cache
+     * @param {StorageEngine} [options.storage.emoji=options.storage.default] - storage engine used by the emoji cache
+     * @param {StorageEngine} [options.storage.presence=options.storage.default] - storage engine used by the presence cache
+     * @param {StorageEngine} [options.storage.permOverwrite=options.storage.default] - storage engine used by the permission overwrite cache
+     * @param {Object} [options.disabledEvents={}] - If you want to disable events from being processed,
+     * you can add them here like this: `{'MESSAGE_CREATE':true}`,
+     * this would disable any message_creates from being cached
+     * @param {Object} [options.cacheClasses] - object with classes (not objects) that should be used for each type of data that is cached
+     *
+     * **RainCache automatically uses default classes when no cache classes are passed, else it will use your classes.**
+     * @param {Object} [options.cacheClasses.guild=GuildCache] - cache class to use for guilds, defaults to the GuildCache
+     * @param {Object} [options.cacheClasses.channel=ChannelCache] - cache class to use for channels, defaults to ChannelCache
+     * @param inboundConnector
+     * @param outboundConnector
+     */
     constructor(options, inboundConnector, outboundConnector) {
         super();
         if (!options.storage) {

@@ -5,6 +5,9 @@
  * @private
  */
 class BaseStorageEngine {
+    /**
+     * @private
+     */
     constructor() {
         this.ready = true;
     }

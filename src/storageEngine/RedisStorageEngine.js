@@ -6,7 +6,7 @@ promisifyAll(redis.RedisClient.prototype);
 promisifyAll(redis.Multi.prototype);
 
 /**
- * StorageEngine which uses redis as a datasource
+ * @typedef {class} RedisStorageEngine - StorageEngine which uses redis as a datasource
  * @property {Redis} client - redis client
  * @property {Boolean} ready - whether this storage engine can be used
  * @property {Boolean} useHash - whether hash objects should be used for storing data
@@ -99,13 +99,13 @@ class RedisStorageEngine extends BaseStorageEngine {
      * @returns {Promise.<Array.<Object|null>>} - filtered data
      */
     async filter(fn, ids, namespace) {
-        namespace = this.prepareNamespace(namespace);
         let resolvedDataArray = [];
         let data = [];
         if (!ids) {
-            data = await this.client.keysAsync(namespace);
+            data = await this.getListMembers(namespace);
         } else {
             data = ids;
+            data = data.map(id => `${namespace}.${id}`);
         }
         for (let key of data) {
             let resolvedData = await this.get(key);
@@ -122,7 +122,6 @@ class RedisStorageEngine extends BaseStorageEngine {
      * @returns {Promise.<Object|null>} - the first result or null if nothing was found
      */
     async find(fn, ids = null, namespace) {
-        namespace = this.prepareNamespace(namespace);
         let data = [];
         if (typeof ids === 'string' && !namespace) {
             namespace = ids;
@@ -132,6 +131,7 @@ class RedisStorageEngine extends BaseStorageEngine {
             data = await this.getListMembers(namespace);
         } else {
             data = ids;
+            data = data.map(id => `${namespace}.${id}`);
         }
         for (let key of data) {
             let resolvedData = await this.get(key);
