@@ -10,7 +10,7 @@
   "author": "wolke <wolke@weeb.sh>",
   "license": "MIT",
   "optionalDependencies": {
-    "amqp": "^0.2.6",
+    "amqplib": "^0.5.2",
     "redis": "^2.8.0"
   },
   "dependencies": {
