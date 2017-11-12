@@ -105,8 +105,8 @@ class RedisStorageEngine extends BaseStorageEngine {
             data = await this.getListMembers(namespace);
         } else {
             data = ids;
-            data = data.map(id => `${namespace}.${id}`);
         }
+        data = data.map(id => `${namespace}.${id}`);
         for (let key of data) {
             let resolvedData = await this.get(key);
             resolvedDataArray.push(resolvedData);
@@ -131,8 +131,8 @@ class RedisStorageEngine extends BaseStorageEngine {
             data = await this.getListMembers(namespace);
         } else {
             data = ids;
-            data = data.map(id => `${namespace}.${id}`);
         }
+        data = data.map(id => `${namespace}.${id}`);
         for (let key of data) {
             let resolvedData = await this.get(key);
             if (fn(resolvedData)) {
