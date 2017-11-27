@@ -24,7 +24,7 @@ class AqmpConnector extends BaseConnector {
     }
 
     /**
-     * Initialize the connector
+     * Initializes the connector by creating a new connection to the amqp host set via config and creating a new queue to receive messages from
      * @returns {Promise.<void>}
      */
     async initialize() {

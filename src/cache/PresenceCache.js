@@ -1,7 +1,20 @@
 'use strict';
 let BaseCache = require('./BaseCache');
 
+/**
+ * Cache responsible for storing presence related data
+ * @extends BaseCache
+ */
 class PresenceCache extends BaseCache {
+    /**
+     * Create a new Presence Cache
+     *
+     * **This class is automatically instantiated by RainCache**
+     * @param {StorageEngine} storageEngine - Storage engine to use for this cache
+     * @param {UserCache} userCache -
+     * @param {Presence} boundObject - Optional, may be used to bind a presence object to the cache
+     * @property {String} namespace=user - namespace of the cache
+     */
     constructor(storageEngine, userCache, boundObject) {
         super();
         this.storageEngine = storageEngine;
@@ -12,13 +25,18 @@ class PresenceCache extends BaseCache {
         }
     }
 
-    async get (id) {
+    /**
+     * Get a presence via user id
+     * @param {String} id - id of a discord user
+     * @return {Promise.<PresenceCache|null>} - Returns a new PresenceCache with bound data or null if nothing was found
+     */
+    async get(id) {
         if (this.boundObject) {
             return this.boundObject;
         }
         let presence = await this.storageEngine.get(this.buildId(id));
         if (presence) {
-            return new PresenceCache(this.storageEngine, this.users, presence);
+            return new PresenceCache(this.storageEngine, this.users.bindUserId(id), presence);
         } else {
             return null;
         }
@@ -49,7 +67,6 @@ class PresenceCache extends BaseCache {
             return null;
         }
     }
-
 }
 
 module.exports = PresenceCache;

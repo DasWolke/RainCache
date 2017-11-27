@@ -1,6 +1,11 @@
 'use strict';
 const BaseCache = require('./BaseCache');
 
+/**
+ * @property {StorageEngine} storageEngine - Storage engine to use for this cache
+ * @property {String} namespace=user - namespace of the cache
+ * @extends BaseCache
+ */
 class PermissionOverwriteCache extends BaseCache {
     constructor(storageEngine, boundObject) {
         super();
@@ -67,6 +72,7 @@ class PermissionOverwriteCache extends BaseCache {
 
     bindChannel(channelId) {
         this.boundChannel = channelId;
+        this.boundGuild = channelId;
         return this;
     }
 }

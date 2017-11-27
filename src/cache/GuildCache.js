@@ -3,18 +3,13 @@ const BaseCache = require('./BaseCache');
 
 /**
  * Cache responsible for guilds
- * @property {StorageEngine} storageEngine - Storage engine to use for this cache
- * @property {String} namespace=guild - namespace of the cache
- * @property {ChannelCache} channels - Instantiated ChannelCache class
- * @property {RoleCache} roles - Instantiated RoleCache class
- * @property {MemberCache} members - Instantiated MemberCache class
- * @property {EmojiCache} emojis - Instantiated EmojiCache class
- * @property {PresenceCache} presences - Instantiated PresenceCache class
- * @property {ChannelMapCache} guildChannelMap - Instantiated ChannelMap class
+ * @extends BaseCache
  */
 class GuildCache extends BaseCache {
     /**
-     * Create a new Guildcache
+     * Create a new GuildCache
+     *
+     * **This class is automatically instantiated by RainCache**
      * @param {StorageEngine} storageEngine - Storage engine to use for this cache
      * @param {ChannelCache} channelCache - Instantiated ChannelCache class
      * @param {RoleCache} roleCache - Instantiated RoleCache class
@@ -23,6 +18,13 @@ class GuildCache extends BaseCache {
      * @param {PresenceCache} presenceCache - Instantiated PresenceCache class
      * @param {ChannelMapCache} guildToChannelCache - Instantiated ChannelMap class
      * @param {Guild} boundObject - Optional, may be used to bind a guild object to the cache
+     * @property {String} namespace=guild - namespace of the cache, defaults to `guild`
+     * @property {ChannelCache} channels - Instantiated ChannelCache class
+     * @property {RoleCache} roles - Instantiated RoleCache class
+     * @property {MemberCache} members - Instantiated MemberCache class
+     * @property {EmojiCache} emojis - Instantiated EmojiCache class
+     * @property {PresenceCache} presences - Instantiated PresenceCache class
+     * @property {ChannelMapCache} guildChannelMap - Instantiated ChannelMap class
      */
     constructor(storageEngine, channelCache, roleCache, memberCache, emojiCache, presenceCache, guildToChannelCache, boundObject) {
         super();
@@ -214,7 +216,7 @@ class GuildCache extends BaseCache {
 
     /**
      * Remove the guild index, you should probably not call this at all :<
-     * @returns {Promise.<*>}
+     * @returns {Promise.<void>}
      */
     async removeIndex() {
         return this.storageEngine.removeList(this.namespace);
@@ -222,7 +224,7 @@ class GuildCache extends BaseCache {
 }
 
 /**
- * @typedef {Object} Guild
+ * @typedef {Object} Guild - Object describing a regular discord guild
  * @property {String} id - guild id
  * @property {String} name - guild name
  * @property {String} icon - icon hash

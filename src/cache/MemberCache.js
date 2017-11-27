@@ -4,10 +4,6 @@ const BaseCache = require('./BaseCache');
 /**
  * Cache responsible for storing guild members
  * @extends BaseCache
- * @property {Object} storageEngine - storage engine of this cache
- * @property {String} namespace=member - namespace of this cache
- * @property {UserCache} user - user cache
- * @property {String} boundGuild - id of a guild this cache is bound to
  */
 class MemberCache extends BaseCache {
     /**
@@ -15,6 +11,9 @@ class MemberCache extends BaseCache {
      * @param {Object} storageEngine - storage engine to use
      * @param {UserCache} userCache - user cache instance
      * @param {Object} [boundObject] - Bind an object to this instance
+     * @property {String} namespace=member - namespace of this cache, defaults to `member`
+     * @property {UserCache} user - user cache instance
+     * @property {String} boundGuild - id of a guild this cache is bound to
      */
     constructor(storageEngine, userCache, boundObject) {
         super();
@@ -34,16 +33,13 @@ class MemberCache extends BaseCache {
      * @returns {Promise.<MemberCache|null>} - bound member cache with properties of the member or null if no member is cached
      */
     async get(id, guildId = this.boundGuild) {
-        let user = await this.user.get(id);
         if (this.boundObject) {
-            this.boundObject.user = user;
             return this.boundObject;
         }
         let member = await this.storageEngine.get(this.buildId(id, guildId));
         if (!member) {
             return null;
         }
-        member.user = user;
         return new MemberCache(this.storageEngine, this.user.bindUserId(member.id), member);
     }
 

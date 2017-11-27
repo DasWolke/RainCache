@@ -7,6 +7,10 @@ try {
 }
 
 class EventProcessor extends EventEmitter {
+    /**
+     *
+     * @param options
+     */
     constructor(options) {
         super();
         this.options = options || {disabledEvents: {}, presenceInterval: 1000 * 5};

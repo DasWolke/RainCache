@@ -2,7 +2,15 @@
   "src": [
     {
       "RainCache": [
-        "./src/**/*.js"
+        "./src/**/*.js",
+        "!./src/connector/**/*.js",
+        "!./src/storageEngine/**/*.js"
+      ],
+      "Connectors": [
+        "./src/connector/**/*.js"
+      ],
+      "StorageEngines": [
+        "./src/storageEngine/**/*.js"
       ]
     },
     {
@@ -19,6 +27,8 @@
   },
   "jsdoc": {
     "access": "public",
+    "hierarchy": true,
+    "sort": "group",
     "plugins": [
       "plugins/markdown"
     ]
@@ -43,7 +53,27 @@
         },
         {
           "label": "Documentation",
-          "href": "?api=RainCache#RainCache"
+          "iconClass": "ico ico-book",
+          "items": [
+            {
+              "label": "Cache",
+              "href": "?api=RainCache#RainCache"
+            },
+            {
+              "label": "Connectors",
+              "href": "?api=Connectors"
+            },
+            {
+              "label": "Storage Engines",
+              "href": "?api=StorageEngines"
+            }
+          ]
+        },
+        {
+          "label": "GitHub",
+          "href": "https://github.com/DasWolke/RainCache",
+          "target": "_blank",
+          "iconClass": "ico-md ico-github"
         }
       ]
     }

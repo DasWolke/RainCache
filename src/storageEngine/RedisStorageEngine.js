@@ -8,7 +8,7 @@ promisifyAll(redis.Multi.prototype);
 /**
  * @typedef {class} RedisStorageEngine - StorageEngine which uses redis as a datasource
  * @property {Redis} client - redis client
- * @property {Boolean} ready - whether this storage engine can be used
+ * @property {Boolean} ready - whether this storage engine is ready for usage
  * @property {Boolean} useHash - whether hash objects should be used for storing data
  * @property {Object} options - options that are passed to the redis client
  * @extends BaseStorageEngine

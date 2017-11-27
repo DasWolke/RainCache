@@ -3,20 +3,22 @@ let BaseCache = require('./BaseCache');
 
 /**
  * Cache responsible for storing channel related data
- * @property {StorageEngine} storageEngine - storage engine to use for this cache
- * @property {String} namespace=channel - namespace of the cache
- * @property {ChannelMapCache} guildChannelMap - Instantiated ChannelMap class
- * @property {PermissionOverwriteCache} permissionOverwrites - Instantiated PermissionOverwrite class
- * @property {UserCache} recipients - Instantiated UserCache class
+ * @extends BaseCache
  */
 class ChannelCache extends BaseCache {
     /**
      * Create a new ChanneCache
+     *
+     * **This class is automatically instantiated by RainCache**
      * @param {StorageEngine} storageEngine - storage engine to use for this cache
      * @param {ChannelMapCache} channelMap - Instantiated ChannelMap class
-     * @param {PermissionOverwriteCache} permissionOverwriteCache - Instantiated PermissionOverwrite class
-     * @param {UserCache} userCache
-     * @param {Channel} boundObject
+     * @param {PermissionOverwriteCache} permissionOverwriteCache - Instantiated PermissionOverwriteCache class
+     * @param {UserCache} userCache - Instantiated UserCache class
+     * @param {Channel} [boundObject] - Optional, may be used to bind a channel object to this cache
+     * @property {String} namespace=channel - namespace of the cache, defaults to `channel`
+     * @property {ChannelMapCache} guildChannelMap - Instantiated ChannelMap class
+     * @property {PermissionOverwriteCache} permissionOverwrites - Instantiated PermissionOverwrite class
+     * @property {UserCache} recipients - Instantiated UserCache class
      */
     constructor(storageEngine, channelMap, permissionOverwriteCache, userCache, boundObject) {
         super();
@@ -166,10 +168,10 @@ class ChannelCache extends BaseCache {
 // To anyone wanting to write a library: JUST COPY THIS SHIT, filling this out manually wasn't fun :<
 // https://www.youtube.com/watch?v=LIlZCmETvsY have a weird video to distract yourself from the problems that will come upon ya
 /**
- * @typedef {Object} Channel
+ * @typedef {Object} Channel - a discord channel object
  * @property {String} id - id of the channel
  * @property {Number} type - [type](https://discordapp.com/developers/docs/resources/channel#channel-object-channel-types) of channel
- * @property {String} [guild_id] - id of the {Guild} of the channel
+ * @property {String} [guild_id] - id of the Guild of the channel
  * @property {Number} [position] - sorting position of the channel
  * @property {PermissionOverwrite[]} [permission_overwrites] - array of permission overwrites for this channel
  * @property {String} [name] - name of the channel
@@ -186,7 +188,7 @@ class ChannelCache extends BaseCache {
  */
 
 /**
- * @typedef {Object} PermissionOverwrite
+ * @typedef {Object} PermissionOverwrite - permission overwrite object, which is used to overwrite permissions on a channel level
  * @property {Number} allow - bitwise value of allowed permissions
  * @property {Number} deny - bitwise value of disallowed permissions
  * @property {String} type - type of the overwrite, either member or role

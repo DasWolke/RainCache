@@ -25,6 +25,7 @@ try {
  * @property {Connector} outbound - Connector used for forwarding events
  * @property {Object} cache - Instantiated cache classes
  * @property {GuildCache} cache.guild - Instantiated Guild Cache
+ * @property {ChannelCache} cache.channel - Instantiated Channel Cache
  */
 class RainCache extends EventEmitter {
     /**
@@ -50,13 +51,14 @@ class RainCache extends EventEmitter {
      * @param {Object} [options.disabledEvents={}] - If you want to disable events from being processed,
      * you can add them here like this: `{'MESSAGE_CREATE':true}`,
      * this would disable any message_creates from being cached
-     * @param {Object} [options.cacheClasses] - object with classes (not objects) that should be used for each type of data that is cached
+     * @param {Object} [options.cacheClasses] - object with classes (**not objects**) that should be used for each type of data that is cached
      *
      * **RainCache automatically uses default classes when no cache classes are passed, else it will use your classes.**
      * @param {Object} [options.cacheClasses.guild=GuildCache] - cache class to use for guilds, defaults to the GuildCache
      * @param {Object} [options.cacheClasses.channel=ChannelCache] - cache class to use for channels, defaults to ChannelCache
-     * @param inboundConnector
-     * @param outboundConnector
+     * @param {Object} [options.cacheClasses.channelMap=ChannelMapCache] - cache class to use for channels, defaults to ChannelMapCache
+     * @param {Connector} inboundConnector
+     * @param {Connector} outboundConnector
      */
     constructor(options, inboundConnector, outboundConnector) {
         super();

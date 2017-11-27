@@ -1,7 +1,19 @@
 'use strict';
 let BaseCache = require('./BaseCache');
 
+/**
+ * Cache responsible for storing role related data
+ * @extends BaseCache
+ */
 class RoleCache extends BaseCache {
+    /**
+     * Create a new RoleCache
+     *
+     * **This class is automatically instantiated by RainCache**
+     * @param {StorageEngine} storageEngine - Storage engine to use for this cache
+     * @param {Role} boundObject - Optional, may be used to bind a role object to the cache
+     * @property {String} namespace=role - namespace of the cache, defaults to `role`
+     */
     constructor(storageEngine, boundObject) {
         super();
         this.storageEngine = storageEngine;
@@ -11,6 +23,12 @@ class RoleCache extends BaseCache {
         }
     }
 
+    /**
+     * Get a role via id and guild id of the role
+     * @param {String} id - id of the role
+     * @param {String} guildId - id of the guild belonging to the role
+     * @return {Promise.<RoleCache|null>} Returns a Role Cache with a bound role or null if no role was found
+     */
     async get(id, guildId) {
         if (this.boundObject) {
             return this.boundObject;
@@ -22,6 +40,12 @@ class RoleCache extends BaseCache {
         return new RoleCache(this.storageEngine, role);
     }
 
+    /**
+     * Update a role
+     * @param id
+     * @param guildId
+     * @param data
+     */
     async update(id, guildId, data) {
         if (this.boundObject) {
             this.bindObject(data);
@@ -74,7 +98,7 @@ class RoleCache extends BaseCache {
 }
 
 /**
- * @typedef {Object} Role
+ * @typedef {Object} Role - a discord role object
  * @property {String} id - role id
  * @property {String} name - role name
  * @property {Number} color - integer representation of hexadecimal color code
