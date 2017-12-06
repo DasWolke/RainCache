@@ -67,7 +67,7 @@ class GuildCache extends BaseCache {
      * @param {?Array} data.presences - Array of presences
      * @param {?Role[]} data.roles - Array of roles
      * @param {?Emoji[]} data.emojis - Array of emojis
-     * @returns {Promise.<GuildCache>}
+     * @returns {Promise.<GuildCache>} - returns a bound guild cache
      */
     async update(id, data) {
         if (this.boundObject) {
@@ -129,9 +129,9 @@ class GuildCache extends BaseCache {
     }
 
     /**
-     * Removes a guild from the cache.
+     * Removes a guild and associated elements from the cache.
      * @param {String} id - id of the guild to remove
-     * @returns {Promise.<null>}
+     * @returns {Promise.<void>}
      */
     async remove(id) {
         if (this.boundObject) {
@@ -142,6 +142,7 @@ class GuildCache extends BaseCache {
             let channelMap = await this.guildChannelMap.get(id);
             let roles = await this.roles.getIndexMembers(id);
             let emojis = await this.emojis.getIndexMembers(id);
+            let members = await this.members.getIndexMembers(id);
             for (let emoji of emojis) {
                 await this.emojis.remove(id, emoji);
             }
@@ -150,6 +151,9 @@ class GuildCache extends BaseCache {
             }
             for (let channel of channelMap.channels) {
                 await this.channels.remove(channel);
+            }
+            for (let member of members) {
+                await this.members.remove(id, member);
             }
             await this.guildChannelMap.remove(id);
             await this.removeFromIndex(id);
@@ -162,7 +166,7 @@ class GuildCache extends BaseCache {
     /**
      * Filter through the collection of guilds
      * @param {Function} fn - Filter function
-     * @returns {Promise.<Array<GuildCache>>}
+     * @returns {Promise.<GuildCache[]>} - array of bound guild caches
      */
     async filter(fn) {
         let guilds = await this.storageEngine.filter(fn, this.namespace);
@@ -172,7 +176,7 @@ class GuildCache extends BaseCache {
     /**
      * Filter through the collection of guilds and return the first match
      * @param {Function} fn - Filter function
-     * @returns {Promise.<GuildCache>}
+     * @returns {Promise.<GuildCache>} - returns a bound guild cache
      */
     async find(fn) {
         let guild = await this.storageEngine.find(fn, this.namespace);
@@ -198,9 +202,9 @@ class GuildCache extends BaseCache {
     }
 
     /**
-     * Check if a guild is indexed
+     * Check if a guild is indexed alias cached
      * @param {String} id - id of the guild
-     * @returns {Promise.<Boolean>}
+     * @returns {Promise.<Boolean>} - True if this guild is cached and false if not
      */
     async isIndexed(id) {
         return this.storageEngine.isListMember(this.namespace, id);
@@ -208,7 +212,7 @@ class GuildCache extends BaseCache {
 
     /**
      * Get all guild ids currently indexed
-     * @returns {Promise.<String[]>}
+     * @returns {Promise.<String[]>} - array of guild ids
      */
     async getIndexMembers() {
         return this.storageEngine.getListMembers(this.namespace);
@@ -220,6 +224,14 @@ class GuildCache extends BaseCache {
      */
     async removeIndex() {
         return this.storageEngine.removeList(this.namespace);
+    }
+
+    /**
+     * Get the number of guilds that are currently cached
+     * @return {Promise.<Number>} - Number of guilds currently cached
+     */
+    async getIndexCount() {
+        return this.storageEngine.getListCount(this.namespace);
     }
 }
 

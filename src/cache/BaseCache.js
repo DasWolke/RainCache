@@ -28,7 +28,7 @@ class BaseCache {
     /**
      * Bind a guild id to the cache
      * @param {String} guildId - id of the guild that should be bound to this cache
-     * @return {BaseCache}
+     * @return {this}
      * @public
      */
     bindGuild(guildId) {

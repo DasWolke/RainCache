@@ -26,8 +26,8 @@ class EmojiCache extends BaseCache {
 
     /**
      * Get an emoji via id
-     * @param {String} id - id of the emoji, this does not refer to the name of the emoji
-     * @param {String} guildId - id of the guild
+     * @param {String} id - id of the emoji (this does not refer to the name of the emoji)
+     * @param {String} guildId - id of the guild this emoji belongs to
      * @return {Promise.<EmojiCache|null>} EmojiCache with bound object or null if nothing was found
      */
     async get(id, guildId = this.boundGuild) {
@@ -43,11 +43,11 @@ class EmojiCache extends BaseCache {
     }
 
     /**
-     *
-     * @param id
-     * @param guildId
-     * @param data
-     * @return {Promise.<EmojiCache>}
+     * Update a emoji
+     * @param {String} id - id of the emoji (this does not refer to the name of the emoji)
+     * @param {String} guildId - id of the guild this emoji belongs to
+     * @param {Emoji} data - new data of the emoji, that will get merged with the old data
+     * @return {Promise.<EmojiCache>} - returns a bound EmojiCache
      */
     async update(id, guildId = this.boundGuild, data) {
         if (this.boundObject) {
@@ -61,10 +61,10 @@ class EmojiCache extends BaseCache {
     }
 
     /**
-     *
-     * @param id
-     * @param guildId
-     * @return {Promise.<*>}
+     * Remove an emoji from the cache
+     * @param {String} id - id of the emoji (this does not refer to the name of the emoji)
+     * @param {String} guildId - id of the guild this emoji belongs to
+     * @return {Promise.<void>}
      */
     async remove(id, guildId = this.boundGuild) {
         if (this.boundObject) {
@@ -80,11 +80,11 @@ class EmojiCache extends BaseCache {
     }
 
     /**
-     *
-     * @param fn
-     * @param guildId
+     * Filter for emojis by providing a filter function which returns true upon success and false otherwise
+     * @param {Function} fn - filter function to use for the filtering
+     * @param {String} guildId - id of the guild the emojis searched belong to
      * @param ids
-     * @return {Promise.<EmojiCache[]>}
+     * @return {Promise.<EmojiCache[]>} - array of bound emoji caches
      */
     async filter(fn, guildId = this.boundGuild, ids = null) {
         let emojis = await this.storageEngine.filter(fn, ids, super.buildId(guildId));
@@ -92,11 +92,11 @@ class EmojiCache extends BaseCache {
     }
 
     /**
-     *
-     * @param fn
+     * Find an emoji by providing a filter function which returns true upon success and false otherwise
+     * @param {Function} fn - filter function to use for filtering for a single emoji
      * @param guildId
      * @param ids
-     * @return {Promise.<EmojiCache>}
+     * @return {Promise.<EmojiCache>} - bound emoji cache
      */
     async find(fn, guildId = this.boundGuild, ids = null) {
         let emoji = await this.storageEngine.find(fn, ids, super.buildId(guildId));
@@ -104,10 +104,10 @@ class EmojiCache extends BaseCache {
     }
 
     /**
-     *
-     * @param emojiId
-     * @param guildId
-     * @return {*}
+     * Build a unique key to store the emoji in the datasource
+     * @param {String} emojiId - id of the emoji (this does not refer to the name of the emoji)
+     * @param {String} guildId - id of the guild this emoji belongs to
+     * @return {String} - prepared key
      */
     buildId(emojiId, guildId) {
         if (!guildId) {

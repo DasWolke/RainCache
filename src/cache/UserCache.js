@@ -102,7 +102,7 @@ class UserCache extends BaseCache {
     /**
      * Bind a user id to the cache, used by the member cache
      * @param {String} userId - id of the user
-     * @return {UserCache}
+     * @return {UserCache} - Returns a UserCache that has an id bound to it, which serves as the default argument to get, update and delete
      */
     bindUserId(userId) {
         this.id = userId;
@@ -130,7 +130,7 @@ class UserCache extends BaseCache {
     /**
      * Check if a user is indexed
      * @param {String} id - id of the user
-     * @return {Promise.<boolean>} - True if the user is indexed, falls otherwise
+     * @return {Promise.<boolean>} - True if the user is indexed, false otherwise
      */
     async isIndexed(id) {
         return this.storageEngine.isListMember(this.namespace, id);
@@ -139,7 +139,7 @@ class UserCache extends BaseCache {
     /**
      * Get a list of currently indexed users, since users is a global namespace,
      * this will return **ALL** users that the bot cached currently
-     * @return {Promise.<String[]>}
+     * @return {Promise.<String[]>} - Array with a list of ids of users that are indexed
      */
     async getIndexMembers() {
         return this.storageEngine.getListMembers(this.namespace);
@@ -151,6 +151,14 @@ class UserCache extends BaseCache {
      */
     async removeIndex() {
         return this.storageEngine.removeList(this.namespace);
+    }
+
+    /**
+     * Get the number of users that are currently cached
+     * @return {Promise.<Number>} - Number of users currently cached
+     */
+    async getIndexCount() {
+        return this.storageEngine.getListCount(this.namespace);
     }
 }
 

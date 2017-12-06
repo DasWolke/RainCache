@@ -163,6 +163,14 @@ class ChannelCache extends BaseCache {
     async removeIndex() {
         return this.storageEngine.removeList(this.namespace);
     }
+
+    /**
+     * Get the number of channels that are currently cached
+     * @return {Promise.<Number>} - Number of channels currently cached
+     */
+    async getIndexCount() {
+        return this.storageEngine.getListCount(this.namespace);
+    }
 }
 
 // To anyone wanting to write a library: JUST COPY THIS SHIT, filling this out manually wasn't fun :<

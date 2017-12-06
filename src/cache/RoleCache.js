@@ -42,9 +42,10 @@ class RoleCache extends BaseCache {
 
     /**
      * Update a role
-     * @param id
-     * @param guildId
-     * @param data
+     * @param {String} id - id of the role
+     * @param {String} guildId - id of the guild belonging to the role
+     * @param {Role} data - new role data
+     * @return {Promise.<RoleCache>} - returns a bound RoleCache once the data was updated.
      */
     async update(id, guildId, data) {
         if (this.boundObject) {
@@ -53,7 +54,7 @@ class RoleCache extends BaseCache {
             return this;
         }
         if (!guildId) {
-            return;
+            return Promise.reject('Missing guild id');
         }
         if (!data.guild_id) {
             data.guild_id = guildId;
@@ -66,6 +67,12 @@ class RoleCache extends BaseCache {
         return new RoleCache(this.storageEngine, data);
     }
 
+    /**
+     * Remove a role from the cache
+     * @param {String} id - id of the role
+     * @param {String} guildId - id of the guild belonging to the role
+     * @return {Promise.<void>}
+     */
     async remove(id, guildId) {
         if (this.boundObject) {
             return this.remove(this.boundObject.id, this.boundObject.guild_id);
@@ -79,16 +86,36 @@ class RoleCache extends BaseCache {
         }
     }
 
+    /**
+     * Filter for roles by providing a filter function which returns true upon success and false otherwise
+     * @param {Function} fn - filter function to use for the filtering
+     * @param {String} guildId - id of the guild belonging to the roles
+     * @param {String[]} ids - array of role ids that should be used for the filtering
+     * @return {Promise.<RoleCache[]>} - array of bound role caches
+     */
     async filter(fn, guildId = this.boundGuild, ids = null) {
         let roles = await this.storageEngine.filter(fn, ids, super.buildId(guildId));
         return roles.map(r => new RoleCache(this.storageEngine, r));
     }
 
+    /**
+     * Find a role by providing a filter function which returns true upon success and false otherwise
+     * @param {Function} fn - filter function to use for filtering for a single role
+     * @param {String} guildId - id of the guild belonging to the roles
+     * @param {String[]} ids - array of role ids that should be used for the filtering
+     * @return {Promise.<RoleCache>} - bound role cache
+     */
     async find(fn, guildId = this.boundGuild, ids = null) {
         let role = await this.storageEngine.find(fn, ids, super.buildId(guildId));
         return new RoleCache(this.storageEngine, role);
     }
 
+    /**
+     * Build a unique key for the role cache entry
+     * @param {String} roleId - id of the role
+     * @param {String} guildId - id of the guild belonging to the role
+     * @return {String} - the prepared key
+     */
     buildId(roleId, guildId) {
         if (!guildId) {
             return super.buildId(roleId);
@@ -107,6 +134,7 @@ class RoleCache extends BaseCache {
  * @property {Number} permissions - permission bit set
  * @property {Boolean} managed - if this role is managed by an integration
  * @property {Boolean} mentionable - if this role can be mentioned
+ * @property {String} ?guild_id - optional guild id, of the guild that owns this role, not supplied by discord.
  */
 
 module.exports = RoleCache;
