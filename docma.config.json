@@ -14,7 +14,7 @@
       ]
     },
     {
-      "index": "./README.md"
+      "index": "./README.MD"
     }
   ],
   "dest": "./RainCache",
