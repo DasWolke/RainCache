@@ -9,8 +9,12 @@ try {
 /**
  * BaseConnector class, provides a common structure for connectors
  * @extends EventEmitter
+ * @private
  */
 class BaseConnector extends EventEmitter {
+    /**
+     * @private
+     */
     constructor() {
         super();
         this.ready = false;

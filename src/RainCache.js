@@ -8,6 +8,7 @@ let UserCache = require('./cache/UserCache');
 let RoleCache = require('./cache/RoleCache');
 let EmojiCache = require('./cache/EmojiCache');
 let PresenceCache = require('./cache/PresenceCache');
+let PermissionsOverwriteCache = require('./cache/PermissionOverwriteCache');
 let EventEmitter;
 try {
     EventEmitter = require('eventemitter3');
@@ -15,7 +16,50 @@ try {
     EventEmitter = require('events').EventEmitter;
 }
 
+/**
+ * @typedef {class} RainCache - Main class used for accessing caches via subclasses and initializing the whole library
+ * @extends EventEmitter
+ * @property {Object} options - options that the user passed through the constructor
+ * @property {Boolean} ready=false - whether the cache is ready to process events
+ * @property {Connector} inbound - Connector used for receiving events
+ * @property {Connector} outbound - Connector used for forwarding events
+ * @property {Object} cache - Instantiated cache classes
+ * @property {GuildCache} cache.guild - Instantiated Guild Cache
+ * @property {ChannelCache} cache.channel - Instantiated Channel Cache
+ */
 class RainCache extends EventEmitter {
+    /**
+     * Create a new Cache instance
+     * @param {Object} options Options that should be used by RainCache
+     * @param {Object} options.storage - object with storage engines to use for the different cache classes
+     * @param {StorageEngine} [options.storage.default] - default storage engine to use when no special storage engine was passed for a class.
+     *
+     * **Use this option if you do not want to use a different type of storage engine for certain caches**
+     *
+     * You may also combine options: e.g. a RedisStorageEngine for presence and the rest within mongo, that's no issue.
+     *
+     * The cache type specific storage engine takes priority over the default one.
+     * @param {StorageEngine} [options.storage.guild=options.storage.default] - storage engine used by the guild cache
+     * @param {StorageEngine} [options.storage.channel=options.storage.default] - storage engine used by the channel cache
+     * @param {StorageEngine} [options.storage.channelMap=options.storage.default] - storage engine used by the channelMap cache
+     * @param {StorageEngine} [options.storage.member=options.storage.default] - storage engine used by the member cache
+     * @param {StorageEngine} [options.storage.user=options.storage.default] - storage engine used by the user cache
+     * @param {StorageEngine} [options.storage.role=options.storage.default] - storage engine used by the role cache
+     * @param {StorageEngine} [options.storage.emoji=options.storage.default] - storage engine used by the emoji cache
+     * @param {StorageEngine} [options.storage.presence=options.storage.default] - storage engine used by the presence cache
+     * @param {StorageEngine} [options.storage.permOverwrite=options.storage.default] - storage engine used by the permission overwrite cache
+     * @param {Object} [options.disabledEvents={}] - If you want to disable events from being processed,
+     * you can add them here like this: `{'MESSAGE_CREATE':true}`,
+     * this would disable any message_creates from being cached
+     * @param {Object} [options.cacheClasses] - object with classes (**not objects**) that should be used for each type of data that is cached
+     *
+     * **RainCache automatically uses default classes when no cache classes are passed, else it will use your classes.**
+     * @param {Object} [options.cacheClasses.guild=GuildCache] - cache class to use for guilds, defaults to the GuildCache
+     * @param {Object} [options.cacheClasses.channel=ChannelCache] - cache class to use for channels, defaults to ChannelCache
+     * @param {Object} [options.cacheClasses.channelMap=ChannelMapCache] - cache class to use for channels, defaults to ChannelMapCache
+     * @param {Connector} inboundConnector
+     * @param {Connector} outboundConnector
+     */
     constructor(options, inboundConnector, outboundConnector) {
         super();
         if (!options.storage) {
@@ -30,7 +74,8 @@ class RainCache extends EventEmitter {
                 user: UserCache,
                 role: RoleCache,
                 emoji: EmojiCache,
-                presence: PresenceCache
+                presence: PresenceCache,
+                permOverwrite: PermissionsOverwriteCache
             };
         }
         if (!options.storage.default) {
@@ -57,7 +102,7 @@ class RainCache extends EventEmitter {
         } catch (e) {
             throw new Error('Failed to initialize storage engines');
         }
-        this.cache = this.createCaches(this.options.storage, this.options.cacheClasses);
+        this.cache = this._createCaches(this.options.storage, this.options.cacheClasses);
         Object.assign(this, this.cache);
         this.eventProcessor = new EventProcessor({
             disabledEvents: this.options.disabledEvents,
@@ -69,7 +114,8 @@ class RainCache extends EventEmitter {
                 user: this.cache.user,
                 role: this.cache.role,
                 emoji: this.cache.emoji,
-                presence: this.cache.presence
+                presence: this.cache.presence,
+                permOverwrite: this.cache.permOverwrite
             }
         });
         if (this.inbound && !this.inbound.ready) {
@@ -80,9 +126,14 @@ class RainCache extends EventEmitter {
         }
         if (this.inbound) {
             this.inbound.on('event', async (event) => {
-                await this.eventProcessor.inbound(event);
-                if (this.outbound) {
-                    this.outbound.send(event);
+                try {
+                    await this.eventProcessor.inbound(event);
+                    if (this.outbound) {
+                        await this.outbound.send(event);
+                    }
+                }
+                catch (e) {
+                    this.emit('error', e);
                 }
             });
         }
@@ -92,48 +143,48 @@ class RainCache extends EventEmitter {
         this.ready = true;
     }
 
-    createCaches(engines, cacheClasses) {
+    _createCaches(engines, cacheClasses) {
         let caches = {};
         if (cacheClasses['role']) {
-            let engine = this.getEngine(engines, 'role');
+            let engine = this._getEngine(engines, 'role');
             caches['role'] = new cacheClasses['role'](engine);
         }
         if (cacheClasses['emoji']) {
-            let engine = this.getEngine(engines, 'emoji');
+            let engine = this._getEngine(engines, 'emoji');
             caches['emoji'] = new cacheClasses['emoji'](engine);
         }
         if (cacheClasses['permOverwrite']) {
-            let engine = this.getEngine(engines, 'permOverwrite');
+            let engine = this._getEngine(engines, 'permOverwrite');
             caches['permOverwrite'] = new cacheClasses['permOverwrite'](engine);
         }
         if (cacheClasses['user']) {
-            let engine = this.getEngine(engines, 'user');
+            let engine = this._getEngine(engines, 'user');
             caches['user'] = new cacheClasses['user'](engine);
         }
         if (cacheClasses['member']) {
-            let engine = this.getEngine(engines, 'member');
+            let engine = this._getEngine(engines, 'member');
             caches['member'] = new cacheClasses['member'](engine, caches['user']);
         }
         if (cacheClasses['presence']) {
-            let engine = this.getEngine(engines, 'presence');
+            let engine = this._getEngine(engines, 'presence');
             caches['presence'] = new cacheClasses['presence'](engine, caches['user']);
         }
         if (cacheClasses['channelMap']) {
-            let engine = this.getEngine(engines, 'channelMap');
+            let engine = this._getEngine(engines, 'channelMap');
             caches['channelMap'] = new cacheClasses['channelMap'](engine);
         }
         if (cacheClasses['channel']) {
-            let engine = this.getEngine(engines, 'channel');
+            let engine = this._getEngine(engines, 'channel');
             caches['channel'] = new cacheClasses['channel'](engine, caches['channelMap'], caches['permOverwrite'], caches['user']);
         }
         if (cacheClasses['guild']) {
-            let engine = this.getEngine(engines, 'guild');
+            let engine = this._getEngine(engines, 'guild');
             caches['guild'] = new cacheClasses['guild'](engine, caches['channel'], caches['role'], caches['member'], caches['emoji'], caches['presence'], caches['channelMap']);
         }
         return caches;
     }
 
-    getEngine(engines, engine) {
+    _getEngine(engines, engine) {
         return engines[engine] || engines['default'];
     }
 }

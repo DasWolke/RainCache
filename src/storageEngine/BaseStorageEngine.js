@@ -1,6 +1,13 @@
 'use strict';
 
+/**
+ * Base Storage engine class defining the methods being used by RainCache that a storage engine is supposed to have
+ * @private
+ */
 class BaseStorageEngine {
+    /**
+     * @private
+     */
     constructor() {
         this.ready = true;
     }
@@ -25,15 +32,15 @@ class BaseStorageEngine {
 
     }
 
-    addToList(ids, listId) {
+    addToList(listId, ids) {
 
     }
 
-    isListMember(id, listId) {
+    isListMember(listId, id) {
 
     }
 
-    removeFromList(id, listId) {
+    removeFromList(listId, id) {
 
     }
 

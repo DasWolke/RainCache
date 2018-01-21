@@ -1,0 +1,17 @@
+language: node_js
+node_js:
+- '8'
+install:
+- npm install
+script:
+- npm run build:docs
+deploy:
+- provider: pages
+  skip_cleanup: true
+  github_token: $github_token
+  local_dir: RainCache
+  on:
+    branch: dev
+env:
+  global:
+    secure: ekp/FeFmc/Pl6q9vu4Fap7Lt8LM5grS8H8j1NppqGxmonmGiTJuysY70BsmmtC1XB+iG/0rtT5VQAleabX09i8gK3e1WA1iyLLNjxnqIfrOUKGH6r5tqa8Oj96/zwmu1XuW9sl3qRu+JDg0UqGDKUCQRZNVd71JLbuxl/p0DRZTXEyv6CV3rmxvJqO+2yqGn1IovFgEY6B6XZDyHrT2FkphlGGNqpsrcjQm3YiOMRtskmnHuhwhY4+sb7iKkZmSejb9IScwkcl8UosXjRlpN/1RjN7c2dI9zK2jfq+6KtQdRqipz2HicKrzuNoo+GfS0IIBHc6PDYXdjgRLs74cAR2HXv0JElfgMQojNNmsCaqihS4+QphXCXwYrQx+BdXsWsfwEB/5KfvHR92bGS0+5+QYuGmDStYBSaE+ycKpaRkA3IXf4qMOY5F+mXBdiQknv0bWyvG+ShMDxPaTVDssRNzsGx94pna7nGsmjjpbGEm+G6D34w1TabbkQS90K7QqVCaOd8x2NQDClnBDfEF4Yg7swi/SBEp0ryMCY/CFRTddMVom/4LFq0oFry/eMnOXcDV3cWBE+ATpvJ835N0bVrWadlfKXJ6h2nf62ugVfWYeR3c7Cm8hg6yRBF1qhouDGrKlEHVgxEAU4JVHgbgbB6Zpc10OV+FQ211XJEnYcprA=

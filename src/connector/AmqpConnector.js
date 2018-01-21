@@ -4,6 +4,7 @@ let amqp = require('amqplib');
 
 /**
  * Amqp Connector, used for receiving and sending messages to an amqp based message queue
+ * @extends BaseConnector
  */
 class AqmpConnector extends BaseConnector {
     /**
@@ -23,7 +24,7 @@ class AqmpConnector extends BaseConnector {
     }
 
     /**
-     * Initialize the connector
+     * Initializes the connector by creating a new connection to the amqp host set via config and creating a new queue to receive messages from
      * @returns {Promise.<void>}
      */
     async initialize() {
@@ -32,6 +33,7 @@ class AqmpConnector extends BaseConnector {
         this.ready = true;
         this.channel.assertQueue(this.options.amqpQueue, {durable: false, autoDelete: true});
         this.channel.consume(this.options.amqpQueue, (event) => {
+            this.channel.ack(event);
             // console.log(event.content.toString());
             this.emit('event', JSON.parse(event.content.toString()));
         });

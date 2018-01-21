@@ -3,12 +3,16 @@ let BaseCache = require('./BaseCache');
 
 /**
  * Cache for providing a guild/user -> channels map
+ * @extends BaseCache
  */
 class ChannelMapCache extends BaseCache {
     /**
      * Create a new ChannelMapCache
-     * @param storageEngine - storage engine to use for this cache
-     * @param boundObject - Optional, may be used to bind the map object to the cache
+     *
+     * **This class is automatically instantiated by RainCache**
+     * @param {StorageEngine} storageEngine - storage engine to use for this cache
+     * @param {Object} boundObject - Optional, may be used to bind the map object to the cache
+     * @property {String} namespace=channelmap - namespace of this cache, defaults to `channelmap`
      */
     constructor(storageEngine, boundObject) {
         super();
@@ -41,7 +45,7 @@ class ChannelMapCache extends BaseCache {
     /**
      * Upsert a ChannelMap
      * @param {String} id Id of the user or the guild
-     * @param {Array} data Array of channel ids
+     * @param {String[]} data Array of channel ids
      * @param {String} [type=guild] Type of the map to upsert
      * @param {Boolean} [remove=false] Remove old channels that don't exist anymore
      * @returns {Promise.<ChannelMapCache>}

@@ -7,6 +7,10 @@ try {
 }
 
 class EventProcessor extends EventEmitter {
+    /**
+     *
+     * @param options
+     */
     constructor(options) {
         super();
         this.options = options || {disabledEvents: {}, presenceInterval: 1000 * 5};
@@ -112,6 +116,12 @@ class EventProcessor extends EventEmitter {
                 }
                 break;
             }
+            case 'MESSAGE_CREATE': {
+                if (event.d.user && !event.d.webhook_id) {
+                    await this.userCache.update(event.d.user.id, event.d.author);
+                }
+                break;
+            }
             default:
                 if (event.t !== 'PRESENCE_UPDATE') {
                     this.emit('debug', `Unknown Event ${event.t}`);
@@ -157,6 +167,7 @@ class EventProcessor extends EventEmitter {
         switch (channelCreateEvent.d.type) {
             case 0:
             case 2:
+            case 4:
                 await this.channelMapCache.update(channelCreateEvent.d.guild_id, [channelCreateEvent.d.id], 'guild');
                 // this.emit('debug', `Caching guild channel ${channelCreateEvent.d.id}`);
                 return this.channelCache.update(channelCreateEvent.d.id, channelCreateEvent.d);

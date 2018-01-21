@@ -2,7 +2,8 @@
 let BaseConnector = require('./BaseConnector');
 
 /**
- * Direct Connector, useful when using raincache with an existing solution like rawWs
+ * Direct Connector, useful when using raincache with an existing solution library that runs in the same process
+ * @extends BaseConnector
  */
 class DirectConnector extends BaseConnector {
     /**
@@ -28,6 +29,19 @@ class DirectConnector extends BaseConnector {
      */
     receive(event) {
         this.emit('event', event);
+    }
+
+    /**
+     * Called when RainCache finishes processing of an event
+     * @param {Object} event - received event
+     */
+    send(event) {
+        /**
+         * @event DirectConnector#send
+         * @type {Object}
+         * @description Emitted once an event was fully processed by RainCache, you can now forward that event somewhere else
+         */
+        this.emit('send', event);
     }
 }
 
