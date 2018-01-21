@@ -116,6 +116,12 @@ class EventProcessor extends EventEmitter {
                 }
                 break;
             }
+            case 'MESSAGE_CREATE': {
+                if (event.d.user && !event.d.webhook_id) {
+                    await this.userCache.update(event.d.user.id, event.d.author);
+                }
+                break;
+            }
             default:
                 if (event.t !== 'PRESENCE_UPDATE') {
                     this.emit('debug', `Unknown Event ${event.t}`);

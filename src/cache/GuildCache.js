@@ -144,16 +144,16 @@ class GuildCache extends BaseCache {
             let emojis = await this.emojis.getIndexMembers(id);
             let members = await this.members.getIndexMembers(id);
             for (let emoji of emojis) {
-                await this.emojis.remove(id, emoji);
+                await this.emojis.remove(emoji, id);
             }
             for (let role of roles) {
-                await this.roles.remove(id, role);
+                await this.roles.remove(role, id);
             }
             for (let channel of channelMap.channels) {
                 await this.channels.remove(channel);
             }
             for (let member of members) {
-                await this.members.remove(id, member);
+                await this.members.remove(member, id);
             }
             await this.guildChannelMap.remove(id);
             await this.removeFromIndex(id);

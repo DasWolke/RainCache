@@ -45,7 +45,7 @@ class ChannelMapCache extends BaseCache {
     /**
      * Upsert a ChannelMap
      * @param {String} id Id of the user or the guild
-     * @param {Array} data Array of channel ids
+     * @param {String[]} data Array of channel ids
      * @param {String} [type=guild] Type of the map to upsert
      * @param {Boolean} [remove=false] Remove old channels that don't exist anymore
      * @returns {Promise.<ChannelMapCache>}
