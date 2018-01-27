@@ -132,7 +132,7 @@ class RoleCache extends BaseCache {
  * @property {Boolean} hoist - if this role is hoisted
  * @property {Number} position - position of the role
  * @property {Number} permissions - permission bit set
- * @property {Boolean} managed - if this role is managed by an integration
+ * @property {Boolean} managed - if this role is managed by an integration (also true for bot roles that are added when you add a bot that requires permissions)
  * @property {Boolean} mentionable - if this role can be mentioned
  * @property {String} ?guild_id - optional guild id, of the guild that owns this role, not supplied by discord.
  */

@@ -43,7 +43,7 @@ class PresenceCache extends BaseCache {
     }
 
     /**
-     * Update the presence of a user.
+     * Upsert the presence of a user.
      *
      * **This function automatically removes the guild_id, roles and user of a presence update before saving it**
      * @param {String} id - id of the user the presence belongs to

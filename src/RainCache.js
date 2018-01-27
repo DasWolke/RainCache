@@ -17,15 +17,8 @@ try {
 }
 
 /**
- * @typedef {class} RainCache - Main class used for accessing caches via subclasses and initializing the whole library
+ * RainCache - Main class used for accessing caches via subclasses and initializing the whole library
  * @extends EventEmitter
- * @property {Object} options - options that the user passed through the constructor
- * @property {Boolean} ready=false - whether the cache is ready to process events
- * @property {Connector} inbound - Connector used for receiving events
- * @property {Connector} outbound - Connector used for forwarding events
- * @property {Object} cache - Instantiated cache classes
- * @property {GuildCache} cache.guild - Instantiated Guild Cache
- * @property {ChannelCache} cache.channel - Instantiated Channel Cache
  */
 class RainCache extends EventEmitter {
     /**
@@ -59,6 +52,14 @@ class RainCache extends EventEmitter {
      * @param {Object} [options.cacheClasses.channelMap=ChannelMapCache] - cache class to use for channels, defaults to ChannelMapCache
      * @param {Connector} inboundConnector
      * @param {Connector} outboundConnector
+     *
+     * @property {Object} options - options that the user passed through the constructor
+     * @property {Boolean} ready=false - whether the cache is ready to process events
+     * @property {Connector} inbound - Connector used for receiving events
+     * @property {Connector} outbound - Connector used for forwarding events
+     * @property {Object} cache - Instantiated cache classes
+     * @property {GuildCache} cache.guild - Instantiated Guild Cache
+     * @property {ChannelCache} cache.channel - Instantiated Channel Cache
      */
     constructor(options, inboundConnector, outboundConnector) {
         super();

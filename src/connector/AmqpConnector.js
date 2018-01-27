@@ -6,7 +6,7 @@ let amqp = require('amqplib');
  * Amqp Connector, used for receiving and sending messages to an amqp based message queue
  * @extends BaseConnector
  */
-class AqmpConnector extends BaseConnector {
+class AmqpConnector extends BaseConnector {
     /**
      * Create a new Amqp Connector
      * @param {Object} options - Options
@@ -49,4 +49,4 @@ class AqmpConnector extends BaseConnector {
     }
 }
 
-module.exports = AqmpConnector;
+module.exports = AmqpConnector;
