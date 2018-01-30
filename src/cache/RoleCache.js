@@ -130,7 +130,7 @@ class RoleCache extends BaseCache {
  * @property {String} name - role name
  * @property {Number} color - integer representation of hexadecimal color code
  * @property {Boolean} hoist - if this role is hoisted
- * @property {Number} position - position of the role
+ * @property {Number} position - position of the role, Roles with a lower position can't execute actions on roles with a higher position
  * @property {Number} permissions - permission bit set
  * @property {Boolean} managed - if this role is managed by an integration (also true for bot roles that are added when you add a bot that requires permissions)
  * @property {Boolean} mentionable - if this role can be mentioned
