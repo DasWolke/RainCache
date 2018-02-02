@@ -24,12 +24,14 @@ Then run the following command in a terminal `npm install raincache`
 #### Example:
 ```js
 let RainCache = require('raincache');
-let AmqpConnector = RainCache.Connectors.AmqpConnector; 
 // Load the Amqp Connector
-let RedisStorageEngine = RainCache.Engines.RedisStorageEngine; 
+let AmqpConnector = RainCache.Connectors.AmqpConnector; 
 // Load the redis storage engine class
-let con = new AmqpConnector(); 
+let RedisStorageEngine = RainCache.Engines.RedisStorageEngine; 
 // Use the default options and create a new connector which isn't connected yet
+let con = new AmqpConnector(); 
+// Create a new uninitialized RainCache instance, set redis as the default storage engine, 
+// disable debugging mode and pass an inbound and an outbound connector to receive and forward events
 let cache = new RainCache({
     storage: {
         default: new RedisStorageEngine({
@@ -37,10 +39,10 @@ let cache = new RainCache({
         })
     }, debug: false}, 
     con, con);
-// Create a new uninitialized RainCache instance, set redis as the default storage engine, 
-// disable debugging mode and pass an inbound and an outbound connector to receive and forward events
+
 let init = async () => {
-    await cache.initialize(); // initialize the cache, the connector and the database conenction
+    // initialize the cache, the connector and the database connection
+    await cache.initialize(); 
 };
 // Declare an asynchronous init method
 init().then(() => {

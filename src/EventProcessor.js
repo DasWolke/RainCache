@@ -8,7 +8,7 @@ try {
 
 class EventProcessor extends EventEmitter {
     /**
-     *
+     * Class responsible for executing methods on the correct cache class based on the event received from the incoming connector
      * @param options
      */
     constructor(options) {
@@ -117,8 +117,8 @@ class EventProcessor extends EventEmitter {
                 break;
             }
             case 'MESSAGE_CREATE': {
-                if (event.d.user && !event.d.webhook_id) {
-                    await this.userCache.update(event.d.user.id, event.d.author);
+                if (event.d.author && !event.d.webhook_id) {
+                    await this.userCache.update(event.d.author.id, event.d.author);
                 }
                 break;
             }
