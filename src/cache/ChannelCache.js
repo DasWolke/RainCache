@@ -180,14 +180,14 @@ class ChannelCache extends BaseCache {
  * @property {String} id - id of the channel
  * @property {Number} type - [type](https://discordapp.com/developers/docs/resources/channel#channel-object-channel-types) of channel
  * @property {String} [guild_id] - id of the Guild of the channel
- * @property {Number} [position] - sorting position of the channel
+ * @property {Number} [position] - sorting position of the channel (Channels are sorted in an ascending way, e.g. 0 is the highest channel, while 9 is the lowest)
  * @property {PermissionOverwrite[]} [permission_overwrites] - array of permission overwrites for this channel
  * @property {String} [name] - name of the channel
  * @property {String} [topic] - topic of the channel
  * @property {Boolean} [nsfw] - if the channel is nsfw (guild only)
  * @property {String} [last_message_id] - the id of the last message sent in this channel
- * @property {Number} [bitrate] - bitrate of the channel (voice only)
- * @property {Number} [user_limit] - limit of users in a channel (voice only)
+ * @property {Number} [bitrate] - bitrate (in bits) of the channel (voice only)
+ * @property {Number} [user_limit] - limit of users in a channel (voice only), if this value is not set it's 0 (unlimited)
  * @property {User[]} [recipients] - recipients of a dm (dm only)
  * @property {String} [icon] - icon hash (dm only)
  * @property {String} [owner_id] - id of the DM creator (dm only)

@@ -8,7 +8,7 @@ try {
 
 class EventProcessor extends EventEmitter {
     /**
-     *
+     * Class responsible for executing methods on the correct cache class based on the event received from the incoming connector
      * @param options
      */
     constructor(options) {
