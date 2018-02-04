@@ -141,13 +141,15 @@ class EventProcessor extends EventEmitter {
             this.presenceQueue[presenceEvent.user.id] = Object.assign(this.presenceQueue[presenceEvent.user.id], {
                 status: presenceEvent.status,
                 game: presenceEvent.game,
-                id: presenceEvent.user.id
+                id: presenceEvent.user.id,
+                user: presenceEvent.user
             });
         } else {
             this.presenceQueue[presenceEvent.user.id] = {
                 status: presenceEvent.status,
                 game: presenceEvent.game,
-                id: presenceEvent.user.id
+                id: presenceEvent.user.id,
+                user: presenceEvent.user
             };
         }
     }
@@ -176,7 +178,7 @@ class EventProcessor extends EventEmitter {
         }
         if (channelCreateEvent.d.type === 1) {
             if (!channelCreateEvent.d.recipients || channelCreateEvent.d.recipients.length === 0) {
-                console.error(`Empty Recipients array for dm ${channelCreateEvent.d.id}`);
+                this.emit('debug', `Empty Recipients array for dm ${channelCreateEvent.d.id}`);
                 return;
             }
             // this.emit('debug', `Caching dm channel ${channelCreateEvent.d.id}`);
