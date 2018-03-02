@@ -12,4 +12,7 @@ RainCache.Connectors = {
 RainCache.Engines = {
     RedisStorageEngine: require('./src/storageEngine/RedisStorageEngine'),
 };
+Raincache.Structures = {
+    BaseStructure: require('./src/structures/BaseStructure')
+};
 module.exports = RainCache;
