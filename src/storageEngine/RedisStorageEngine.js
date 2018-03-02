@@ -119,8 +119,8 @@ class RedisStorageEngine extends BaseStorageEngine {
                 if (!cachedData) {
                     cachedData = {};
                 }
-                data = Object.assign(cachedData, data[index]);
-                args.push(id, this.prepareData(data));
+                const updatedCacheData = Object.assign(cachedData, data[index]);
+                args.push(id, this.prepareData(updatedCacheData));
             });
             return this.client.msetAsync(...args);
         }

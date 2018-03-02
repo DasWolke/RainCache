@@ -98,22 +98,28 @@ class EventProcessor extends EventEmitter {
                 await this.roleCache.remove(event.d.guild_id, event.d.role_id);
                 break;
             case 'GUILD_EMOJIS_UPDATE': {
-                let oldEmotes = await this.emojiCache.filter(() => true, event.d.guild_id);
+                let oldEmotes = await this.emojiCache.getIndexMembers(event.d.guild_id);
                 if (!oldEmotes || oldEmotes.length === 0) {
                     oldEmotes = [];
+                } else {
+                    oldEmotes = await this.emojiCache.batchGet(oldEmotes, event.d.guild_id);
                 }
+                let emojisToUpdate = [];
+                let emojisToDelete = [];
                 for (let emoji of event.d.emojis) {
                     let oldEmote = oldEmotes.find(e => e.id === emoji.id);
                     if (!oldEmote || oldEmote !== emoji) {
-                        await this.emojiCache.update(emoji.id, event.d.guild_id, emoji);
+                        emojisToUpdate.push(emoji);
                     }
                 }
                 for (let oldEmote of oldEmotes) {
                     let newEmote = event.d.emojis.find(e => e.id === oldEmote.id);
                     if (!newEmote) {
-                        await this.emojiCache.remove(oldEmote.id, event.d.guild_id);
+                        emojisToDelete.push(oldEmote);
                     }
                 }
+                await this.emojiCache.batchUpdate(emojisToUpdate.map(e => e.id), event.d.guild_id, emojisToUpdate);
+                await this.emojiCache.batchRemove(emojisToDelete.map(e => e.id), event.d.guild_id, emojisToDelete);
                 break;
             }
             case 'MESSAGE_CREATE': {
