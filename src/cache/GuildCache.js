@@ -1,4 +1,3 @@
-'use strict';
 const BaseCache = require('./BaseCache');
 
 /**
@@ -43,7 +42,7 @@ class GuildCache extends BaseCache {
 
     /**
      * Retrieves a guild via id
-     * @param id - Discord id of the guild
+     * @param {String} id - id of the guild
      * @returns {Promise.<GuildCache|null>} Returns either a Guild Object or null if the guild does not exist.
      */
     async get(id) {
@@ -52,10 +51,34 @@ class GuildCache extends BaseCache {
         }
         let guild = await this.storageEngine.get(this.buildId(id));
         if (guild) {
-            return new GuildCache(this.storageEngine, this.channels.bindGuild(guild.id), this.roles.bindGuild(guild.id), this.members.bindGuild(guild.id), this.emojis.bindGuild(guild.id), this.presences.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id), guild);
+            return new GuildCache(this.storageEngine,
+                this.channels.bindGuild(guild.id),
+                this.roles.bindGuild(guild.id),
+                this.members.bindGuild(guild.id),
+                this.emojis.bindGuild(guild.id),
+                this.presences.bindGuild(guild.id),
+                this.guildChannelMap.bindGuild(guild.id),
+                guild);
         } else {
             return null;
         }
+    }
+
+    /**
+     * Retrieve a list of guild ids
+     * @param {String[]} ids - array of guild ids
+     * @return {Promise.<GuildCache[]>}
+     */
+    async batchGet(ids) {
+        let guilds = await this.storageEngine.batchGet(ids.map(id => this.buildId(id)));
+        return guilds.map(guild => new GuildCache(this.storageEngine,
+            this.channels.bindGuild(guild.id),
+            this.roles.bindGuild(guild.id),
+            this.members.bindGuild(guild.id),
+            this.emojis.bindGuild(guild.id),
+            this.presences.bindGuild(guild.id),
+            this.guildChannelMap.bindGuild(guild.id),
+            guild));
     }
 
     /**
@@ -75,46 +98,43 @@ class GuildCache extends BaseCache {
             await this.update(this.boundObject.id, data);
             return this;
         }
+        let start = Date.now();
         if (data.channels && data.channels.length > 0) {
-            await this.guildChannelMap.update(id, data.channels.map(c => c.id));
-            for (let channel of data.channels) {
-                channel.guild_id = id;
-                await this.channels.update(channel.id, channel);
-                // console.log(`Cached channel ${channel.id}|#"${channel.name}"|${typeof channel.name}`);
-            }
+            data.channels.map(c => {
+                c.guild_id = id;
+                return c;
+            });
+            await this.channels.batchUpdate(data.channels.map(c => c.id), data.channels);
         }
+        console.log(`Channels ${id} ${Date.now() - start}ms`);
+        start = Date.now();
         if (data.members && data.members.length > 0) {
-            let membersPromiseBatch = [];
-            for (let member of data.members) {
-                member.guild_id = id;
-                membersPromiseBatch.push(this.members.update(member.user.id, id, member));
-            }
-            await Promise.all(membersPromiseBatch);
+            data.members = data.members.map(m => {
+                m.guild_id = id;
+                return m;
+            });
+            await this.members.batchUpdate(data.members.map(m => m.user.id), id, data.members);
             // console.log(`Cached ${data.members.length} Guild Members from guild ${id}|${data.name}`);
         }
+        console.log(`Members ${id} ${Date.now() - start}ms`);
+        start = Date.now();
         if (data.presences && data.presences.length > 0) {
-            let presencePromiseBatch = [];
-            for (let presence of data.presences) {
-                presencePromiseBatch.push(this.presences.update(presence.user.id, presence));
-            }
-            await Promise.all(presencePromiseBatch);
+            await this.presences.batchUpdate(data.presences.map(p => p.user.id), data.presences);
             // console.log(`Cached ${data.presences.length} presences from guild ${id}|${data.name}`);
         }
+        console.log(`Presences ${id} ${Date.now() - start}ms`);
+        start = Date.now();
         if (data.roles && data.roles.length > 0) {
-            let rolePromiseBatch = [];
-            for (let role of data.roles) {
-                rolePromiseBatch.push(this.roles.update(role.id, id, role));
-            }
-            await Promise.all(rolePromiseBatch);
+            await this.roles.batchUpdate(data.roles.map(r => r.id), id, data.roles);
             // console.log(`Cached ${data.roles.length} roles from guild ${id}|${data.name}`);
         }
+        console.log(`Roles ${id} ${Date.now() - start}ms`);
+        start = Date.now();
         if (data.emojis && data.emojis.length > 0) {
-            let emojiPromiseBatch = [];
-            for (let emoji of data.emojis) {
-                emojiPromiseBatch.push(this.emojis.update(emoji.id, id, emoji));
-            }
-            await Promise.all(emojiPromiseBatch);
+            await this.emojis.batchUpdate(data.emojis.map(e => e.id), id, data.emojis);
         }
+        console.log(`Emojis ${id} ${Date.now() - start}ms`);
+        start = Date.now();
         delete data.members;
         delete data.voice_states;
         delete data.roles;
@@ -125,7 +145,24 @@ class GuildCache extends BaseCache {
         await this.addToIndex(id);
         await this.storageEngine.upsert(this.buildId(id), data);
         let guild = await this.storageEngine.get(this.buildId(id));
+        console.log(`Guild ${id} ${Date.now() - start}ms`);
         return new GuildCache(this.storageEngine, this.channels.bindGuild(guild.id), this.roles.bindGuild(guild.id), this.members.bindGuild(guild.id), this.emojis.bindGuild(guild.id), this.presences.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id), guild);
+    }
+
+    /**
+     * Batch update guilds
+     * @param {String[]} ids - Array of guild ids
+     * @param {Guild[]} data - Array of guild objects
+     *
+     *
+     * @return {Promise<GuildCache[]>}
+     */
+    async batchUpdate(ids, data) {
+        let promises = [];
+        ids.forEach((id, index) => {
+            promises.push(this.update(id, data[index]));
+        });
+        return Promise.all(promises);
     }
 
     /**
@@ -143,17 +180,17 @@ class GuildCache extends BaseCache {
             let roles = await this.roles.getIndexMembers(id);
             let emojis = await this.emojis.getIndexMembers(id);
             let members = await this.members.getIndexMembers(id);
-            for (let emoji of emojis) {
-                await this.emojis.remove(emoji, id);
+            if (emojis && emojis.length > 0) {
+                await this.emojis.batchRemove(emojis, id);
             }
-            for (let role of roles) {
-                await this.roles.remove(role, id);
+            if (roles && roles.length > 0) {
+                await this.roles.batchRemove(roles, id);
             }
-            for (let channel of channelMap.channels) {
-                await this.channels.remove(channel);
+            if (channelMap.channels && channelMap.channels.length > 0) {
+                await this.channels.batchRemove(channelMap.channels);
             }
-            for (let member of members) {
-                await this.members.remove(member, id);
+            if (members && members.length > 0) {
+                await this.members.batchRemove(members, id);
             }
             await this.guildChannelMap.remove(id);
             await this.removeFromIndex(id);

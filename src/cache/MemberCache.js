@@ -46,6 +46,18 @@ class MemberCache extends BaseCache {
     }
 
     /**
+     * Batch get members via id
+     * @param {String[]} ids - array of member ids
+     * @param {String} guildId - id of the guild the members belong to
+     * @return {Promise<MemberCache[]>} - Array of bound member caches
+     */
+    async batchGet(ids, guildId) {
+        let members = await this.storageEngine.batchGet(ids.map(id => this.buildId(id, guildId)));
+        return members.map(m => new MemberCache(this.storageEngine, this.user.bindUserId(m.id), m));
+    }
+
+
+    /**
      * Update data of a guild member
      * @param {String} id - id of the member
      * @param {String} [guildId=this.boundGuild] - id of the guild of the member, defaults to the bound guild of the cache
@@ -77,6 +89,37 @@ class MemberCache extends BaseCache {
     }
 
     /**
+     * Batch update members
+     * @param {String[]} ids - array of member ids
+     * @param {String} guildId - id of the guild the members belong to
+     * @param {GuildMember[]} data - array of member data
+     * @return {Promise.<MemberCache[]>} - array of bound member caches
+     */
+    async batchUpdate(ids, guildId = this.boundGuild, data) {
+        let usersToUpdate = [];
+        if (!guildId) {
+            throw new Error('Empty guild id');
+        }
+        data = data.map((d, index) => {
+            if (!d.guild_id) {
+                d.guild_id = guildId;
+            }
+            if (!d.id) {
+                d.id = ids[index];
+            }
+            if (d.user) {
+                usersToUpdate.push(d.user);
+                delete d.user;
+            }
+            return d;
+        });
+        await this.user.batchUpdate(usersToUpdate.map(u => u.id), usersToUpdate);
+        await this.addToIndex(ids, guildId);
+        await this.storageEngine.batchUpsert(ids.map(id => this.buildId(id, guildId)), data);
+        return ids.map((id, index) => new MemberCache(this.storageEngine, this.user.bindUserId(id), data[index]));
+    }
+
+    /**
      * Remove a member from the cache
      * @param {String} id - id of the member
      * @param {String} [guildId=this.boundGuild] - id of the guild of the member, defaults to the bound guild of the cache
@@ -93,6 +136,17 @@ class MemberCache extends BaseCache {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Batch remove members
+     * @param {String[]} ids - array of member ids
+     * @param {String} guildId - guild id the members belong to
+     * @return {Promise<void>}
+     */
+    async batchRemove(ids, guildId = this.boundGuild) {
+        await this.removeFromIndex(ids, guildId);
+        return this.storageEngine.batchRemove(ids.map(id => this.buildId(id, guildId)));
     }
 
     /**

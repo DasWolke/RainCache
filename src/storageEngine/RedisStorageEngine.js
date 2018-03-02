@@ -223,7 +223,7 @@ class RedisStorageEngine extends BaseStorageEngine {
     /**
      * Remove an id from a list
      * @param {String} listId - id of the list
-     * @param {String} id - id that should be removed
+     * @param {String|String[]} id - id(s) that should be removed
      * @returns {Promise.<void>}
      */
     async removeFromList(listId, id) {

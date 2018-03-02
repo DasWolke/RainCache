@@ -41,6 +41,17 @@ class RoleCache extends BaseCache {
     }
 
     /**
+     * Batch get a list of role ids for a certain guild
+     * @param {String[]} ids - array of discord role ids
+     * @param {String} guildId - id of the guild the roles belong to
+     * @return {Promise.<RoleCache[]>} - array of bound role caches
+     */
+    async batchGet(ids, guildId) {
+        let roles = await this.storageEngine.batchGet(ids.map(id => this.buildId(id, guildId)));
+        return roles.map(r => new RoleCache(this.storageEngine, r));
+    }
+
+    /**
      * Update a role
      * @param {String} id - id of the role
      * @param {String} guildId - id of the guild belonging to the role
@@ -68,6 +79,31 @@ class RoleCache extends BaseCache {
     }
 
     /**
+     * Batch update roles
+     * @param {String[]} ids - array of discord role ids
+     * @param {String} guildId - id of the guild the roles belong to
+     * @param {Role[]} data - array of discord role objects
+     * @return {Promise.<RoleCache[]>}
+     */
+    async batchUpdate(ids, guildId, data) {
+        if (!guildId) {
+            return Promise.reject('Missing guild id');
+        }
+        data = data.map((d, index) => {
+            if (!d.guild_id) {
+                d.guild_id = guildId;
+            }
+            if (!d.id) {
+                d.id = ids[index];
+            }
+            return d;
+        });
+        await this.addToIndex(ids, guildId);
+        await this.storageEngine.batchUpsert(ids.map(id => this.buildId(id, guildId)), data);
+        return data.map(d => new RoleCache(this.storageEngine, d));
+    }
+
+    /**
      * Remove a role from the cache
      * @param {String} id - id of the role
      * @param {String} guildId - id of the guild belonging to the role
@@ -84,6 +120,17 @@ class RoleCache extends BaseCache {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Batch remove roles from the cache
+     * @param {String[]} ids - array of role ids
+     * @param {String} guildId - id of the guild the roles belong to
+     * @return {Promise<void>}
+     */
+    async batchRemove(ids, guildId) {
+        await this.removeFromIndex(ids, guildId);
+        return this.storageEngine.batchRemove(ids.map(id => this.buildId(id, guildId)));
     }
 
     /**

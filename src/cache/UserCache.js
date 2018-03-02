@@ -40,6 +40,15 @@ class UserCache extends BaseCache {
     }
 
     /**
+     * Batch get a list of users by their ids
+     * @param {String[]} ids - array of user ids
+     */
+    async batchGet(ids) {
+        let users = await this.storageEngine.batchGet(ids.map(id => this.buildId(id)));
+        return users.map(u => new UserCache(this.storageEngine, u));
+    }
+
+    /**
      * Update a user entry in the cache
      * @param {String} id=this.id - discord id of the user
      * @param {Object|User} data - updated data of the user, it will be merged with the old data
@@ -54,6 +63,18 @@ class UserCache extends BaseCache {
         await this.addToIndex(id);
         await this.storageEngine.upsert(this.buildId(id), data);
         return new UserCache(this.storageEngine, data);
+    }
+
+    /**
+     * Batch update a list of users
+     * @param {String[]} ids - ids of the users that should be updated
+     * @param {Object[]|User[]} data - array of updated data of the users
+     * @return {Promise<UserCache[]>}
+     */
+    async batchUpdate(ids, data) {
+        await this.addToIndex(ids);
+        await this.storageEngine.batchUpsert(ids.map(id => this.buildId(id)), data);
+        return data.map(d => new UserCache(this.storageEngine, d));
     }
 
     /**
@@ -72,6 +93,16 @@ class UserCache extends BaseCache {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Batch remove users from the cache
+     * @param {String[]} ids - array of user ids that should be removed
+     * @return {Promise<void>}
+     */
+    async batchRemove(ids) {
+        await this.removeFromIndex(ids);
+        await this.storageEngine.batchRemove(ids.map(id => this.buildId(id)));
     }
 
     /**
@@ -111,7 +142,7 @@ class UserCache extends BaseCache {
 
     /**
      * Add a user to the index
-     * @param {String} id - id of the user
+     * @param {String|String[]} id - id of the user
      * @return {Promise.<void>}
      */
     async addToIndex(id) {
@@ -120,7 +151,7 @@ class UserCache extends BaseCache {
 
     /**
      * Remove a user from the index
-     * @param {String} id - id of the user
+     * @param {String|String[]} id - id of the user
      * @return {Promise.<void>}
      */
     async removeFromIndex(id) {
