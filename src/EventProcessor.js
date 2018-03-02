@@ -123,9 +123,7 @@ class EventProcessor extends EventEmitter {
                 break;
             }
             default:
-                if (event.t !== 'PRESENCE_UPDATE') {
-                    this.emit('debug', `Unknown Event ${event.t}`);
-                }
+                this.emit('debug', `Unknown Event ${event.t}`);
                 break;
         }
     }

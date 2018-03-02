@@ -47,7 +47,7 @@ class BaseCache {
 
     /**
      * Add an id to the index of a namespace
-     * @param {String} id - id to add
+     * @param {String|String[]} id - id to add
      * @param {String} [objectId=this.boundGuild] - id of the parent object of the index
      * @return {Promise.<void>}
      */
@@ -57,7 +57,7 @@ class BaseCache {
 
     /**
      * Remove an id from the index
-     * @param {String} id - id to be removed
+     * @param {String|String[]} id - id to be removed
      * @param {String} [objectId=this.boundGuild] - id of the parent object of the index
      * @return {Promise.<void>}
      */

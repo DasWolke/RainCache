@@ -43,6 +43,17 @@ class PermissionOverwriteCache extends BaseCache {
     }
 
     /**
+     * Batch get a list of permission overwrites via their ids
+     * @param {String[]} ids - array of permission overwrite ids
+     * @param {String} channelId=this.boundChannel - id of the channel that belongs to the permission overwrites
+     * @return {Promise.<PermissionOverwriteCache[]>} - returns an array of bound permission overwrite cache
+     */
+    async batchGet(ids, channelId = this.boundChannel) {
+        let permissionOverwrites = await this.storageEngine.batchGet(ids.map(id => this.buildId(id, channelId)));
+        return permissionOverwrites.map(p => new PermissionOverwriteCache(this.storageEngine, p));
+    }
+
+    /**
      * Update a permission overwrite entry in the cache
      * @param {String} id - id of the permission overwrite
      * @param {String} channelId=this.boundChannel - id of the channel that belongs to the permission overwrite
@@ -58,6 +69,19 @@ class PermissionOverwriteCache extends BaseCache {
         await super.addToIndex(id, channelId);
         await this.storageEngine.upsert(this.buildId(id, channelId), data);
         return new PermissionOverwriteCache(this.storageEngine, data);
+    }
+
+    /**
+     * Batch update a list of permission overwrite entrys in the cache
+     * @param {String[]} ids - array of permission overwrite ids
+     * @param {String} channelId=this.boundChannel - id of the channel that belongs to the permission overwrite
+     * @param {PermissionOverwrite[]} data - array of updated permission overwrite data, will be merged with the old data
+     * @return {Promise.<PermissionOverwriteCache[]>} - returns an array containing bound permission overwrite caches
+     */
+    async batchUpdate(ids, channelId = this.boundChannel, data) {
+        await super.addToIndex(ids, channelId);
+        await this.storageEngine.batchUpsert(ids.map(id => this.buildId(id, channelId)), data);
+        return data.map(d => new PermissionOverwriteCache(this.storageEngine, d));
     }
 
     /**
@@ -77,6 +101,17 @@ class PermissionOverwriteCache extends BaseCache {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Remove a list of permission overwrites from the cache
+     * @param {String[]} ids - ids of the permission overwrites to be removed
+     * @param {String} channelId=this.boundChannel - id of the channel that belongs to the permission overwrites
+     * @return {Promise.<void>}
+     */
+    async batchRemove(ids, channelId = this.boundChannel) {
+        await super.removeFromIndex(ids, channelId);
+        return this.storageEngine.batchRemove(ids.map(id => this.buildId(id, channelId)));
     }
 
     /**

@@ -43,7 +43,18 @@ class EmojiCache extends BaseCache {
     }
 
     /**
-     * Update a emoji
+     * Batch Get an array of emojis via ids
+     * @param {String[]} ids - array of emoji ids (this does not refer to the name of the emoji)
+     * @param {String} guildId - id of the guild the emojis belong to
+     * @return {Promise.<EmojiCache[]>} Array of bound emoji caches
+     */
+    async batchGet(ids, guildId) {
+        let emojis = await this.storageEngine.batchGet(ids.map(id => this.buildId(id, guildId)));
+        return emojis.map(e => new EmojiCache(this.storageEngine, e));
+    }
+
+    /**
+     * Update an emoji
      * @param {String} id - id of the emoji (this does not refer to the name of the emoji)
      * @param {String} guildId - id of the guild this emoji belongs to
      * @param {Emoji} data - new data of the emoji, that will get merged with the old data
@@ -58,6 +69,19 @@ class EmojiCache extends BaseCache {
         await this.addToIndex(id, guildId);
         await this.storageEngine.upsert(this.buildId(id, guildId), data);
         return new EmojiCache(this.storageEngine, data);
+    }
+
+    /**
+     * Batch update emojis
+     * @param {String[]} ids - array of emoji ids (this does not refer to the name of the emoji)
+     * @param {String} guildId - id of the guild this emoji belongs to
+     * @param {Emoji[]} data - new data of the emoji, that will get merged with the old data
+     * @return {Promise.<EmojiCache[]>} - returns an array of bound EmojiCaches
+     */
+    async batchUpdate(ids, guildId = this.boundGuild, data) {
+        await this.addToIndex(ids, guildId);
+        await this.storageEngine.batchUpsert(ids.map(id => this.buildId(id, guildId)), data);
+        return data.map(d => new EmojiCache(this.storageEngine, d));
     }
 
     /**
@@ -77,6 +101,17 @@ class EmojiCache extends BaseCache {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Remove an array of emojis from the cache
+     * @param {String[]} ids - array of emoji ids (this does not refer to the name of the emoji)
+     * @param {String} guildId - id of the guild this emoji belongs to
+     * @return {Promise.<void>}
+     */
+    async batchRemove(ids, guildId = this.boundGuild) {
+        await this.removeFromIndex(ids, guildId);
+        return this.storageEngine.batchRemove(ids.map(id => this.buildId(id, guildId)));
     }
 
     /**

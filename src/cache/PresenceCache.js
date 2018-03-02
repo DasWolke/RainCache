@@ -43,6 +43,16 @@ class PresenceCache extends BaseCache {
     }
 
     /**
+     * Batch get presences via user ids
+     * @param {String[]} ids - Array of discord user ids
+     * @return {Promise.<PresenceCache[]>} - Returns an array of PresenceCaches
+     */
+    async batchGet(ids) {
+        let presences = await this.storageEngine.batchGet(ids.map(id => this.buildId(id)));
+        return presences.map(p => new PresenceCache(this.storageEngine, this.users.bindUserId(id), p));
+    }
+
+    /**
      * Upsert the presence of a user.
      *
      * **This function automatically removes the guild_id, roles and user of a presence update before saving it**
@@ -71,6 +81,31 @@ class PresenceCache extends BaseCache {
     }
 
     /**
+     * Batch update multiple presences
+     * @param {String[]} ids - ids of the users the presences belong to
+     * @param {Presence[]} data - updated presence data of the users
+     * @return {Promise.<PresenceCache[]>} - returns an array of bound presence caches
+     */
+    async batchUpdate(ids, data) {
+        let usersToUpdate = [];
+        data = data.map(d => {
+            if (d.guild_id) {
+                delete d.guild_id;
+            }
+            if (d.roles) {
+                delete d.roles;
+            }
+            if (d.user) {
+                usersToUpdate.push(d.user);
+                delete d.user;
+            }
+        });
+        await this.users.batchUpdate(usersToUpdate.map(u => u.id), usersToUpdate);
+        await this.storageEngine.batchUpsert(ids.map(id => this.buildId(id)), data);
+        return data.map(d => new PresenceCache(this.storageEngine, this.users, d));
+    }
+
+    /**
      * Remove a stored presence from the cache
      * @param {String} id - id of the user the presence belongs to
      * @return {Promise.<void>}
@@ -85,6 +120,15 @@ class PresenceCache extends BaseCache {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Batch remove stored presences from the cache
+     * @param {String[]} ids - array of discord user ids
+     * @return {Promise<void>}
+     */
+    async batchRemove(ids) {
+        return this.storageEngine.batchRemove(ids.map(id => this.buildId(id)));
     }
 }
 
