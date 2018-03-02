@@ -58,6 +58,25 @@ class RedisStorageEngine extends BaseStorageEngine {
     }
 
     /**
+     * Batch get multiple objects by their ids
+     * @param {String[]} ids - array of ids
+     * @param {Boolean} useHash - whether to use hash objects for this action
+     * @return {Promise.<*>}
+     */
+    async batchGet(ids, useHash = this.useHash) {
+        if (useHash) {
+            let transaction = this.client.multi();
+            for (let id of ids) {
+                transaction.hmgetall(id);
+            }
+            return transaction.execAsync();
+        } else {
+            let data = await this.client.mgetAsync(ids);
+            return data.map(d => this.parseData(d));
+        }
+    }
+
+    /**
      * Upsert an object into the cache
      * @param {String} id - id of the object
      * @param {Object} updateData - the new Data which get's merged with the old
@@ -77,18 +96,52 @@ class RedisStorageEngine extends BaseStorageEngine {
     }
 
     /**
+     * Batch upsert objects into the cache
+     *
+     * **The order of the array of ids has to be equal to the order of the objects array**
+     * @param {String[]} ids - array of ids
+     * @param {Object[]} data - array of objects which should be saved into the cache
+     * @param {Boolean} useHash - whether to use hash objects for this action
+     * @return {Promise<void>}
+     */
+    async batchUpsert(ids, data, useHash = this.useHash) {
+        if (useHash) {
+            let transaction = this.client.multi();
+            ids.forEach((id, index) => {
+                transaction.hmsetAsync(id, data[index]);
+            });
+            return transaction.execAsync();
+        } else {
+            let cachedDataArray = await this.batchGet(ids);
+            let args = [];
+            ids.forEach((id, index) => {
+                let cachedData = cachedDataArray[index];
+                if (!cachedData) {
+                    cachedData = {};
+                }
+                data = Object.assign(cachedData, data[index]);
+                args.push(id, this.prepareData(data));
+            });
+            return this.client.msetAsync(...args);
+        }
+    }
+
+    /**
      * Remove an object from the cache
      * @param {String} id - id of the object
-     * @param {Boolean} useHash - whether to use hash objects for this action
      * @returns {Promise.<void>}
      */
-    async remove(id, useHash = this.useHash) {
-        if (useHash) {
-            let hashKeys = await this.client.hkeysAsync(id);
-            return this.client.hdelAsync(id, hashKeys);
-        } else {
-            return this.client.delAsync(id);
-        }
+    async remove(id) {
+        return this.client.delAsync(id);
+    }
+
+    /**
+     * Remove multiple objects from the cache
+     * @param {String[]} ids - ids of the objects to remove
+     * @returns {Promise.<void>}
+     */
+    async batchRemove(ids) {
+        return this.client.delAsync(ids);
     }
 
     /**
@@ -99,7 +152,6 @@ class RedisStorageEngine extends BaseStorageEngine {
      * @returns {Promise.<Array.<Object|null>>} - filtered data
      */
     async filter(fn, ids, namespace) {
-        let resolvedDataArray = [];
         let data = [];
         if (!ids) {
             data = await this.getListMembers(namespace);
@@ -107,10 +159,7 @@ class RedisStorageEngine extends BaseStorageEngine {
             data = ids;
         }
         data = data.map(id => `${namespace}.${id}`);
-        for (let key of data) {
-            let resolvedData = await this.get(key);
-            resolvedDataArray.push(resolvedData);
-        }
+        let resolvedDataArray = this.batchGet(data);
         return resolvedDataArray.filter(fn);
     }
 
@@ -133,10 +182,10 @@ class RedisStorageEngine extends BaseStorageEngine {
             data = ids;
         }
         data = data.map(id => `${namespace}.${id}`);
-        for (let key of data) {
-            let resolvedData = await this.get(key);
-            if (fn(resolvedData)) {
-                return resolvedData;
+        let resolvedDataArray = this.batchGet(data);
+        for (let item of resolvedDataArray) {
+            if (fn(item)) {
+                return item;
             }
         }
     }

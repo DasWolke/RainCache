@@ -20,11 +20,23 @@ class BaseStorageEngine {
 
     }
 
+    batchGet(ids) {
+
+    }
+
     upsert(id, data) {
 
     }
 
+    batchUpsert(ids, data) {
+
+    }
+
     remove(id) {
+
+    }
+
+    batchRemove(ids) {
 
     }
 
