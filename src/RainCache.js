@@ -25,25 +25,27 @@ class RainCache extends EventEmitter {
      * Create a new Cache instance
      * @param {Object} options Options that should be used by RainCache
      * @param {Object} options.storage - object with storage engines to use for the different cache classes
-     * @param {StorageEngine} [options.storage.default] - default storage engine to use when no special storage engine was passed for a class.
+     * @param {BaseStorageEngine} [options.storage.default] - default storage engine to use when no special storage engine was passed for a class.
      *
      * **Use this option if you do not want to use a different type of storage engine for certain caches**
      *
      * You may also combine options: e.g. a RedisStorageEngine for presence and the rest within mongo, that's no issue.
      *
      * The cache type specific storage engine takes priority over the default one.
-     * @param {StorageEngine} [options.storage.guild=options.storage.default] - storage engine used by the guild cache
-     * @param {StorageEngine} [options.storage.channel=options.storage.default] - storage engine used by the channel cache
-     * @param {StorageEngine} [options.storage.channelMap=options.storage.default] - storage engine used by the channelMap cache
-     * @param {StorageEngine} [options.storage.member=options.storage.default] - storage engine used by the member cache
-     * @param {StorageEngine} [options.storage.user=options.storage.default] - storage engine used by the user cache
-     * @param {StorageEngine} [options.storage.role=options.storage.default] - storage engine used by the role cache
-     * @param {StorageEngine} [options.storage.emoji=options.storage.default] - storage engine used by the emoji cache
-     * @param {StorageEngine} [options.storage.presence=options.storage.default] - storage engine used by the presence cache
-     * @param {StorageEngine} [options.storage.permOverwrite=options.storage.default] - storage engine used by the permission overwrite cache
+     * @param {BaseStorageEngine} [options.storage.guild=options.storage.default] - storage engine used by the guild cache
+     * @param {BaseStorageEngine} [options.storage.channel=options.storage.default] - storage engine used by the channel cache
+     * @param {BaseStorageEngine} [options.storage.channelMap=options.storage.default] - storage engine used by the channelMap cache
+     * @param {BaseStorageEngine} [options.storage.member=options.storage.default] - storage engine used by the member cache
+     * @param {BaseStorageEngine} [options.storage.user=options.storage.default] - storage engine used by the user cache
+     * @param {BaseStorageEngine} [options.storage.role=options.storage.default] - storage engine used by the role cache
+     * @param {BaseStorageEngine} [options.storage.emoji=options.storage.default] - storage engine used by the emoji cache
+     * @param {BaseStorageEngine} [options.storage.presence=options.storage.default] - storage engine used by the presence cache
+     * @param {BaseStorageEngine} [options.storage.permOverwrite=options.storage.default] - storage engine used by the permission overwrite cache
      * @param {Object} [options.disabledEvents={}] - If you want to disable events from being processed,
      * you can add them here like this: `{'MESSAGE_CREATE':true}`,
      * this would disable any message_creates from being cached
+     *
+     * @param {Object} [options.disabledIndexes] - disable indexing for selected caches or all of them
      * @param {Object} [options.cacheClasses] - object with classes (**not objects**) that should be used for each type of data that is cached
      *
      * **RainCache automatically uses default classes when no cache classes are passed, else it will use your classes.**
@@ -84,6 +86,9 @@ class RainCache extends EventEmitter {
         }
         if (!options.disabledEvents) {
             options.disabledEvents = {};
+        }
+        if (!options.disabledIndexes) {
+            options.disabledIndexes = {};
         }
         this.options = options;
         this.ready = false;
