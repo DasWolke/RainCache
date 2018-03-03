@@ -13,6 +13,7 @@ class PermissionOverwriteCache extends BaseCache {
      * @param {StorageEngine} storageEngine - Storage engine to use for this cache
      * @param {PermissionOverwrite} [boundObject] - Optional, may be used to bind a permission overwrite object to this cache
      * @property {String} namespace=permissionoverwrite - namespace of the cache, defaults to `permissionoverwrite`
+     * @extends {BaseCache}
      */
     constructor(storageEngine, boundObject) {
         super();

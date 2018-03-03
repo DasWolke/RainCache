@@ -24,6 +24,7 @@ class GuildCache extends BaseCache {
      * @property {EmojiCache} emojis - Instantiated EmojiCache class
      * @property {PresenceCache} presences - Instantiated PresenceCache class
      * @property {ChannelMapCache} guildChannelMap - Instantiated ChannelMap class
+     * @extends {BaseCache}
      */
     constructor(storageEngine, channelCache, roleCache, memberCache, emojiCache, presenceCache, guildToChannelCache, boundObject) {
         super();

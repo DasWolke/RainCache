@@ -13,6 +13,7 @@ class ChannelMapCache extends BaseCache {
      * @param {StorageEngine} storageEngine - storage engine to use for this cache
      * @param {Object} boundObject - Optional, may be used to bind the map object to the cache
      * @property {String} namespace=channelmap - namespace of this cache, defaults to `channelmap`
+     * @extends {BaseCache}
      */
     constructor(storageEngine, boundObject) {
         super();
