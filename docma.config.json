@@ -4,13 +4,17 @@
       "RainCache": [
         "./src/**/*.js",
         "!./src/connector/**/*.js",
-        "!./src/storageEngine/**/*.js"
+        "!./src/storageEngine/**/*.js",
+        "!./src/structures/**/*.js"
       ],
       "Connectors": [
         "./src/connector/**/*.js"
       ],
       "StorageEngines": [
         "./src/storageEngine/**/*.js"
+      ],
+      "Structures": [
+        "./src/structures/**/*.js"
       ]
     },
     {
@@ -68,6 +72,11 @@
               "href": "?api=StorageEngines"
             }
           ]
+        },
+        {
+          "label": "Data Structures",
+          "iconClass": "ico ico-book",
+          "href": "?api=Structures"
         },
         {
           "label": "GitHub",
