@@ -4,7 +4,7 @@
   "description": "A pluggable discord cache worker",
   "main": "index.js",
   "scripts": {
-    "build:docs": "node_modules/.bin/docma -c docma.json",
+    "build:docs": "docma -c docma.json",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "wolke <wolke@weeb.sh>",
