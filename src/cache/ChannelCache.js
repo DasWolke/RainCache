@@ -19,6 +19,7 @@ class ChannelCache extends BaseCache {
      * @property {ChannelMapCache} guildChannelMap - Instantiated ChannelMap class
      * @property {PermissionOverwriteCache} permissionOverwrites - Instantiated PermissionOverwrite class
      * @property {UserCache} recipients - Instantiated UserCache class
+     * @extends {BaseCache}
      */
     constructor(storageEngine, channelMap, permissionOverwriteCache, userCache, boundObject) {
         super();

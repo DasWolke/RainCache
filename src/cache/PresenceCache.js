@@ -14,6 +14,7 @@ class PresenceCache extends BaseCache {
      * @param {UserCache} userCache -
      * @param {Presence} boundObject - Optional, may be used to bind a presence object to the cache
      * @property {String} namespace=user - namespace of the cache
+     * @extends {BaseCache}
      */
     constructor(storageEngine, userCache, boundObject) {
         super();
