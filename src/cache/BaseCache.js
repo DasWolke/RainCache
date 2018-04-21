@@ -1,12 +1,12 @@
-'use strict';
+/**
+ * Base class for all cache classes.
+ */
 class BaseCache {
     /**
-     * Base class for all cache classes.
-     *
      * You should **not** create BaseCache by itself, but instead create a class that extends from it.
      *
      * **All Methods from BaseCache are also available on every class that is extending it.**
-     * @property {StorageEngine} storageEngine - storage engine of the cache
+     * @property {BaseStorageEngine} storageEngine - storage engine of the cache
      * @property {String} namespace=base - namespace of the cache
      * @property {String} [boundGuild] - guild id bound to this cache
      */
@@ -28,7 +28,7 @@ class BaseCache {
     /**
      * Bind a guild id to the cache
      * @param {String} guildId - id of the guild that should be bound to this cache
-     * @return {this}
+     * @return {BaseCache}
      * @public
      */
     bindGuild(guildId) {

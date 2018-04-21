@@ -16,6 +16,7 @@ class MemberCache extends BaseCache {
      * @property {String} namespace=member - namespace of this cache, defaults to `member`
      * @property {UserCache} user - user cache instance
      * @property {String} boundGuild - id of a guild this cache is bound to
+     * @extends {BaseCache}
      */
     constructor(storageEngine, userCache, boundObject) {
         super();

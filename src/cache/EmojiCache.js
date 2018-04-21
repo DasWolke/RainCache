@@ -14,6 +14,7 @@ class EmojiCache extends BaseCache {
      * **This class is automatically instantiated by RainCache**
      * @param {StorageEngine} storageEngine - storage engine to use for this cache
      * @param {Emoji} [boundObject] - Optional, may be used to bind an emoji object to the cache
+     * @extends {BaseCache}
      */
     constructor(storageEngine, boundObject) {
         super();

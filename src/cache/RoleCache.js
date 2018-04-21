@@ -13,6 +13,7 @@ class RoleCache extends BaseCache {
      * @param {StorageEngine} storageEngine - Storage engine to use for this cache
      * @param {Role} boundObject - Optional, may be used to bind a role object to the cache
      * @property {String} namespace=role - namespace of the cache, defaults to `role`
+     * @extends {BaseCache}
      */
     constructor(storageEngine, boundObject) {
         super();

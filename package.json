@@ -4,7 +4,7 @@
   "description": "A pluggable discord cache worker",
   "main": "index.js",
   "scripts": {
-    "build:docs": "node_modules/.bin/docma -c docma.config.json",
+    "build:docs": "node_modules/.bin/docma -c docma.json",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "wolke <wolke@weeb.sh>",
@@ -14,10 +14,10 @@
     "redis": "^2.8.0"
   },
   "dependencies": {
-    "tsubaki": "^1.2.0"
+    "tsubaki": "^1.3.0"
   },
   "devDependencies": {
-    "eslint": "^4.4.1",
-    "docma": "^1.5.1"
+    "eslint": "^4.19.1",
+    "docma": "^2.0.0"
   }
 }

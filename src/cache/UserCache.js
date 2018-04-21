@@ -13,6 +13,7 @@ class UserCache extends BaseCache {
      * @param {StorageEngine} storageEngine - Storage engine to use for this cache
      * @param {User} boundObject - Optional, may be used to bind a user object to the cache
      * @property {String} namespace - namespace of this cache, defaults to `user`
+     * @extends {BaseCache}
      */
     constructor(storageEngine, boundObject) {
         super();
