@@ -1,23 +1,19 @@
 const BaseStructure = require('./BaseStructure');
 
 /**
- * Structure used for holding the values of a channel object
+ * Structure used for holding the values of a [Channel](?api=RainCache#Channel) object
  */
 class ChannelStructure extends BaseStructure {
     /**
-     * Create a new Channel Structure, this structure gives you access to all properties of the channel object passed
+     * Creates a new [Channel](?api=RainCache#Channel) Structure, which gives you access to all properties of the passed [Channel](?api=RainCache#Channel) object
      * @param {String} id - id of the channel
-     * @param {Channel} data - a [discord channel object](?api=Structures#Channel)
-     * @param {BaseCache} cache - a [ChannelCache](?api=RainCache#ChannelCache) instance, allows you to access the cache this object originated from
+     * @param {Channel} data - a [Discord channel object](?api=RainCache#Channel)
+     * @param {ChannelCache} cache - a [ChannelCache](?api=RainCache#ChannelCache) instance, allows you to access the cache this object originated from
      * @extends {Channel}
      * @extends {BaseStructure}
      */
     constructor(id, data, cache) {
-        super();
-        this.id = id;
-        this.cache = cache;
-        data = data || {};
-        Object.assign(this, data);
+        super(id, data, cache);
     }
 }
 
@@ -26,7 +22,7 @@ module.exports = ChannelStructure;
 // To anyone wanting to write a library: JUST COPY THIS SHIT, filling this out manually wasn't fun :<
 // https://www.youtube.com/watch?v=oXUMPSjwpFI have a weird video to distract yourself from the problems that will come upon ya
 /**
- * @typedef {Object} Channel - a discord channel object
+ * @typedef {Object} Channel - a [Discord channel](https://discordapp.com/developers/docs/resources/channel#channel-object) object
  * @property {String} id - id of the channel
  * @property {Number} type - [type](https://discordapp.com/developers/docs/resources/channel#channel-object-channel-types) of channel
  * @property {String} [guild_id] - id of the Guild of the channel
@@ -43,11 +39,4 @@ module.exports = ChannelStructure;
  * @property {String} [owner_id] - id of the DM creator (dm only)
  * @property {String} [application_id] - application id of the creator of the group dm if a bot created it (group dm only)
  * @property {String} [parent_id] - id of the parent category for a channel
- */
-
-/**
- * @typedef {Object} PermissionOverwrite - permission overwrite object, which is used to overwrite permissions on a channel level
- * @property {Number} allow - bitwise value of allowed permissions
- * @property {Number} deny - bitwise value of disallowed permissions
- * @property {String} type - type of the overwrite, either member or role
  */

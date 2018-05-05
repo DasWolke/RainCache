@@ -5,7 +5,7 @@ const BaseStructure = require('./BaseStructure');
  */
 class ChannelMapStructure extends BaseStructure {
     /**
-     * Create a new ChannelMap Structure, this structure gives you access to all properties of the channelmap object passed
+     * Creates a new [ChannelMap](?api=RainCache#ChannelMap) Structure, which gives you access to all properties of the based [ChannelMap](?api=RainCache#ChannelMap) object
      * @param {String} id - id of the channelmap parent entity (either user id or guild id)
      * @param {ChannelMap} data - an internal channelmap structure
      * @param {ChannelMapCache} cache - a [ChannelMapCache](?api=RainCache#ChannelMapCache) instance, allows you to access the cache this object originated from
@@ -13,11 +13,7 @@ class ChannelMapStructure extends BaseStructure {
      * @extends ChannelMap
      */
     constructor(id, data, cache) {
-        super();
-        this.id = id;
-        this.cache = cache;
-        data = data || {};
-        Object.assign(this, data);
+        super(id, data, cache);
     }
 }
 
