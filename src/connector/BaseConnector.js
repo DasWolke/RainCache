@@ -1,7 +1,7 @@
 'use strict';
 let EventEmitter;
 try {
-    EventEmitter = require('eventemiiter3');
+    EventEmitter = require('eventemitter3');
 } catch (e) {
     EventEmitter = require('events').EventEmitter;
 }
@@ -9,11 +9,12 @@ try {
 /**
  * BaseConnector class, provides a common structure for connectors
  * @extends EventEmitter
- * @private
  */
 class BaseConnector extends EventEmitter {
     /**
-     * @private
+     * The BaseConnector is the class that a user-created connector should extend,
+     * since it provides all necessary methods to allow RainCache to properly work
+     * with the user-created connector
      */
     constructor() {
         super();
