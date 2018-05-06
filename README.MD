@@ -1,24 +1,24 @@
 # RainCache
 
-## A simple and modular discord caching library
+## A simple and modular Discord caching library
 
 Part of the WeatherStack
 
-You want to use a shared cache for your discord bot ? Maybe MongoDB ? But Presences should be stored in redis ?
+You want to use a shared cache for your Discord bot ? Maybe MongoDB ? But Presences should be stored in redis ?
 
 Then RainCache is the right tool for the job!
 
 #### Cool things you can do with RainCache:
-- Store data received from discord in a configurable storage medium
+- Store data received from Discord in a configurable storage medium
 - Select the type of storage on a type level basis (e.g Channel, Presence, etc..)
-- Batteries included, RainCache can parse raw discord events and store the data accordingly
+- Batteries included, RainCache can parse raw Discord events and store the data accordingly
 - Easily customizable, you can write your own storage engine, connector or cache class
 
 #### Documentation:
 You can find the docs at [https://daswolke.github.io/RainCache/](https://daswolke.github.io/RainCache/)
 
 #### Installation:
-To install RainCache, make sure that you have node 8 or higher and npm installed on your computer.
+To be able to install RainCache, make sure that you have node 8 (or higher) and npm installed on your computer.
 Then run the following command in a terminal `npm install raincache`
 
 #### Example:
@@ -59,7 +59,7 @@ init().then(() => {
 ---
 
 #### Notable Difference to normal caches
-RainCache generally does not have any differences in comparison with general discord library caches, but there is one notable difference: 
+RainCache generally does not have any differences in comparison with general Discord library caches, but there is one notable difference: 
 
 **Presences are stored per user and not per guild**
 
@@ -70,17 +70,7 @@ Apart from that it allows RainCache to minimize the storage usage a lot, since a
 
 ---
 
-#### Object Binding
-RainCache returns the data received as a cache object with additional properties found in the retrieved data.
- This way you can easily retrieve additional properties of received data (e.g. permission overwrites of a channel).
-```js
-let cache = new RainCache(someOptions);
-let channel = await cache.channel.get('channel id') 
-// The received object is a channel cache with the properties of the retrieved channel object (id, name, type, etc..) attached to it
-let overwrites = await channel.permissionOverwrites.getIndexMembers() 
-//this would load all permission overwrites for the channel previously loaded
-```
----
+
 #### Indexing
 
 RainCache uses indexing to allow you to easily get something like a list of all members of a server or similar,

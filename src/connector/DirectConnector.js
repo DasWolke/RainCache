@@ -24,7 +24,7 @@ class DirectConnector extends BaseConnector {
     }
 
     /**
-     * Forward a discord event to RainCache
+     * Forward a Discord event to RainCache
      * @param {Object} event - received event
      */
     receive(event) {
