@@ -49,7 +49,7 @@ class AmqpConnector extends BaseConnector {
      */
     async send(event) {
         if (event.t !== 'PRESENCE_UPDATE') {
-            console.log(`event ${event.t} took ${Date.now() - event.receive}ms`);
+            //console.log(`event ${event.t} took ${Date.now() - event.receive}ms`);
         }
         this.channel.sendToQueue(this.options.sendQueue, Buffer.from(JSON.stringify(event)));
     }
