@@ -46,6 +46,9 @@
   },
   "template": {
     "options": {
+      "title": {
+        "label": "RainCache"
+      },
       "sidebar": {
         "itemsFolded": true
       },
