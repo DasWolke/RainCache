@@ -43,7 +43,7 @@ class RoleCache extends BaseCache {
 
     /**
      * Batch get a list of role ids for a certain guild
-     * @param {String[]} ids - array of discord role ids
+     * @param {String[]} ids - array of Discord role ids
      * @param {String} guildId - id of the guild the roles belong to
      * @return {Promise.<RoleCache[]>} - array of bound role caches
      */
@@ -81,9 +81,9 @@ class RoleCache extends BaseCache {
 
     /**
      * Batch update roles
-     * @param {String[]} ids - array of discord role ids
+     * @param {String[]} ids - array of Discord role ids
      * @param {String} guildId - id of the guild the roles belong to
-     * @param {Role[]} data - array of discord role objects
+     * @param {Role[]} data - array of Discord role objects
      * @return {Promise.<RoleCache[]>}
      */
     async batchUpdate(ids, guildId, data) {
@@ -172,17 +172,5 @@ class RoleCache extends BaseCache {
     }
 }
 
-/**
- * @typedef {Object} Role - a discord role object
- * @property {String} id - role id
- * @property {String} name - role name
- * @property {Number} color - integer representation of hexadecimal color code
- * @property {Boolean} hoist - if this role is hoisted
- * @property {Number} position - position of the role, Roles with a lower position can't execute actions on roles with a higher position
- * @property {Number} permissions - permission bit set
- * @property {Boolean} managed - if this role is managed by an integration (also true for bot roles that are added when you add a bot that requires permissions)
- * @property {Boolean} mentionable - if this role can be mentioned
- * @property {String} ?guild_id - optional guild id, of the guild that owns this role, not supplied by discord.
- */
 
 module.exports = RoleCache;

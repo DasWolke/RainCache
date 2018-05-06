@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Base class for all cache classes.
  */

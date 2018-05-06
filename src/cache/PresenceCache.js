@@ -28,7 +28,7 @@ class PresenceCache extends BaseCache {
 
     /**
      * Get a presence via user id
-     * @param {String} id - id of a discord user
+     * @param {String} id - id of a Discord user
      * @return {Promise.<PresenceCache|null>} - Returns a new PresenceCache with bound data or null if nothing was found
      */
     async get(id) {
@@ -45,7 +45,7 @@ class PresenceCache extends BaseCache {
 
     /**
      * Batch get presences via user ids
-     * @param {String[]} ids - Array of discord user ids
+     * @param {String[]} ids - Array of Discord user ids
      * @return {Promise.<PresenceCache[]>} - Returns an array of PresenceCaches
      */
     async batchGet(ids) {
@@ -125,7 +125,7 @@ class PresenceCache extends BaseCache {
 
     /**
      * Batch remove stored presences from the cache
-     * @param {String[]} ids - array of discord user ids
+     * @param {String[]} ids - array of Discord user ids
      * @return {Promise<void>}
      */
     async batchRemove(ids) {
@@ -133,20 +133,6 @@ class PresenceCache extends BaseCache {
     }
 }
 
-/**
- * @typedef {Object} Presence - A discord presence object
- * @property {User} user - the user which presence is being updated
- * @property {String[]} roles - array of role ids that belong to the user
- * @property {Game} game - null or the current activity of the user
- * @property {String} guild_id - id of the guild
- * @property {String} status - status of the user, either "idle", "dnd", "online", or "offline"
- */
 
-/**
- * @typedef {Object} Game - A discord game object
- * @property {String} name - name of the game
- * @property {Number} type - type of the game, checkout [activity types](https://discordapp.com/developers/docs/topics/gateway#game-object-activity-types) for more info
- * @property {String} ?url - stream url, only present with a type value of 1
- */
 
 module.exports = PresenceCache;

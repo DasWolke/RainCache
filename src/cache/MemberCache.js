@@ -189,16 +189,5 @@ class MemberCache extends BaseCache {
 
 }
 
-/**
- * @typedef {Object} GuildMember
- * @property {User} user - user belonging to the member
- * @property {?String} nick - nickname if the member has one
- * @property {String[]} roles - array of role ids
- * @property {String} joined_at - timestamp when the user joined the guild
- * @property {Boolean} deaf - if the user is deafened
- * @property {Boolean} mute - if the user is muted
- * @property {String} ?id - id of the user belonging to the guild member, only available with raincache
- * @property {String} ?guild_id - id of the guild the user is a member of, only available with raincache
- */
 
 module.exports = MemberCache;

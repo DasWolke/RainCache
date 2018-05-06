@@ -26,7 +26,7 @@ class UserCache extends BaseCache {
 
     /**
      * Loads a user from the cache via id
-     * @param {String} [id=this.id] - discord id of the user
+     * @param {String} [id=this.id] - Discord id of the user
      * @return {Promise.<UserCache|Null>} Returns a User Cache with a bound user or null if no user was found
      */
     async get(id = this.id) {
@@ -51,7 +51,7 @@ class UserCache extends BaseCache {
 
     /**
      * Update a user entry in the cache
-     * @param {String} id=this.id - discord id of the user
+     * @param {String} id=this.id - Discord id of the user
      * @param {Object|User} data - updated data of the user, it will be merged with the old data
      * @return {Promise.<UserCache>}
      */
@@ -80,7 +80,7 @@ class UserCache extends BaseCache {
 
     /**
      * Remove a user from the cache
-     * @param {String} id=this.id - discord id of the user
+     * @param {String} id=this.id - Discord id of the user
      * @return {Promise.<void>}
      */
     async remove(id = this.id) {
@@ -194,13 +194,5 @@ class UserCache extends BaseCache {
     }
 }
 
-/**
- * @typedef {Object} User - a discord user object
- * @property {String} id - id of the user
- * @property {String} username - username of the user
- * @property {String} discriminator - 4 digit long discord tag
- * @property {String} avatar - avatar hash of the user
- * @property {Boolean} bot - Whether the user is a bot
- */
 
 module.exports = UserCache;
