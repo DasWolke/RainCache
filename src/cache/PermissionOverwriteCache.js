@@ -79,7 +79,7 @@ class PermissionOverwriteCache extends BaseCache {
 
 	/**
 	 * Filter for permission overwrites by providing a filter function which returns true upon success and false otherwise
-	 * @param {Function} fn - filter function to use for the filtering
+	 * @param {(overwrite: import("./ChannelCache").PermissionOverwrite) => boolean} fn - filter function to use for the filtering
 	 * @param {string} channelId=this.boundChannel - id of the channel that belongs to the permission overwrite
 	 * @param {Array<string>} ids - Array of permission overwrite ids, if omitted the permission overwrite index will be used
 	 * @return {Promise<Array<PermissionOverwriteCache>>} - returns an array of bound permission overwrite caches
@@ -91,7 +91,7 @@ class PermissionOverwriteCache extends BaseCache {
 
 	/**
 	 * Find a permission overwrite by providing a filter function which returns true upon success and false otherwise
-	 * @param {Function} fn - filter function to use for the filtering
+	 * @param {(overwrite: import("./ChannelCache").PermissionOverwrite) => boolean} fn - filter function to use for the filtering
 	 * @param {string} channelId=this.boundChannel - id of the channel that belongs to the permission overwrite
 	 * @param {Array<string>} ids - Array of permission overwrite ids, if omitted the permission overwrite index will be used
 	 * @return {Promise<PermissionOverwriteCache>} - returns a bound permission overwrite cache

@@ -156,7 +156,7 @@ class GuildCache extends BaseCache {
 
 	/**
 	 * Filter through the collection of guilds
-	 * @param {Function} fn - Filter function
+	 * @param {(emoji: import("@amanda/discordtypings").GuildData) => boolean} fn - Filter function
 	 * @returns {Promise<Array<GuildCache>>} - array of bound guild caches
 	 */
 	async filter(fn) {
@@ -166,7 +166,7 @@ class GuildCache extends BaseCache {
 
 	/**
 	 * Filter through the collection of guilds and return the first match
-	 * @param {Function} fn - Filter function
+	 * @param {(emoji: import("@amanda/discordtypings").GuildData) => boolean} fn - Filter function
 	 * @returns {Promise<GuildCache>} - returns a bound guild cache
 	 */
 	async find(fn) {

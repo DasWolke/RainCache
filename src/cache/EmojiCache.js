@@ -77,7 +77,7 @@ class EmojiCache extends BaseCache {
 
 	/**
 	 * Filter for emojis by providing a filter function which returns true upon success and false otherwise
-	 * @param {Function} fn - filter function to use for the filtering
+	 * @param {(emoji: import("@amanda/discordtypings").EmojiData) => boolean} fn - filter function to use for the filtering
 	 * @param {string} guildId - id of the guild the emojis searched belong to
 	 * @param ids
 	 * @return {Promise<EmojiCache[]>} - array of bound emoji caches
@@ -89,7 +89,7 @@ class EmojiCache extends BaseCache {
 
 	/**
 	 * Find an emoji by providing a filter function which returns true upon success and false otherwise
-	 * @param {Function} fn - filter function to use for filtering for a single emoji
+	 * @param {(emoji: import("@amanda/discordtypings").EmojiData) => boolean} fn - filter function to use for filtering for a single emoji
 	 * @param guildId
 	 * @param ids
 	 * @return {Promise<EmojiCache>} - bound emoji cache

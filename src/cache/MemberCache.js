@@ -92,7 +92,7 @@ class MemberCache extends BaseCache {
 
 	/**
 	 * Filter for members by providing filter function which returns true upon success and false otherwise
-	 * @param fn
+	 * @param {(member: import("@amanda/discordtypings").MemberData) => boolean} fn
 	 * @param guildId
 	 * @param ids
 	 * @return {Promise<Array|*|{}>}
@@ -104,7 +104,7 @@ class MemberCache extends BaseCache {
 
 	/**
 	 *
-	 * @param fn
+	 * @param {(member: import("@amanda/discordtypings").MemberData) => boolean} fn
 	 * @param guildId
 	 * @param ids
 	 * @return {Promise<MemberCache>}

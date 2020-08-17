@@ -95,8 +95,8 @@ class ChannelCache extends BaseCache {
 
 	/**
 	 * Filter through the collection of channels
-	 * @param {Function} fn - Filter function
-	 * @param {Array<string>} channelMap - Array of ids used for the filter
+	 * @param {(channel: import("@amanda/discordtypings").ChannelData) => boolean} fn - Filter function
+	 * @param {Array<string>} [channelMap] - Array of ids used for the filter
 	 * @returns {Promise<Array<ChannelCache>>} - array of channel caches with bound results
 	 */
 	async filter(fn, channelMap) {
@@ -106,7 +106,7 @@ class ChannelCache extends BaseCache {
 
 	/**
 	 * Filter through the collection of channels and return on the first result
-	 * @param {Function} fn - Filter function
+	 * @param {(channel: import("@amanda/discordtypings").ChannelData) => boolean} fn - Filter function
 	 * @param {Array<string>} channelMap - Array of ids used for the filter
 	 * @returns {Promise<ChannelCache>} - First result bound to a channel cache
 	 */

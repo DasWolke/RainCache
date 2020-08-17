@@ -86,7 +86,7 @@ class RoleCache extends BaseCache {
 
 	/**
 	 * Filter for roles by providing a filter function which returns true upon success and false otherwise
-	 * @param {Function} fn - filter function to use for the filtering
+	 * @param {(role: Role) => boolean} fn - filter function to use for the filtering
 	 * @param {string} guildId - id of the guild belonging to the roles
 	 * @param {Array<string>} ids - array of role ids that should be used for the filtering
 	 * @return {Promise<Array<RoleCache>>} - array of bound role caches
@@ -98,7 +98,7 @@ class RoleCache extends BaseCache {
 
 	/**
 	 * Find a role by providing a filter function which returns true upon success and false otherwise
-	 * @param {Function} fn - filter function to use for filtering for a single role
+	 * @param {(role: Role) => boolean} fn - filter function to use for filtering for a single role
 	 * @param {string} guildId - id of the guild belonging to the roles
 	 * @param {Array<string>} ids - array of role ids that should be used for the filtering
 	 * @return {Promise<RoleCache>} - bound role cache
