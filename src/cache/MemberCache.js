@@ -95,7 +95,7 @@ class MemberCache extends BaseCache {
 	 * @param {(member: import("@amanda/discordtypings").MemberData) => boolean} fn
 	 * @param guildId
 	 * @param ids
-	 * @return {Promise<Array|*|{}>}
+	 * @return {Promise<Array<MemberCache>>}
 	 */
 	async filter(fn, guildId = this.boundGuild, ids = null) {
 		const members = await this.storageEngine.filter(fn, ids, super.buildId(guildId));

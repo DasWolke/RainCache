@@ -80,7 +80,7 @@ class EmojiCache extends BaseCache {
 	 * @param {(emoji: import("@amanda/discordtypings").EmojiData) => boolean} fn - filter function to use for the filtering
 	 * @param {string} guildId - id of the guild the emojis searched belong to
 	 * @param ids
-	 * @return {Promise<EmojiCache[]>} - array of bound emoji caches
+	 * @return {Promise<Array<EmojiCache>>} - array of bound emoji caches
 	 */
 	async filter(fn, guildId = this.boundGuild, ids = null) {
 		const emojis = await this.storageEngine.filter(fn, ids, super.buildId(guildId));

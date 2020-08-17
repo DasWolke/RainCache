@@ -76,7 +76,7 @@ class UserCache extends BaseCache {
 	 * Filter for users by providing a filter function which returns true upon success and false otherwise
 	 * @param {(user: import("@amanda/discordtypings").UserData) => boolean} fn - filter function to use for the filtering
 	 * @param {Array<string>} ids - Array of user ids, if omitted the global user index will be used
-	 * @return {Promise<UserCache[]>}
+	 * @return {Promise<Array<UserCache>>}
 	 */
 	async filter(fn, ids = null) {
 		const users = await this.storageEngine.filter(fn, ids, this.namespace);
@@ -87,7 +87,7 @@ class UserCache extends BaseCache {
 	 * Find a user by providing a filter function which returns true upon success and false otherwise
 	 * @param {(user: import("@amanda/discordtypings").UserData) => boolean} fn - filter function to use for filtering for a user
 	 * @param {Array<string>} ids - List of ids that should be used as the scope of the filter
-	 * @return {Promise.<UserCache|null>} - Returns a User Cache with a bound user or null if no user was found
+	 * @return {Promise<UserCache|null>} - Returns a User Cache with a bound user or null if no user was found
 	 */
 	async find(fn, ids = null) {
 		const user = await this.storageEngine.find(fn, ids, this.namespace);
