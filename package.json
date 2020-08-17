@@ -3,6 +3,7 @@
   "version": "0.4.1",
   "description": "A pluggable discord cache worker",
   "main": "index.js",
+  "types": "./typings/index.d.ts",
   "scripts": {
     "build:docs": "node_modules/.bin/docma -c docma.config.json",
     "test": "echo \"Error: no test specified\" && exit 1"
