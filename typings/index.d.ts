@@ -80,3 +80,5 @@ class RainCache<Inbound extends BaseConnector, Outbound extends BaseConnector> e
 	private _createCaches(engines: RainCacheOptions["cacheClasses"], cacheClasses: RainCacheOptions["cacheClasses"]): RainCacheOptions["cacheClasses"];
 	private _getEngine(engines: RainCacheOptions["cacheClasses"], engine: keyof RainCacheOptions["cacheClasses"]): BaseStorageEngine;
 }
+
+export = RainCache;
