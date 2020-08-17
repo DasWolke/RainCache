@@ -10,14 +10,13 @@
   "author": "wolke <wolke@weeb.sh>",
   "license": "MIT",
   "optionalDependencies": {
-    "amqplib": "^0.5.2",
-    "redis": "^2.8.0"
+    "amqplib": "^0.6.0",
+    "redis": "^3.0.2"
   },
   "dependencies": {
-    "tsubaki": "^1.2.0"
+    "@amanda/discordtypings": "github:AmandaDiscord/DiscordTypings"
   },
   "devDependencies": {
-    "eslint": "^4.4.1",
-    "docma": "^1.5.1"
+    "eslint": "^7.7.0"
   }
 }

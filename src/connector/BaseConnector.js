@@ -1,29 +1,19 @@
-'use strict';
-let EventEmitter;
-try {
-    EventEmitter = require('eventemiiter3');
-} catch (e) {
-    EventEmitter = require('events').EventEmitter;
-}
+const EventEmitter = require("events").EventEmitter;
 
 /**
  * BaseConnector class, provides a common structure for connectors
- * @extends EventEmitter
- * @private
  */
 class BaseConnector extends EventEmitter {
-    /**
-     * @private
-     */
-    constructor() {
-        super();
-        this.ready = false;
-    }
-
-    initialize() {
-        this.ready = true;
-        return Promise.resolve();
-    }
+	constructor() {
+		super();
+		this.ready = false;
+	}
+	initialize() {
+		this.ready = true;
+		return Promise.resolve();
+	}
+	// eslint-disable-next-line no-unused-vars
+	send(event) {}
 }
 
 module.exports = BaseConnector;
