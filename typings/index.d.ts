@@ -57,11 +57,11 @@ class RainCache<Inbound extends BaseConnector, Outbound extends BaseConnector> e
 	public outbound: Outbound;
 
 	public static Connectors: {
-		AmqpConnector: AmqpConnector;
-		DirectConnector: DirectConnector;
+		AmqpConnector: typeof AmqpConnector;
+		DirectConnector: typeof DirectConnector;
 	};
 	public static Engines: {
-		RedisStorageEngine: RedisStorageEngine;
+		RedisStorageEngine: typeof RedisStorageEngine;
 	};
 
 	public cache: {
