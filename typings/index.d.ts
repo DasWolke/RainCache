@@ -64,15 +64,17 @@ class RainCache<Inbound extends BaseConnector, Outbound extends BaseConnector> e
 		RedisStorageEngine: RedisStorageEngine;
 	};
 
-	public guild: RainCacheOptions["cacheClasses"]["guild"];
-	public channel: RainCacheOptions["cacheClasses"]["channel"];
-	public channelMap: RainCacheOptions["cacheClasses"]["channelMap"];
-	public member: RainCacheOptions["cacheClasses"]["member"];
-	public user: RainCacheOptions["cacheClasses"]["user"];
-	public role: RainCacheOptions["cacheClasses"]["role"];
-	public emoji: RainCacheOptions["cacheClasses"]["emoji"];
-	public presence: RainCacheOptions["cacheClasses"]["presence"];
-	public permOverwrite?: RainCacheOptions["cacheClasses"]["permOverwrite"];
+	public cache: {
+		guild: RainCacheOptions["cacheClasses"]["guild"];
+		channel: RainCacheOptions["cacheClasses"]["channel"];
+		channelMap: RainCacheOptions["cacheClasses"]["channelMap"];
+		member: RainCacheOptions["cacheClasses"]["member"];
+		user: RainCacheOptions["cacheClasses"]["user"];
+		role: RainCacheOptions["cacheClasses"]["role"];
+		emoji: RainCacheOptions["cacheClasses"]["emoji"];
+		presence: RainCacheOptions["cacheClasses"]["presence"];
+		permOverwrite: RainCacheOptions["cacheClasses"]["permOverwrite"];
+	};
 
 
 	public initialize(): Promise<void>;
