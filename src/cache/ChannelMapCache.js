@@ -24,7 +24,7 @@ class ChannelMapCache extends BaseCache {
 	 * Get a ChannelMap via id of the guild or the user
 	 * @param {string} id Id of the user or the guild
 	 * @param {string} [type=guild] Type of the map to get
-	 * @returns {Promise<ChannelMapCache|null>}
+	 * @returns {Promise<?ChannelMapCache>}
 	 */
 	async get(id, type = "guild") {
 		if (this.boundObject) {

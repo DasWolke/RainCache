@@ -65,6 +65,7 @@ class RedisStorageEngine extends BaseStorageEngine {
 	 */
 	upsert(id, updateData, useHash = this.useHash) {
 		let data;
+		// eslint-disable-next-line no-async-promise-executor
 		return new Promise(async (res, rej) => {
 			if (useHash) {
 				this.client.HMSET(id, updateData, (err) => {
@@ -113,7 +114,7 @@ class RedisStorageEngine extends BaseStorageEngine {
 	 * @param {(value?: any, index?: number, array?: Array<any>) => any} fn - filter function to use
 	 * @param {Array<string>} ids - array of ids that should be used for the filtering
 	 * @param {string} namespace - namespace of the filter
-	 * @returns {Promise<Array<Object|null>>} - filtered data
+	 * @returns {Promise<Array<?Object>>} - filtered data
 	 */
 	async filter(fn, ids, namespace) {
 		let resolvedDataArray = [];
@@ -136,7 +137,7 @@ class RedisStorageEngine extends BaseStorageEngine {
 	 * @param {Function} fn - filter function to use
 	 * @param {Array<string>} ids - array of ids that should be used for the filtering
 	 * @param {string} namespace - namespace of the filter
-	 * @returns {Promise<Object|null>} - the first result or null if nothing was found
+	 * @returns {Promise<?Object>} - the first result or null if nothing was found
 	 */
 	async find(fn, ids = null, namespace) {
 		let data = [];
@@ -250,7 +251,7 @@ class RedisStorageEngine extends BaseStorageEngine {
 	/**
 	 * Parse loaded data
 	 * @param data
-	 * @returns {Object|null}
+	 * @returns {?Object}
 	 */
 	parseData(data) {
 		return data ? JSON.parse(data) : null;

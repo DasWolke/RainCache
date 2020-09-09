@@ -29,7 +29,7 @@ class ChannelCache extends BaseCache {
 	/**
 	 * Get a channel via id
 	 * @param {string} id - id of the channel
-	 * @returns {Promise<ChannelCache|null>} - ChannelCache with bound object or null if nothing was found
+	 * @returns {Promise<?ChannelCache>} - ChannelCache with bound object or null if nothing was found
 	 */
 	async get(id) {
 		if (this.boundObject) {

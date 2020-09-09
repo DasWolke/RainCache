@@ -25,7 +25,7 @@ class PresenceCache extends BaseCache {
 	/**
 	 * Get a presence via user id
 	 * @param {string} id - id of a discord user
-	 * @return {Promise<PresenceCache|null>} - Returns a new PresenceCache with bound data or null if nothing was found
+	 * @return {Promise<?PresenceCache>} - Returns a new PresenceCache with bound data or null if nothing was found
 	 */
 	async get(id) {
 		if (this.boundObject) {

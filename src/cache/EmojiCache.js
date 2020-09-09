@@ -24,7 +24,7 @@ class EmojiCache extends BaseCache {
 	 * Get an emoji via id
 	 * @param {string} id - id of the emoji (this does not refer to the name of the emoji)
 	 * @param {string} guildId - id of the guild this emoji belongs to
-	 * @return {Promise<EmojiCache|null>} EmojiCache with bound object or null if nothing was found
+	 * @return {Promise<?EmojiCache>} EmojiCache with bound object or null if nothing was found
 	 */
 	async get(id, guildId = this.boundGuild) {
 		if (this.boundObject) {

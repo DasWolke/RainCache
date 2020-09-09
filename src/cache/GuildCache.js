@@ -35,7 +35,7 @@ class GuildCache extends BaseCache {
 	/**
 	 * Retrieves a guild via id
 	 * @param id - Discord id of the guild
-	 * @returns {Promise<GuildCache|null>} Returns either a Guild Object or null if the guild does not exist.
+	 * @returns {Promise<?GuildCache>} Returns either a Guild Object or null if the guild does not exist.
 	 */
 	async get(id) {
 		if (this.boundObject) {

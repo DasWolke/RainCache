@@ -27,7 +27,7 @@ class MemberCache extends BaseCache {
 	 * Get a member via id
 	 * @param {string} id - id of the member
 	 * @param {string} [guildId=this.boundGuild] - id of the guild of the member, defaults to the bound guild of the cache
-	 * @returns {Promise<MemberCache|null>} - bound member cache with properties of the member or null if no member is cached
+	 * @returns {Promise<?MemberCache>} - bound member cache with properties of the member or null if no member is cached
 	 */
 	async get(id, guildId = this.boundGuild) {
 		if (this.boundObject) {

@@ -12,6 +12,7 @@ import RoleCache = require("../src/cache/RoleCache");
 import EmojiCache = require("../src/cache/EmojiCache");
 import PresenceCache = require("../src/cache/PresenceCache");
 import PermissionsOverwriteCache = require("../src/cache/PermissionOverwriteCache");
+import VoiceStateCache = require("../src/cache/VoiceStateCache");
 
 import AmqpConnector = require("../src/connector/AmqpConnector");
 import DirectConnector = require("../src/connector/DirectConnector");
@@ -45,6 +46,7 @@ export type RainCacheOptions = {
 		emoji?: EmojiCache;
 		presence?: PresenceCache;
 		permOverwrite?: PermissionsOverwriteCache;
+		voiceState?: VoiceStateCache;
 	};
 }
 
@@ -74,6 +76,7 @@ class RainCache<Inbound extends BaseConnector, Outbound extends BaseConnector> e
 		emoji: RainCacheOptions["cacheClasses"]["emoji"];
 		presence: RainCacheOptions["cacheClasses"]["presence"];
 		permOverwrite: RainCacheOptions["cacheClasses"]["permOverwrite"];
+		voiceState: RainCacheOptions["cacheClasses"]["voiceState"];
 	};
 
 

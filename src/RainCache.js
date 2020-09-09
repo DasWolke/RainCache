@@ -8,6 +8,7 @@ const RoleCache = require("./cache/RoleCache");
 const EmojiCache = require("./cache/EmojiCache");
 const PresenceCache = require("./cache/PresenceCache");
 const PermissionsOverwriteCache = require("./cache/PermissionOverwriteCache");
+const VoiceStateCache = require("./cache/VoiceStateCache");
 const EventEmitter = require("events").EventEmitter;
 
 
@@ -37,6 +38,7 @@ class RainCache extends EventEmitter {
 	 * @param {import("./storageEngine/BaseStorageEngine")} [options.storage.emoji=options.storage.default] - storage engine used by the emoji cache
 	 * @param {import("./storageEngine/BaseStorageEngine")} [options.storage.presence=options.storage.default] - storage engine used by the presence cache
 	 * @param {import("./storageEngine/BaseStorageEngine")} [options.storage.permOverwrite=options.storage.default] - storage engine used by the permission overwrite cache
+	 * @param {import("./storageEngine/BaseStorageEngine")} [options.storage.voiceState=options.storage.default] - storage engine used by the voice state cache
 	 * @param {Object.<string, boolean>} [options.disabledEvents={}] - If you want to disable events from being processed,
 	 * you can add them here like this: `{'MESSAGE_CREATE':true}`,
 	 * this would disable any message_creates from being cached
@@ -52,6 +54,7 @@ class RainCache extends EventEmitter {
 	 * @param {typeof EmojiCache} [options.cacheClasses.emoji]
 	 * @param {typeof PresenceCache} [options.cacheClasses.presence]
 	 * @param {typeof PermissionsOverwriteCache} [options.cacheClasses.permOverwrite]
+	 * @param {typeof VoiceStateCache} [options.cacheClasses.voiceState]
 	 * @param {import("./connector/BaseConnector")} inboundConnector
 	 * @param {import("./connector/BaseConnector")} outboundConnector
 	 */
@@ -70,7 +73,8 @@ class RainCache extends EventEmitter {
 				role: RoleCache,
 				emoji: EmojiCache,
 				presence: PresenceCache,
-				permOverwrite: PermissionsOverwriteCache
+				permOverwrite: PermissionsOverwriteCache,
+				voiceState: VoiceStateCache
 			};
 		}
 		if (!options.storage.default) {
@@ -101,6 +105,7 @@ class RainCache extends EventEmitter {
 	async initialize() {
 		try {
 			for (const engine in this.options.storage) {
+				// eslint-disable-next-line no-prototype-builtins
 				if (this.options.storage.hasOwnProperty(engine)) {
 					if (!this.options.storage[engine].ready) {
 						await this.options.storage[engine].initialize();
@@ -123,7 +128,8 @@ class RainCache extends EventEmitter {
 				role: this.cache.role,
 				emoji: this.cache.emoji,
 				presence: this.cache.presence,
-				permOverwrite: this.cache.permOverwrite
+				permOverwrite: this.cache.permOverwrite,
+				voiceState: this.cache.voiceState
 			}
 		});
 		if (this.inbound && !this.inbound.ready) {
@@ -188,6 +194,10 @@ class RainCache extends EventEmitter {
 		if (cacheClasses["guild"]) {
 			const engine = this._getEngine(engines, "guild");
 			caches["guild"] = new cacheClasses["guild"](engine, caches["channel"], caches["role"], caches["member"], caches["emoji"], caches["presence"], caches["channelMap"]);
+		}
+		if (cacheClasses["voiceState"]) {
+			const engine = this._getEngine(engines, "voiceState");
+			caches["voiceState"] = new cacheClasses["voiceState"](engine);
 		}
 		return caches;
 	}

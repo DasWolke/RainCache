@@ -25,7 +25,7 @@ class RoleCache extends BaseCache {
 	 * Get a role via id and guild id of the role
 	 * @param {string} id - id of the role
 	 * @param {string} guildId - id of the guild belonging to the role
-	 * @return {Promise<RoleCache|null>} Returns a Role Cache with a bound role or null if no role was found
+	 * @return {Promise<?RoleCache>} Returns a Role Cache with a bound role or null if no role was found
 	 */
 	async get(id, guildId) {
 		if (this.boundObject) {
@@ -48,7 +48,7 @@ class RoleCache extends BaseCache {
 	async update(id, guildId, data) {
 		if (this.boundObject) {
 			this.bindObject(data);
-			await this.update(this.boundObject.id, this.bindObject.guild_id, data);
+			await this.update(this.boundObject.id, this.boundObject.guild_id, data);
 			return this;
 		}
 		if (!guildId) {

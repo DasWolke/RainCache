@@ -26,7 +26,7 @@ class PermissionOverwriteCache extends BaseCache {
 	 * Get a permission overwrite via id
 	 * @param {string} id - id of the permission overwrite
 	 * @param {string} channelId=this.boundChannel - id of the channel that belongs to the permission overwrite
-	 * @return {Promise<PermissionOverwriteCache|null>} - returns a bound permission overwrite cache or null if nothing was found
+	 * @return {Promise<?PermissionOverwriteCache>} - returns a bound permission overwrite cache or null if nothing was found
 	 */
 	async get(id, channelId = this.boundChannel) {
 		if (this.boundObject) {

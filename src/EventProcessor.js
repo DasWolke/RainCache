@@ -15,6 +15,8 @@ class EventProcessor extends EventEmitter {
 	 * @param {import("./cache/EmojiCache")} options.cache.emoji
 	 * @param {import("./cache/ChannelMapCache")} options.cache.channelMap
 	 * @param {import("./cache/PresenceCache")} options.cache.presence
+	 * @param {import("./cache/PermissionOverwriteCache")} options.cache.permOverwrite
+	 * @param {import("./cache/VoiceStateCache")} options.cache.voiceState
 	 */
 	constructor(options = { disabledEvents: {}, presenceInterval: 1000 * 5 }) {
 		super();
@@ -30,6 +32,8 @@ class EventProcessor extends EventEmitter {
 		this.emojiCache = options.cache.emoji;
 		this.channelMapCache = options.cache.channelMap;
 		this.presenceCache = options.cache.presence;
+		this.permOverwriteCache = options.cache.permOverwrite;
+		this.voiceStateCache = options.cache.voiceState;
 		this.ready = false;
 		this.presenceQueue = {};
 		this.presenceFlush = setInterval(async () => {
@@ -108,14 +112,17 @@ class EventProcessor extends EventEmitter {
 				oldEmotes = [];
 			}
 			for (const emoji of event.d.emojis) {
+				// @ts-ignore
 				const oldEmote = oldEmotes.find(e => e.id === emoji.id);
 				if (!oldEmote || oldEmote !== emoji) {
 					await this.emojiCache.update(emoji.id, event.d.guild_id, emoji);
 				}
 			}
 			for (const oldEmote of oldEmotes) {
+				// @ts-ignore
 				const newEmote = event.d.emojis.find(e => e.id === oldEmote.id);
 				if (!newEmote) {
+					// @ts-ignore
 					await this.emojiCache.remove(oldEmote.id, event.d.guild_id);
 				}
 			}
@@ -161,12 +168,14 @@ class EventProcessor extends EventEmitter {
 
 	async processReady(readyEvent) {
 		const updates = [];
+		// @ts-ignore
 		updates.push(this.userCache.update("self", { id: readyEvent.d.user.id }));
 		updates.push(this.userCache.update(readyEvent.d.user.id, readyEvent.d.user));
 		for (const guild of readyEvent.d.guilds) {
 			this.emit("debug", `Caching guild ${guild.id} from ready`);
 			updates.push(this.guildCache.update(guild.id, guild));
 		}
+		// @ts-ignore
 		return Promise.all(updates);
 	}
 
@@ -213,6 +222,7 @@ class EventProcessor extends EventEmitter {
 		this.presenceQueue = {};
 		const presenceUpdatePromises = [];
 		for (const key in queue) {
+			// eslint-disable-next-line no-prototype-builtins
 			if (queue.hasOwnProperty(key)) {
 				presenceUpdatePromises.push(this.presenceCache.update(key, queue[key]));
 			}

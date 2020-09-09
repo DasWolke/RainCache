@@ -24,7 +24,7 @@ class UserCache extends BaseCache {
 	/**
 	 * Loads a user from the cache via id
 	 * @param {string} [id=this.id] - discord id of the user
-	 * @return {Promise<UserCache|Null>} Returns a User Cache with a bound user or null if no user was found
+	 * @return {Promise<?UserCache>} Returns a User Cache with a bound user or null if no user was found
 	 */
 	async get(id = this.id) {
 		if (this.boundObject) {
@@ -87,7 +87,7 @@ class UserCache extends BaseCache {
 	 * Find a user by providing a filter function which returns true upon success and false otherwise
 	 * @param {(user: import("@amanda/discordtypings").UserData) => boolean} fn - filter function to use for filtering for a user
 	 * @param {Array<string>} ids - List of ids that should be used as the scope of the filter
-	 * @return {Promise<UserCache|null>} - Returns a User Cache with a bound user or null if no user was found
+	 * @return {Promise<?UserCache>} - Returns a User Cache with a bound user or null if no user was found
 	 */
 	async find(fn, ids = null) {
 		const user = await this.storageEngine.find(fn, ids, this.namespace);
