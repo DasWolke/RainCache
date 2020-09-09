@@ -51,6 +51,8 @@ class VoiceStateCache extends BaseCache {
 			return this;
 		}
 
+		delete data.member;
+
 		await this.addToIndex(id);
 		await this.storageEngine.upsert(this.buildId(id, channelId), data);
 		return new VoiceStateCache(this.storageEngine, data);
