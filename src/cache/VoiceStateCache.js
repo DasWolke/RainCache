@@ -23,14 +23,14 @@ class VoiceStateCache extends BaseCache {
 	/**
 	 * Loads a VoiceState from the cache via id
 	 * @param {string} [id=this.user_id] - discord id of the user
-	 * @param {string} [channelId] - channel id
+	 * @param {string} [guildId] - guild id
 	 * @return {Promise<?VoiceStateCache>} Returns a VoiceState Cache with a bound user or null if no user was found
 	 */
-	async get(id = this.user_id, channelId) {
+	async get(id = this.user_id, guildId) {
 		if (this.boundObject) {
 			return this.boundObject;
 		}
-		const state = await this.storageEngine.get(this.buildId(id, channelId));
+		const state = await this.storageEngine.get(this.buildId(id, guildId));
 		if (!state) {
 			return null;
 		}
@@ -40,38 +40,38 @@ class VoiceStateCache extends BaseCache {
 	/**
 	 * Update a VoiceState entry in the cache
 	 * @param {string} id - discord id of the user
-	 * @param {string} channelId - channel id
+	 * @param {string} guildId - guild id
 	 * @param {import("@amanda/discordtypings").VoiceStateData} data - updated data of the VoiceState, it will be merged with the old data
 	 * @return {Promise<VoiceStateCache>}
 	 */
-	async update(id, channelId, data) {
+	async update(id, guildId, data) {
 		if (this.boundObject) {
 			this.bindObject(data);
-			await this.update(id, channelId, data);
+			await this.update(id, guildId, data);
 			return this;
 		}
 
 		delete data.member;
 
 		await this.addToIndex(id);
-		await this.storageEngine.upsert(this.buildId(id, channelId), data);
+		await this.storageEngine.upsert(this.buildId(id, guildId), data);
 		return new VoiceStateCache(this.storageEngine, data);
 	}
 
 	/**
 	 * Remove a VoiceState from the cache
 	 * @param {string} [id=this.user_id] - discord id of the user
-	 * @param {string} [channelId] - channel id
+	 * @param {string} [guildId] - guild id
 	 * @return {Promise<void>}
 	 */
-	async remove(id = this.user_id, channelId) {
+	async remove(id = this.user_id, guildId) {
 		if (this.boundObject) {
 			return this.remove(this.boundObject.id);
 		}
-		const state = await this.storageEngine.get(this.buildId(id, channelId));
+		const state = await this.storageEngine.get(this.buildId(id, guildId));
 		if (state) {
 			await this.removeFromIndex(id);
-			return this.storageEngine.remove(this.buildId(id, channelId));
+			return this.storageEngine.remove(this.buildId(id, guildId));
 		} else {
 			return null;
 		}
@@ -167,15 +167,15 @@ class VoiceStateCache extends BaseCache {
 	/**
 	 * Build a unique key for storing VoiceState data
 	 * @param {string} userId - id of the user
-	 * @param {string} channelId - id of the channel
+	 * @param {string} guildId - id of the guild
 	 * @return {any}
 	 */
 	// @ts-ignore
-	buildId(userId, channelId) {
-		if (!channelId) {
+	buildId(userId, guildId) {
+		if (!guildId) {
 			return super.buildId(userId);
 		}
-		return `${this.namespace}.${channelId}.${userId}`;
+		return `${this.namespace}.${guildId}.${userId}`;
 	}
 }
 
