@@ -2,15 +2,15 @@
   "src": [
     {
       "RainCache": [
-        "./src/**/*.js",
-        "!./src/connector/**/*.js",
-        "!./src/storageEngine/**/*.js"
+        "./dist/**/*.js",
+        "!./dist/connector/**/*.js",
+        "!./dist/storageEngine/**/*.js"
       ],
       "Connectors": [
-        "./src/connector/**/*.js"
+        "./dist/connector/**/*.js"
       ],
       "StorageEngines": [
-        "./src/storageEngine/**/*.js"
+        "./dist/storageEngine/**/*.js"
       ]
     },
     {
