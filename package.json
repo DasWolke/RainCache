@@ -18,10 +18,10 @@
   "dependencies": {
     "@amanda/discordtypings": "github:AmandaDiscord/DiscordTypings",
     "@types/amqplib": "^0.5.14",
-    "@types/node": "^14.11.8"
+    "@types/node": "^14.11.8",
+    "@types/redis": "^2.8.28"
   },
   "devDependencies": {
-    "@types/redis": "^2.8.28",
     "@typescript-eslint/eslint-plugin": "^4.4.1",
     "@typescript-eslint/parser": "^4.4.1",
     "docma": "3.2.2",
