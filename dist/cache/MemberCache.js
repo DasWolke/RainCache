@@ -15,16 +15,18 @@ class MemberCache extends BaseCache_1.default {
         }
     }
     async get(id, guildId = this.boundGuild) {
+        var _a;
         if (this.boundObject) {
             return this;
         }
-        const member = await this.storageEngine.get(this.buildId(id, guildId));
+        const member = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.get(this.buildId(id, guildId)));
         if (!member) {
             return null;
         }
         return new MemberCache(this.storageEngine, this.user.bindUserId(member.id), member);
     }
     async update(id, guildId = this.boundGuild, data) {
+        var _a;
         if (this.boundObject) {
             this.bindObject(data);
         }
@@ -42,27 +44,30 @@ class MemberCache extends BaseCache_1.default {
             delete data.user;
         }
         await this.addToIndex([id], guildId);
-        await this.storageEngine.upsert(this.buildId(id, guildId), data);
+        await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.upsert(this.buildId(id, guildId), data));
         if (this.boundObject)
             return this;
         return new MemberCache(this.storageEngine, this.user.bindUserId(data.id), data);
     }
     async remove(id, guildId = this.boundGuild) {
-        const member = await this.storageEngine.get(this.buildId(id, guildId));
+        var _a, _b;
+        const member = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.get(this.buildId(id, guildId)));
         if (member) {
             await this.removeFromIndex(id, guildId);
-            return this.storageEngine.remove(this.buildId(id, guildId));
+            return (_b = this.storageEngine) === null || _b === void 0 ? void 0 : _b.remove(this.buildId(id, guildId));
         }
         else {
-            return null;
+            return undefined;
         }
     }
-    async filter(fn, guildId = this.boundGuild, ids = null) {
-        const members = await this.storageEngine.filter(fn, ids, super.buildId(guildId));
+    async filter(fn, guildId = this.boundGuild, ids) {
+        var _a;
+        const members = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.filter(fn, ids, super.buildId(guildId)));
         return members.map(m => new MemberCache(this.storageEngine, this.user.bindUserId(m.id), m).bindGuild(this.boundGuild));
     }
-    async find(fn, guildId = this.boundGuild, ids = null) {
-        const member = await this.storageEngine.find(fn, ids, super.buildId(guildId));
+    async find(fn, guildId = this.boundGuild, ids = undefined) {
+        var _a;
+        const member = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.find(fn, ids, super.buildId(guildId)));
         if (!member)
             return null;
         return new MemberCache(this.storageEngine, this.user.bindUserId(member.id), member);

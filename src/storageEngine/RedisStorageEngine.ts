@@ -21,7 +21,7 @@ class RedisStorageEngine<T> extends BaseStorageEngine<T> {
 		super();
 		this.client = null;
 		this.ready = false;
-		this.useHash = options.useHash;
+		this.useHash = options.useHash || false;
 		this.options = options;
 	}
 
@@ -134,7 +134,7 @@ class RedisStorageEngine<T> extends BaseStorageEngine<T> {
 	 */
 	public async filter(fn: (value?: T, index?: number, array?: Array<T>) => unknown, ids: Array<string>, namespace: string): Promise<Array<any>> {
 		const resolvedDataArray: Array<T> = [];
-		let data = [];
+		let data: Array<string> = [];
 		if (!ids) {
 			data = await this.getListMembers(namespace);
 		} else {
@@ -156,7 +156,7 @@ class RedisStorageEngine<T> extends BaseStorageEngine<T> {
 	 * @returns the first result or null if nothing was found
 	 */
 	public async find(fn: (value?: T, index?: number, array?: Array<string>) => boolean, ids: Array<string> | null = null, namespace: string): Promise<T | null> {
-		let data = [];
+		let data: Array<string> = [];
 		if (typeof ids === "string" && !namespace) {
 			namespace = ids;
 			ids = null;

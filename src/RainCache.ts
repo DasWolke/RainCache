@@ -105,7 +105,7 @@ class RainCache<Inbound extends BaseConnector, Outbound extends BaseConnector> e
 		this.cache = this._createCaches(this.options.storage, this.options.cacheClasses);
 		Object.assign(this, this.cache);
 		this.eventProcessor = new EventProcessor({
-			disabledEvents: this.options.disabledEvents,
+			disabledEvents: this.options.disabledEvents || {},
 			cache: {
 				guild: this.cache.guild,
 				channel: this.cache.channel,

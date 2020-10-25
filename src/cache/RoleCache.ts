@@ -33,11 +33,11 @@ class RoleCache extends BaseCache<import("@amanda/discordtypings").RoleData> {
 		if (this.boundObject) {
 			return this;
 		}
-		const role = await this.storageEngine.get(this.buildId(id, guildId));
+		const role = await this.storageEngine?.get(this.buildId(id, guildId));
 		if (!role) {
 			return null;
 		}
-		return new RoleCache(this.storageEngine, role);
+		return new RoleCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").RoleData>, role);
 	}
 
 	/**
@@ -63,9 +63,9 @@ class RoleCache extends BaseCache<import("@amanda/discordtypings").RoleData> {
 			data.id = id;
 		}
 		await this.addToIndex([id], guildId);
-		await this.storageEngine.upsert(this.buildId(id, guildId), data);
+		await this.storageEngine?.upsert(this.buildId(id, guildId), data);
 		if (this.boundObject) return this;
-		return new RoleCache(this.storageEngine, data);
+		return new RoleCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").RoleData>, data);
 	}
 
 	/**
@@ -74,12 +74,12 @@ class RoleCache extends BaseCache<import("@amanda/discordtypings").RoleData> {
 	 * @param guildId id of the guild belonging to the role
 	 */
 	public async remove(id: string, guildId: string): Promise<void> {
-		const role = await this.storageEngine.get(this.buildId(id, guildId));
+		const role = await this.storageEngine?.get(this.buildId(id, guildId));
 		if (role) {
 			await this.removeFromIndex(id, guildId);
-			return this.storageEngine.remove(this.buildId(id, guildId));
+			return this.storageEngine?.remove(this.buildId(id, guildId));
 		} else {
-			return null;
+			return undefined;
 		}
 	}
 
@@ -90,9 +90,10 @@ class RoleCache extends BaseCache<import("@amanda/discordtypings").RoleData> {
 	 * @param ids array of role ids that should be used for the filtering
 	 * @returns array of bound role caches
 	 */
-	public async filter(fn: (role?: import("@amanda/discordtypings").RoleData, index?: number, array?: Array<import("@amanda/discordtypings").RoleData>) => unknown, guildId: string = this.boundGuild, ids: Array<string> = null): Promise<Array<RoleCache>> {
-		const roles = await this.storageEngine.filter(fn, ids, super.buildId(guildId));
-		return roles.map(r => new RoleCache(this.storageEngine, r));
+	public async filter(fn: (role?: import("@amanda/discordtypings").RoleData, index?: number, array?: Array<import("@amanda/discordtypings").RoleData>) => unknown, guildId = this.boundGuild, ids: Array<string> | undefined = undefined): Promise<Array<RoleCache>> {
+		const roles = await this.storageEngine?.filter(fn, ids, super.buildId(guildId as string));
+		if (!roles) return [];
+		return roles.map(r => new RoleCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").RoleData>, r));
 	}
 
 	/**
@@ -102,10 +103,10 @@ class RoleCache extends BaseCache<import("@amanda/discordtypings").RoleData> {
 	 * @param ids array of role ids that should be used for the filtering
 	 * @returns bound role cache
 	 */
-	public async find(fn: (role?: import("@amanda/discordtypings").RoleData, index?: number, array?: Array<string>) => unknown, guildId: string = this.boundGuild, ids: Array<string> = null): Promise<RoleCache> {
-		const role = await this.storageEngine.find(fn, ids, super.buildId(guildId));
+	public async find(fn: (role?: import("@amanda/discordtypings").RoleData, index?: number, array?: Array<string>) => unknown, guildId = this.boundGuild, ids: Array<string> | undefined = undefined): Promise<RoleCache | null> {
+		const role = await this.storageEngine?.find(fn, ids, super.buildId(guildId as string));
 		if (!role) return null;
-		return new RoleCache(this.storageEngine, role);
+		return new RoleCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").RoleData>, role);
 	}
 
 	/**

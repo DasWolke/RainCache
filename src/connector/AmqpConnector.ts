@@ -34,9 +34,9 @@ class AmqpConnector extends BaseConnector {
 		this.ready = true;
 		this.channel.assertQueue(this.options.amqpQueue, {durable: false, autoDelete: true});
 		this.channel.consume(this.options.amqpQueue, (event) => {
-			this.channel.ack(event);
+			if (event) this.channel?.ack(event);
 			// console.log(event.content.toString());
-			this.emit("event", JSON.parse(event.content.toString()));
+			if (event) this.emit("event", JSON.parse(event.content.toString()));
 		});
 	}
 
@@ -45,7 +45,7 @@ class AmqpConnector extends BaseConnector {
 	 * @param event event that should be forwarded, has to be JSON.stringify-able
 	 */
 	async send(event: any): Promise<void> {
-		this.channel.sendToQueue(this.options.sendQueue, Buffer.from(JSON.stringify(event)));
+		this.channel?.sendToQueue(this.options.sendQueue, Buffer.from(JSON.stringify(event)));
 	}
 }
 

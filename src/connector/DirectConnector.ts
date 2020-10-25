@@ -15,9 +15,9 @@ class DirectConnector extends BaseConnector {
 	/**
 	 * Init Method, initializes this connector
 	 */
-	initialize(): Promise<null> {
+	initialize(): Promise<void> {
 		this.ready = true;
-		return Promise.resolve(null);
+		return Promise.resolve(undefined);
 	}
 
 	/**

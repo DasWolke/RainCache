@@ -83,7 +83,7 @@ class EventProcessor extends EventEmitter {
 			await this.memberCache?.remove(event.d.user.id, event.d.guild_id);
 			break;
 		case "GUILD_MEMBERS_CHUNK": {
-			const guildMemberChunkPromises = [];
+			const guildMemberChunkPromises: Array<Promise<any> | undefined> = [];
 			for (const member of event.d.members) {
 				guildMemberChunkPromises.push(this.memberCache?.update(member.user.id, event.d.guild_id, member));
 			}
@@ -142,9 +142,11 @@ class EventProcessor extends EventEmitter {
 
 	private handlePresenceUpdate(presenceEvent: import("@amanda/discordtypings").PresenceData & { status: number }) {
 		if (presenceEvent.roles) {
+			// @ts-ignore
 			delete presenceEvent.roles;
 		}
 		if (presenceEvent.guild_id) {
+			// @ts-ignore
 			delete presenceEvent.guild_id;
 		}
 		if (this.presenceQueue[presenceEvent.user.id]) {
@@ -165,13 +167,13 @@ class EventProcessor extends EventEmitter {
 	}
 
 	private async processReady(readyEvent: any) {
-		const updates = [];
+		const updates: Array<Promise<any> | undefined> = [];
 		// @ts-ignore
-		updates.push(this.userCache.update("self", { id: readyEvent.d.user.id }));
-		updates.push(this.userCache.update(readyEvent.d.user.id, readyEvent.d.user));
+		updates.push(this.userCache?.update("self", { id: readyEvent.d.user.id }));
+		updates.push(this.userCache?.update(readyEvent.d.user.id, readyEvent.d.user));
 		for (const guild of readyEvent.d.guilds) {
 			this.emit("debug", `Caching guild ${guild.id} from ready`);
-			updates.push(this.guildCache.update(guild.id, guild));
+			updates.push(this.guildCache?.update(guild.id, guild));
 		}
 		return Promise.all(updates);
 	}
@@ -181,9 +183,9 @@ class EventProcessor extends EventEmitter {
 		case 0:
 		case 2:
 		case 4:
-			await this.channelMapCache.update(channelCreateEvent.d.guild_id, [channelCreateEvent.d.id], "guild");
+			await this.channelMapCache?.update(channelCreateEvent.d.guild_id, [channelCreateEvent.d.id], "guild");
 			// this.emit('debug', `Caching guild channel ${channelCreateEvent.d.id}`);
-			return this.channelCache.update(channelCreateEvent.d.id, channelCreateEvent.d);
+			return this.channelCache?.update(channelCreateEvent.d.id, channelCreateEvent.d);
 		default:
 			break;
 		}
@@ -193,8 +195,8 @@ class EventProcessor extends EventEmitter {
 				return;
 			}
 			// this.emit('debug', `Caching dm channel ${channelCreateEvent.d.id}`);
-			await this.channelMapCache.update(channelCreateEvent.d.recipients[0].id, [channelCreateEvent.d.id], "user");
-			return this.channelCache.update(channelCreateEvent.d.id, channelCreateEvent.d);
+			await this.channelMapCache?.update(channelCreateEvent.d.recipients[0].id, [channelCreateEvent.d.id], "user");
+			return this.channelCache?.update(channelCreateEvent.d.id, channelCreateEvent.d);
 		}
 		//ignore channel categories for now.
 	}
@@ -203,25 +205,25 @@ class EventProcessor extends EventEmitter {
 		switch (channelDeleteEvent.d.type) {
 		case 0:
 		case 2:
-			await this.channelMapCache.update(channelDeleteEvent.d.guild_id, [channelDeleteEvent.d.id], "guild", true);
-			return this.channelCache.remove(channelDeleteEvent.d.id);
+			await this.channelMapCache?.update(channelDeleteEvent.d.guild_id, [channelDeleteEvent.d.id], "guild", true);
+			return this.channelCache?.remove(channelDeleteEvent.d.id);
 		default:
 			break;
 		}
 		if (channelDeleteEvent.d.type === 1) {
-			await this.channelMapCache.update(channelDeleteEvent.d.recipients[0].id, [channelDeleteEvent.d.id], "user", true);
-			return this.channelCache.remove(channelDeleteEvent.d.id);
+			await this.channelMapCache?.update(channelDeleteEvent.d.recipients[0].id, [channelDeleteEvent.d.id], "user", true);
+			return this.channelCache?.remove(channelDeleteEvent.d.id);
 		}
 	}
 
 	private async flushQueue() {
 		const queue = this.presenceQueue;
 		this.presenceQueue = {};
-		const presenceUpdatePromises = [];
+		const presenceUpdatePromises: Array<Promise<any> | undefined> = [];
 		for (const key in queue) {
 			// eslint-disable-next-line no-prototype-builtins
 			if (queue.hasOwnProperty(key)) {
-				presenceUpdatePromises.push(this.presenceCache.update(key, queue[key]));
+				presenceUpdatePromises.push(this.presenceCache?.update(key, queue[key]));
 			}
 		}
 		await Promise.all(presenceUpdatePromises);

@@ -27,43 +27,43 @@ class UserCache extends BaseCache<import("@amanda/discordtypings").UserData> {
 	 * @param id discord id of the user
 	 * @returns Returns a User Cache with a bound user or null if no user was found
 	 */
-	public async get(id: string = this.boundObject?.id): Promise<UserCache | null> {
+	public async get(id = this.boundObject?.id): Promise<UserCache | null> {
 		if (this.boundObject) {
 			return this;
 		}
-		const user = await this.storageEngine.get(this.buildId(id));
+		const user = await this.storageEngine?.get(this.buildId(id as string));
 		if (!user) {
 			return null;
 		}
-		return new UserCache(this.storageEngine, user);
+		return new UserCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").UserData>, user);
 	}
 
 	/**
 	 * Update a user entry in the cache
 	 * @param id discord id of the user
-	 * @param data - updated data of the user, it will be merged with the old data
+	 * @param data updated data of the user, it will be merged with the old data
 	 */
-	public async update(id: string = this.boundObject?.id, data: import("@amanda/discordtypings").UserData): Promise<UserCache> {
+	public async update(id = this.boundObject?.id, data: import("@amanda/discordtypings").UserData): Promise<UserCache> {
 		if (this.boundObject) {
 			this.bindObject(data);
 		}
-		await this.addToIndex([id]);
-		await this.storageEngine.upsert(this.buildId(id), data);
+		await this.addToIndex([id as string]);
+		await this.storageEngine?.upsert(this.buildId(id as string), data);
 		if (this.boundObject) return this;
-		return new UserCache(this.storageEngine, data);
+		return new UserCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").UserData>, data);
 	}
 
 	/**
 	 * Remove a user from the cache
-	 * @param {string} id=this.id - discord id of the user
+	 * @param id discord id of the user
 	 */
-	public async remove(id: string = this.boundObject?.id): Promise<void> {
-		const user = await this.storageEngine.get(this.buildId(id));
+	public async remove(id = this.boundObject?.id): Promise<void> {
+		const user = await this.storageEngine?.get(this.buildId(id as string));
 		if (user) {
-			await this.removeFromIndex(id);
-			return this.storageEngine.remove(this.buildId(id));
+			await this.removeFromIndex(id as string);
+			return this.storageEngine?.remove(this.buildId(id as string));
 		} else {
-			return null;
+			return undefined;
 		}
 	}
 
@@ -72,9 +72,10 @@ class UserCache extends BaseCache<import("@amanda/discordtypings").UserData> {
 	 * @param fn filter function to use for the filtering
 	 * @param ids Array of user ids, if omitted the global user index will be used
 	 */
-	public async filter(fn: (user?: import("@amanda/discordtypings").UserData, index?: number, array?: Array<import("@amanda/discordtypings").UserData>) => unknown, ids: Array<string> = null): Promise<Array<UserCache>> {
-		const users = await this.storageEngine.filter(fn, ids, this.namespace);
-		return users.map(u => new UserCache(this.storageEngine, u));
+	public async filter(fn: (user?: import("@amanda/discordtypings").UserData, index?: number, array?: Array<import("@amanda/discordtypings").UserData>) => unknown, ids: Array<string> | undefined = undefined): Promise<Array<UserCache>> {
+		const users = await this.storageEngine?.filter(fn, ids, this.namespace);
+		if (!users) return [];
+		return users.map(u => new UserCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").UserData>, u));
 	}
 
 	/**
@@ -83,10 +84,10 @@ class UserCache extends BaseCache<import("@amanda/discordtypings").UserData> {
 	 * @param ids List of ids that should be used as the scope of the filter
 	 * @returns Returns a User Cache with a bound user or null if no user was found
 	 */
-	public async find(fn: (user?: import("@amanda/discordtypings").UserData, index?: number, array?: Array<string>) => unknown, ids: Array<string> = null): Promise<UserCache | null> {
-		const user = await this.storageEngine.find(fn, ids, this.namespace);
+	public async find(fn: (user?: import("@amanda/discordtypings").UserData, index?: number, array?: Array<string>) => unknown, ids: Array<string> | undefined = undefined): Promise<UserCache | null> {
+		const user = await this.storageEngine?.find(fn, ids, this.namespace);
 		if (!user) return null;
-		return new UserCache(this.storageEngine, user);
+		return new UserCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").UserData>, user);
 	}
 
 	/**
@@ -105,7 +106,7 @@ class UserCache extends BaseCache<import("@amanda/discordtypings").UserData> {
 	 * @param ids ids of the users
 	 */
 	public async addToIndex(ids: Array<string>): Promise<void> {
-		return this.storageEngine.addToList(this.namespace, ids);
+		return this.storageEngine?.addToList(this.namespace, ids);
 	}
 
 	/**
@@ -113,7 +114,7 @@ class UserCache extends BaseCache<import("@amanda/discordtypings").UserData> {
 	 * @param id id of the user
 	 */
 	public async removeFromIndex(id: string): Promise<void> {
-		return this.storageEngine.removeFromList(this.namespace, id);
+		return this.storageEngine?.removeFromList(this.namespace, id);
 	}
 
 	/**
@@ -122,7 +123,7 @@ class UserCache extends BaseCache<import("@amanda/discordtypings").UserData> {
 	 * @returns True if the user is indexed, false otherwise
 	 */
 	public async isIndexed(id: string): Promise<boolean> {
-		return this.storageEngine.isListMember(this.namespace, id);
+		return this.storageEngine?.isListMember(this.namespace, id) || false;
 	}
 
 	/**
@@ -131,14 +132,14 @@ class UserCache extends BaseCache<import("@amanda/discordtypings").UserData> {
 	 * @returns Array with a list of ids of users that are indexed
 	 */
 	public async getIndexMembers(): Promise<Array<string>> {
-		return this.storageEngine.getListMembers(this.namespace);
+		return this.storageEngine?.getListMembers(this.namespace) || [];
 	}
 
 	/**
 	 * Delete the user index, you should probably **not** use this function, but I won't stop you.
 	 */
 	public async removeIndex(): Promise<void> {
-		return this.storageEngine.removeList(this.namespace);
+		return this.storageEngine?.removeList(this.namespace);
 	}
 
 	/**
@@ -146,7 +147,7 @@ class UserCache extends BaseCache<import("@amanda/discordtypings").UserData> {
 	 * @returns Number of users currently cached
 	 */
 	public async getIndexCount(): Promise<number> {
-		return this.storageEngine.getListCount(this.namespace);
+		return this.storageEngine?.getListCount(this.namespace) || 0;
 	}
 }
 

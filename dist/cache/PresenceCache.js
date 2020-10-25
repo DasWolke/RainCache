@@ -14,10 +14,11 @@ class PresenceCache extends BaseCache_1.default {
         }
     }
     async get(id) {
+        var _a;
         if (this.boundObject) {
             return this;
         }
-        const presence = await this.storageEngine.get(this.buildId(id));
+        const presence = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.get(this.buildId(id)));
         if (presence) {
             return new PresenceCache(this.storageEngine, this.users.bindUserId(id), presence);
         }
@@ -26,6 +27,7 @@ class PresenceCache extends BaseCache_1.default {
         }
     }
     async update(id, data) {
+        var _a;
         if (this.boundObject) {
             this.bindObject(data);
         }
@@ -39,18 +41,19 @@ class PresenceCache extends BaseCache_1.default {
             await this.users.update(data.user.id, data.user);
             delete data.user;
         }
-        await this.storageEngine.upsert(this.buildId(id), data);
+        await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.upsert(this.buildId(id), data));
         if (this.boundObject)
             return this;
         return new PresenceCache(this.storageEngine, this.users, data);
     }
     async remove(id) {
-        const presence = await this.storageEngine.get(this.buildId(id));
+        var _a, _b;
+        const presence = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.get(this.buildId(id)));
         if (presence) {
-            return this.storageEngine.remove(this.buildId(id));
+            return (_b = this.storageEngine) === null || _b === void 0 ? void 0 : _b.remove(this.buildId(id));
         }
         else {
-            return null;
+            return undefined;
         }
     }
 }

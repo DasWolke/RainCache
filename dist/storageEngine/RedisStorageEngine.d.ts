@@ -10,7 +10,7 @@ declare class RedisStorageEngine<T> extends BaseStorageEngine<T> {
     upsert(id: string, updateData: any, useHash?: boolean): Promise<void>;
     remove(id: string, useHash?: boolean): Promise<void>;
     filter(fn: (value?: T, index?: number, array?: Array<T>) => unknown, ids: Array<string>, namespace: string): Promise<Array<any>>;
-    find(fn: (value?: T, index?: number, array?: Array<string>) => boolean, ids: Array<string> | null, namespace: string): Promise<T | null>;
+    find(fn: (value?: T, index?: number, array?: Array<string>) => boolean, ids: string[] | null | undefined, namespace: string): Promise<T | null>;
     getListMembers(listId: string): Promise<Array<string>>;
     addToList(listId: string, ids: Array<string>): Promise<void>;
     isListMember(listId: string, id: string): Promise<boolean>;

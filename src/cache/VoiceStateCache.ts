@@ -26,15 +26,15 @@ class VoiceStateCache extends BaseCache<import("@amanda/discordtypings").VoiceSt
 	 * @param guildId guild id
 	 * @returns Returns a VoiceState Cache with a bound user or null if no user was found
 	 */
-	public async get(id: string = this.boundObject?.user_id, guildId: string): Promise<VoiceStateCache | null> {
+	public async get(id = this.boundObject?.user_id, guildId: string): Promise<VoiceStateCache | null> {
 		if (this.boundObject) {
 			return this;
 		}
-		const state = await this.storageEngine.get(this.buildId(id, guildId));
+		const state = await this.storageEngine?.get(this.buildId(id as string, guildId));
 		if (!state) {
 			return null;
 		}
-		return new VoiceStateCache(this.storageEngine, state);
+		return new VoiceStateCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").VoiceStateData>, state);
 	}
 
 	/**
@@ -51,9 +51,9 @@ class VoiceStateCache extends BaseCache<import("@amanda/discordtypings").VoiceSt
 		delete data.member;
 
 		await this.addToIndex([id]);
-		await this.storageEngine.upsert(this.buildId(id, guildId), data);
+		await this.storageEngine?.upsert(this.buildId(id, guildId), data);
 		if (this.boundObject) return this;
-		return new VoiceStateCache(this.storageEngine, data);
+		return new VoiceStateCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").VoiceStateData>, data);
 	}
 
 	/**
@@ -61,13 +61,13 @@ class VoiceStateCache extends BaseCache<import("@amanda/discordtypings").VoiceSt
 	 * @param id discord id of the user
 	 * @param guildId guild id
 	 */
-	public async remove(id: string = this.boundObject?.user_id, guildId: string): Promise<void> {
-		const state = await this.isIndexed(id, guildId);
+	public async remove(id = this.boundObject?.user_id, guildId: string): Promise<void> {
+		const state = await this.isIndexed(id as string, guildId);
 		if (state) {
-			await this.removeFromIndex(id, guildId);
-			return this.storageEngine.remove(this.buildId(id, guildId));
+			await this.removeFromIndex(id as string, guildId);
+			return this.storageEngine?.remove(this.buildId(id as string, guildId));
 		} else {
-			return null;
+			return undefined;
 		}
 	}
 
@@ -76,9 +76,10 @@ class VoiceStateCache extends BaseCache<import("@amanda/discordtypings").VoiceSt
 	 * @param fn filter function to use for the filtering
 	 * @param ids Array of user ids, if omitted the global user index will be used
 	 */
-	public async filter(fn: (state?: import("@amanda/discordtypings").VoiceStateData, index?: number, array?: Array<import("@amanda/discordtypings").VoiceStateData>) => unknown, ids: Array<string> = null): Promise<Array<VoiceStateCache>> {
-		const states = await this.storageEngine.filter(fn, ids, this.namespace);
-		return states.map(s => new VoiceStateCache(this.storageEngine, s));
+	public async filter(fn: (state?: import("@amanda/discordtypings").VoiceStateData, index?: number, array?: Array<import("@amanda/discordtypings").VoiceStateData>) => unknown, ids: Array<string> | undefined = undefined): Promise<Array<VoiceStateCache>> {
+		const states = await this.storageEngine?.filter(fn, ids, this.namespace);
+		if (!states) return [];
+		return states.map(s => new VoiceStateCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").VoiceStateData>, s));
 	}
 
 	/**
@@ -87,10 +88,10 @@ class VoiceStateCache extends BaseCache<import("@amanda/discordtypings").VoiceSt
 	 * @param ids List of ids that should be used as the scope of the filter
 	 * @returns Returns a VoiceState Cache with a bound state or null if no state was found
 	 */
-	public async find(fn: (state?: import("@amanda/discordtypings").VoiceStateData, index?: number, array?: Array<string>) => unknown, ids: Array<string> = null): Promise<VoiceStateCache | null> {
-		const state = await this.storageEngine.find(fn, ids, this.namespace);
+	public async find(fn: (state?: import("@amanda/discordtypings").VoiceStateData, index?: number, array?: Array<string>) => unknown, ids: Array<string> | undefined = undefined): Promise<VoiceStateCache | null> {
+		const state = await this.storageEngine?.find(fn, ids, this.namespace);
 		if (!state) return null;
-		return new VoiceStateCache(this.storageEngine, state);
+		return new VoiceStateCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").VoiceStateData>, state);
 	}
 
 	/**
@@ -109,7 +110,7 @@ class VoiceStateCache extends BaseCache<import("@amanda/discordtypings").VoiceSt
 	 * @param id id of the user
 	 */
 	public async removeFromIndex(id: string, guildId?: string): Promise<void> {
-		return this.storageEngine.removeFromList(this.namespace, this.buildId(id, guildId));
+		return this.storageEngine?.removeFromList(this.namespace, this.buildId(id, guildId));
 	}
 
 	/**
@@ -118,7 +119,7 @@ class VoiceStateCache extends BaseCache<import("@amanda/discordtypings").VoiceSt
 	 * @return True if the state is indexed, false otherwise
 	 */
 	public async isIndexed(id: string, guildId?: string): Promise<boolean> {
-		return this.storageEngine.isListMember(this.namespace, this.buildId(id, guildId));
+		return this.storageEngine?.isListMember(this.namespace, this.buildId(id, guildId)) || false;
 	}
 
 	/**
@@ -127,14 +128,14 @@ class VoiceStateCache extends BaseCache<import("@amanda/discordtypings").VoiceSt
 	 * @returns Array with a list of ids of users that are indexed
 	 */
 	public async getIndexMembers(): Promise<Array<string>> {
-		return this.storageEngine.getListMembers(this.namespace);
+		return this.storageEngine?.getListMembers(this.namespace) || [];
 	}
 
 	/**
 	 * Delete the VoiceState index, you should probably **not** use this function, but I won't stop you.
 	 */
 	public async removeIndex(): Promise<void> {
-		return this.storageEngine.removeList(this.namespace);
+		return this.storageEngine?.removeList(this.namespace);
 	}
 
 	/**
@@ -142,7 +143,7 @@ class VoiceStateCache extends BaseCache<import("@amanda/discordtypings").VoiceSt
 	 * @returns Number of VoiceStates currently cached
 	 */
 	public async getIndexCount(): Promise<number> {
-		return this.storageEngine.getListCount(this.namespace);
+		return this.storageEngine?.getListCount(this.namespace) || 0;
 	}
 
 	/**

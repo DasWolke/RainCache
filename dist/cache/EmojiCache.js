@@ -13,10 +13,11 @@ class EmojiCache extends BaseCache_1.default {
         }
     }
     async get(id, guildId = this.boundGuild) {
+        var _a;
         if (this.boundObject) {
             return this;
         }
-        const emoji = await this.storageEngine.get(this.buildId(id, guildId));
+        const emoji = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.get(this.buildId(id, guildId)));
         if (emoji) {
             return new EmojiCache(this.storageEngine, emoji);
         }
@@ -25,31 +26,41 @@ class EmojiCache extends BaseCache_1.default {
         }
     }
     async update(id, guildId = this.boundGuild, data) {
+        var _a;
         if (this.boundObject) {
             this.bindObject(data);
         }
         await this.addToIndex([id], guildId);
-        await this.storageEngine.upsert(this.buildId(id, guildId), data);
+        await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.upsert(this.buildId(id, guildId), data));
         if (this.boundObject)
             return this;
         return new EmojiCache(this.storageEngine, data);
     }
     async remove(id, guildId = this.boundGuild) {
-        const emoji = await this.storageEngine.get(this.buildId(id, guildId));
+        var _a, _b;
+        const emoji = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.get(this.buildId(id, guildId)));
         if (emoji) {
             await this.removeFromIndex(id, guildId);
-            return this.storageEngine.remove(this.buildId(id, guildId));
+            return (_b = this.storageEngine) === null || _b === void 0 ? void 0 : _b.remove(this.buildId(id, guildId));
         }
         else {
-            return null;
+            return undefined;
         }
     }
-    async filter(fn, guildId = this.boundGuild, ids = null) {
-        const emojis = await this.storageEngine.filter(fn, ids, super.buildId(guildId));
+    async filter(fn, guildId, ids) {
+        var _a;
+        if (!guildId && this.boundGuild)
+            guildId = this.boundGuild;
+        const emojis = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.filter(fn, ids, super.buildId(guildId)));
+        if (!emojis)
+            return [];
         return emojis.map(e => new EmojiCache(this.storageEngine, e));
     }
-    async find(fn, guildId = this.boundGuild, ids = null) {
-        const emoji = await this.storageEngine.find(fn, ids, super.buildId(guildId));
+    async find(fn, guildId, ids) {
+        var _a;
+        if (!guildId && this.boundGuild)
+            guildId = this.boundGuild;
+        const emoji = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.find(fn, ids, super.buildId(guildId)));
         if (!emoji)
             return null;
         return new EmojiCache(this.storageEngine, emoji);

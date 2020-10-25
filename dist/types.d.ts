@@ -26,7 +26,7 @@ export interface CacheTypes {
 }
 export interface RainCacheOptions {
     debug?: boolean;
-    storage?: {
+    storage: {
         default: BaseStorageEngine<any>;
         guild?: RainCacheOptions["storage"]["default"];
         channel?: RainCacheOptions["storage"]["default"];

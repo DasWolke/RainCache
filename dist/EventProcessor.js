@@ -2,21 +2,22 @@
 const events_1 = require("events");
 class EventProcessor extends events_1.EventEmitter {
     constructor(options = { disabledEvents: {}, presenceInterval: 1000 * 5 }) {
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
         super();
         this.options = options;
         if (!this.options.presenceInterval) {
             this.options.presenceInterval = 1000 * 5;
         }
-        this.guildCache = options.cache?.guild;
-        this.channelCache = options.cache?.channel;
-        this.memberCache = options.cache?.member;
-        this.roleCache = options.cache?.role;
-        this.userCache = options.cache?.user;
-        this.emojiCache = options.cache?.emoji;
-        this.channelMapCache = options.cache?.channelMap;
-        this.presenceCache = options.cache?.presence;
-        this.permOverwriteCache = options.cache?.permOverwrite;
-        this.voiceStateCache = options.cache?.voiceState;
+        this.guildCache = (_a = options.cache) === null || _a === void 0 ? void 0 : _a.guild;
+        this.channelCache = (_b = options.cache) === null || _b === void 0 ? void 0 : _b.channel;
+        this.memberCache = (_c = options.cache) === null || _c === void 0 ? void 0 : _c.member;
+        this.roleCache = (_d = options.cache) === null || _d === void 0 ? void 0 : _d.role;
+        this.userCache = (_e = options.cache) === null || _e === void 0 ? void 0 : _e.user;
+        this.emojiCache = (_f = options.cache) === null || _f === void 0 ? void 0 : _f.emoji;
+        this.channelMapCache = (_g = options.cache) === null || _g === void 0 ? void 0 : _g.channelMap;
+        this.presenceCache = (_h = options.cache) === null || _h === void 0 ? void 0 : _h.presence;
+        this.permOverwriteCache = (_j = options.cache) === null || _j === void 0 ? void 0 : _j.permOverwrite;
+        this.voiceStateCache = (_k = options.cache) === null || _k === void 0 ? void 0 : _k.voiceState;
         this.ready = false;
         this.presenceQueue = {};
         this.presenceFlush = setInterval(async () => {
@@ -31,6 +32,7 @@ class EventProcessor extends events_1.EventEmitter {
         return event;
     }
     async process(event) {
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
         switch (event.t) {
             case "READY":
                 await this.processReady(event);
@@ -39,15 +41,15 @@ class EventProcessor extends events_1.EventEmitter {
             case "GUILD_CREATE":
             case "GUILD_UPDATE":
                 this.emit("debug", `Cached guild ${event.d.id}|${event.d.name}`);
-                await this.guildCache?.update(event.d.id, event.d);
+                await ((_a = this.guildCache) === null || _a === void 0 ? void 0 : _a.update(event.d.id, event.d));
                 break;
             case "GUILD_DELETE":
                 this.emit("debug", `Guild ${event.d.id} ${event.d.unavailable ? "is unavailable" : "was removed"}`);
                 if (event.d.unavailable) {
-                    await this.guildCache?.update(event.d.id, event.d);
+                    await ((_b = this.guildCache) === null || _b === void 0 ? void 0 : _b.update(event.d.id, event.d));
                 }
                 else {
-                    await this.guildCache?.remove(event.d.id);
+                    await ((_c = this.guildCache) === null || _c === void 0 ? void 0 : _c.remove(event.d.id));
                 }
                 break;
             case "CHANNEL_CREATE":
@@ -59,42 +61,42 @@ class EventProcessor extends events_1.EventEmitter {
                 break;
             case "GUILD_MEMBER_ADD":
             case "GUILD_MEMBER_UPDATE":
-                await this.memberCache?.update(event.d.user.id, event.d.guild_id, event.d);
+                await ((_d = this.memberCache) === null || _d === void 0 ? void 0 : _d.update(event.d.user.id, event.d.guild_id, event.d));
                 break;
             case "GUILD_MEMBER_REMOVE":
-                await this.memberCache?.remove(event.d.user.id, event.d.guild_id);
+                await ((_e = this.memberCache) === null || _e === void 0 ? void 0 : _e.remove(event.d.user.id, event.d.guild_id));
                 break;
             case "GUILD_MEMBERS_CHUNK": {
                 const guildMemberChunkPromises = [];
                 for (const member of event.d.members) {
-                    guildMemberChunkPromises.push(this.memberCache?.update(member.user.id, event.d.guild_id, member));
+                    guildMemberChunkPromises.push((_f = this.memberCache) === null || _f === void 0 ? void 0 : _f.update(member.user.id, event.d.guild_id, member));
                 }
                 await Promise.all(guildMemberChunkPromises);
                 this.emit("debug", `Cached ${guildMemberChunkPromises.length} Members from Guild Member Chunk`);
                 break;
             }
             case "USER_UPDATE":
-                await this.userCache?.update(event.d.id, event.d);
+                await ((_g = this.userCache) === null || _g === void 0 ? void 0 : _g.update(event.d.id, event.d));
                 break;
             case "PRESENCE_UPDATE":
                 this.handlePresenceUpdate(event.d);
                 break;
             case "GUILD_ROLE_CREATE":
             case "GUILD_ROLE_UPDATE":
-                await this.roleCache?.update(event.d.role.id, event.d.guild_id, event.d.role);
+                await ((_h = this.roleCache) === null || _h === void 0 ? void 0 : _h.update(event.d.role.id, event.d.guild_id, event.d.role));
                 break;
             case "GUILD_ROLE_DELETE":
-                await this.roleCache?.remove(event.d.guild_id, event.d.role_id);
+                await ((_j = this.roleCache) === null || _j === void 0 ? void 0 : _j.remove(event.d.guild_id, event.d.role_id));
                 break;
             case "GUILD_EMOJIS_UPDATE": {
-                let oldEmotes = await this.emojiCache?.filter(() => true, event.d.guild_id);
+                let oldEmotes = await ((_k = this.emojiCache) === null || _k === void 0 ? void 0 : _k.filter(() => true, event.d.guild_id));
                 if (!oldEmotes || oldEmotes.length === 0) {
                     oldEmotes = [];
                 }
                 for (const emoji of event.d.emojis) {
                     const oldEmote = oldEmotes.find(e => e.id === emoji.id);
                     if (!oldEmote || oldEmote !== emoji) {
-                        await this.emojiCache?.update(emoji.id, event.d.guild_id, emoji);
+                        await ((_l = this.emojiCache) === null || _l === void 0 ? void 0 : _l.update(emoji.id, event.d.guild_id, emoji));
                     }
                 }
                 for (const oldEmote of oldEmotes) {
@@ -107,7 +109,7 @@ class EventProcessor extends events_1.EventEmitter {
             }
             case "MESSAGE_CREATE": {
                 if (event.d.author && !event.d.webhook_id) {
-                    await this.userCache?.update(event.d.author.id, event.d.author);
+                    await ((_m = this.userCache) === null || _m === void 0 ? void 0 : _m.update(event.d.author.id, event.d.author));
                 }
                 break;
             }
@@ -143,22 +145,24 @@ class EventProcessor extends events_1.EventEmitter {
         }
     }
     async processReady(readyEvent) {
+        var _a, _b, _c;
         const updates = [];
-        updates.push(this.userCache.update("self", { id: readyEvent.d.user.id }));
-        updates.push(this.userCache.update(readyEvent.d.user.id, readyEvent.d.user));
+        updates.push((_a = this.userCache) === null || _a === void 0 ? void 0 : _a.update("self", { id: readyEvent.d.user.id }));
+        updates.push((_b = this.userCache) === null || _b === void 0 ? void 0 : _b.update(readyEvent.d.user.id, readyEvent.d.user));
         for (const guild of readyEvent.d.guilds) {
             this.emit("debug", `Caching guild ${guild.id} from ready`);
-            updates.push(this.guildCache.update(guild.id, guild));
+            updates.push((_c = this.guildCache) === null || _c === void 0 ? void 0 : _c.update(guild.id, guild));
         }
         return Promise.all(updates);
     }
     async onChannelCreate(channelCreateEvent) {
+        var _a, _b, _c, _d;
         switch (channelCreateEvent.d.type) {
             case 0:
             case 2:
             case 4:
-                await this.channelMapCache.update(channelCreateEvent.d.guild_id, [channelCreateEvent.d.id], "guild");
-                return this.channelCache.update(channelCreateEvent.d.id, channelCreateEvent.d);
+                await ((_a = this.channelMapCache) === null || _a === void 0 ? void 0 : _a.update(channelCreateEvent.d.guild_id, [channelCreateEvent.d.id], "guild"));
+                return (_b = this.channelCache) === null || _b === void 0 ? void 0 : _b.update(channelCreateEvent.d.id, channelCreateEvent.d);
             default:
                 break;
         }
@@ -167,31 +171,33 @@ class EventProcessor extends events_1.EventEmitter {
                 this.emit("debug", `Empty Recipients array for dm ${channelCreateEvent.d.id}`);
                 return;
             }
-            await this.channelMapCache.update(channelCreateEvent.d.recipients[0].id, [channelCreateEvent.d.id], "user");
-            return this.channelCache.update(channelCreateEvent.d.id, channelCreateEvent.d);
+            await ((_c = this.channelMapCache) === null || _c === void 0 ? void 0 : _c.update(channelCreateEvent.d.recipients[0].id, [channelCreateEvent.d.id], "user"));
+            return (_d = this.channelCache) === null || _d === void 0 ? void 0 : _d.update(channelCreateEvent.d.id, channelCreateEvent.d);
         }
     }
     async onChannelDelete(channelDeleteEvent) {
+        var _a, _b, _c, _d;
         switch (channelDeleteEvent.d.type) {
             case 0:
             case 2:
-                await this.channelMapCache.update(channelDeleteEvent.d.guild_id, [channelDeleteEvent.d.id], "guild", true);
-                return this.channelCache.remove(channelDeleteEvent.d.id);
+                await ((_a = this.channelMapCache) === null || _a === void 0 ? void 0 : _a.update(channelDeleteEvent.d.guild_id, [channelDeleteEvent.d.id], "guild", true));
+                return (_b = this.channelCache) === null || _b === void 0 ? void 0 : _b.remove(channelDeleteEvent.d.id);
             default:
                 break;
         }
         if (channelDeleteEvent.d.type === 1) {
-            await this.channelMapCache.update(channelDeleteEvent.d.recipients[0].id, [channelDeleteEvent.d.id], "user", true);
-            return this.channelCache.remove(channelDeleteEvent.d.id);
+            await ((_c = this.channelMapCache) === null || _c === void 0 ? void 0 : _c.update(channelDeleteEvent.d.recipients[0].id, [channelDeleteEvent.d.id], "user", true));
+            return (_d = this.channelCache) === null || _d === void 0 ? void 0 : _d.remove(channelDeleteEvent.d.id);
         }
     }
     async flushQueue() {
+        var _a;
         const queue = this.presenceQueue;
         this.presenceQueue = {};
         const presenceUpdatePromises = [];
         for (const key in queue) {
             if (queue.hasOwnProperty(key)) {
-                presenceUpdatePromises.push(this.presenceCache.update(key, queue[key]));
+                presenceUpdatePromises.push((_a = this.presenceCache) === null || _a === void 0 ? void 0 : _a.update(key, queue[key]));
             }
         }
         await Promise.all(presenceUpdatePromises);

@@ -41,9 +41,9 @@ class ChannelCache extends BaseCache<import("../types").Channel> {
 		if (this.boundObject) {
 			return this;
 		}
-		const channel = await this.storageEngine.get(this.buildId(id));
+		const channel = await this.storageEngine?.get(this.buildId(id));
 		if (channel) {
-			return new ChannelCache(this.storageEngine, this.channelMap, this.permissionOverwrites.bindChannel(channel.id), this.recipients, channel);
+			return new ChannelCache(this.storageEngine as BaseStorageEngine<import("../types").Channel>, this.channelMap, this.permissionOverwrites.bindChannel(channel.id), this.recipients, channel);
 		} else {
 			return null;
 		}
@@ -73,10 +73,10 @@ class ChannelCache extends BaseCache<import("../types").Channel> {
 		delete data.permission_overwrites;
 		delete data.recipients;
 		await this.addToIndex([id]);
-		await this.storageEngine.upsert(this.buildId(id), data);
+		await this.storageEngine?.upsert(this.buildId(id), data);
 		if (this.boundObject) return this;
-		const channel = await this.storageEngine.get(this.buildId(id));
-		if (channel) return new ChannelCache(this.storageEngine, this.channelMap, this.permissionOverwrites.bindChannel(channel.id), this.recipients, channel);
+		const channel = await this.storageEngine?.get(this.buildId(id));
+		if (channel) return new ChannelCache(this.storageEngine as BaseStorageEngine<import("../types").Channel>, this.channelMap, this.permissionOverwrites.bindChannel(channel.id), this.recipients, channel);
 		else return this;
 	}
 
@@ -85,10 +85,10 @@ class ChannelCache extends BaseCache<import("../types").Channel> {
 	 * @param id id of the channel
 	 */
 	public async remove(id: string): Promise<void> {
-		const channel = await this.storageEngine.get(this.buildId(id));
+		const channel = await this.storageEngine?.get(this.buildId(id));
 		if (channel) {
 			await this.removeFromIndex(id);
-			return this.storageEngine.remove(this.buildId(id));
+			return this.storageEngine?.remove(this.buildId(id));
 		} else {
 			return undefined;
 		}
@@ -101,8 +101,8 @@ class ChannelCache extends BaseCache<import("../types").Channel> {
 	 * @returns array of channel caches with bound results
 	 */
 	public async filter(fn: (channel?: import("../types").Channel, index?: number, array?: Array<import("../types").Channel>) => unknown, channelMap?: Array<string>): Promise<Array<ChannelCache>> {
-		const channels = await this.storageEngine.filter(fn, channelMap, this.namespace) || [];
-		return channels.map(c => new ChannelCache(this.storageEngine, this.channelMap, this.permissionOverwrites.bindChannel(c.id), this.recipients, c));
+		const channels = await this.storageEngine?.filter(fn, channelMap, this.namespace) || [];
+		return channels.map(c => new ChannelCache(this.storageEngine as BaseStorageEngine<import("../types").Channel>, this.channelMap, this.permissionOverwrites.bindChannel(c.id), this.recipients, c));
 	}
 
 	/**
@@ -112,9 +112,9 @@ class ChannelCache extends BaseCache<import("../types").Channel> {
 	 * @returns First result bound to a channel cache
 	 */
 	public async find(fn: (channel?: import("@amanda/discordtypings").ChannelData) => unknown, channelMap: Array<string>): Promise<ChannelCache | null> {
-		const channel = await this.storageEngine.find(fn, channelMap, this.namespace);
+		const channel = await this.storageEngine?.find(fn, channelMap, this.namespace);
 		if (!channel) return null;
-		return new ChannelCache(this.storageEngine, this.channelMap, this.permissionOverwrites.bindChannel(channel.id), this.recipients, channel);
+		return new ChannelCache(this.storageEngine as BaseStorageEngine<import("../types").Channel>, this.channelMap, this.permissionOverwrites.bindChannel(channel.id), this.recipients, channel);
 	}
 
 	/**
@@ -122,7 +122,7 @@ class ChannelCache extends BaseCache<import("../types").Channel> {
 	 * @param ids ids of the channels
 	 */
 	public async addToIndex(ids: Array<string>): Promise<void> {
-		return this.storageEngine.addToList(this.namespace, ids);
+		return this.storageEngine?.addToList(this.namespace, ids);
 	}
 
 	/**
@@ -130,7 +130,7 @@ class ChannelCache extends BaseCache<import("../types").Channel> {
 	 * @param id id of the channel
 	 */
 	public async removeFromIndex(id: string): Promise<void> {
-		return this.storageEngine.removeFromList(this.namespace, id);
+		return this.storageEngine?.removeFromList(this.namespace, id);
 	}
 
 	/**
@@ -138,21 +138,21 @@ class ChannelCache extends BaseCache<import("../types").Channel> {
 	 * @param id - id of the channel
 	 */
 	public async isIndexed(id: string): Promise<boolean> {
-		return this.storageEngine.isListMember(this.namespace, id) || false;
+		return this.storageEngine?.isListMember(this.namespace, id) || false;
 	}
 
 	/**
 	 * Get a list of ids of indexed channels
 	 */
 	public async getIndexMembers(): Promise<Array<string>> {
-		return this.storageEngine.getListMembers(this.namespace) || [];
+		return this.storageEngine?.getListMembers(this.namespace) || [];
 	}
 
 	/**
 	 * Remove the channel index, you should probably not call this at all :<
 	 */
 	public async removeIndex(): Promise<void> {
-		return this.storageEngine.removeList(this.namespace);
+		return this.storageEngine?.removeList(this.namespace);
 	}
 
 	/**
@@ -160,7 +160,7 @@ class ChannelCache extends BaseCache<import("../types").Channel> {
 	 * @returns Number of channels currently cached
 	 */
 	public async getIndexCount(): Promise<number> {
-		return this.storageEngine.getListCount(this.namespace) || 0;
+		return this.storageEngine?.getListCount(this.namespace) || 0;
 	}
 }
 

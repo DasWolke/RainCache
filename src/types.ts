@@ -36,7 +36,7 @@ export interface RainCacheOptions {
 	 *
 	 * The cache type specific storage engine takes priority over the default one.
 	 */
-	storage?: {
+	storage: {
 		default: BaseStorageEngine<any>;
 		guild?: RainCacheOptions["storage"]["default"];
 		channel?: RainCacheOptions["storage"]["default"];

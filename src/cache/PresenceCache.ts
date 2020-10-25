@@ -34,9 +34,9 @@ class PresenceCache extends BaseCache<import("@amanda/discordtypings").PresenceD
 		if (this.boundObject) {
 			return this;
 		}
-		const presence = await this.storageEngine.get(this.buildId(id));
+		const presence = await this.storageEngine?.get(this.buildId(id));
 		if (presence) {
-			return new PresenceCache(this.storageEngine, this.users.bindUserId(id), presence);
+			return new PresenceCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").PresenceData>, this.users.bindUserId(id), presence);
 		} else {
 			return null;
 		}
@@ -55,18 +55,21 @@ class PresenceCache extends BaseCache<import("@amanda/discordtypings").PresenceD
 			this.bindObject(data);
 		}
 		if (data.guild_id) {
+			// @ts-ignore It MUST? Watch me. Remove this ignore. It's funny.
 			delete data.guild_id;
 		}
 		if (data.roles) {
+			// @ts-ignore
 			delete data.roles;
 		}
 		if (data.user) {
 			await this.users.update(data.user.id, data.user);
+			// @ts-ignore
 			delete data.user;
 		}
-		await this.storageEngine.upsert(this.buildId(id), data);
+		await this.storageEngine?.upsert(this.buildId(id), data);
 		if (this.boundObject) return this;
-		return new PresenceCache(this.storageEngine, this.users, data);
+		return new PresenceCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").PresenceData>, this.users, data);
 	}
 
 	/**
@@ -74,11 +77,11 @@ class PresenceCache extends BaseCache<import("@amanda/discordtypings").PresenceD
 	 * @param id id of the user the presence belongs to
 	 */
 	public async remove(id: string): Promise<void> {
-		const presence = await this.storageEngine.get(this.buildId(id));
+		const presence = await this.storageEngine?.get(this.buildId(id));
 		if (presence) {
-			return this.storageEngine.remove(this.buildId(id));
+			return this.storageEngine?.remove(this.buildId(id));
 		} else {
-			return null;
+			return undefined;
 		}
 	}
 }

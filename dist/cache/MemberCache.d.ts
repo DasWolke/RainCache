@@ -4,11 +4,11 @@ declare class MemberCache extends BaseCache<import("@amanda/discordtypings").Mem
     namespace: "member";
     user: import("./UserCache");
     constructor(storageEngine: BaseStorageEngine<import("@amanda/discordtypings").MemberData>, userCache: import("./UserCache"), boundObject?: import("@amanda/discordtypings").MemberData);
-    get(id: string, guildId?: string): Promise<MemberCache | null>;
-    update(id: string, guildId: string, data: import("@amanda/discordtypings").MemberData): Promise<MemberCache>;
-    remove(id: string, guildId?: string): Promise<void>;
-    filter(fn: (member?: import("@amanda/discordtypings").MemberData, index?: number, array?: Array<import("@amanda/discordtypings").MemberData>) => unknown, guildId?: string, ids?: Array<string>): Promise<Array<MemberCache>>;
-    find(fn: (member?: import("@amanda/discordtypings").MemberData, index?: number, array?: Array<string>) => boolean, guildId?: string, ids?: any): Promise<MemberCache | null>;
+    get(id: string, guildId?: string | undefined): Promise<MemberCache | null>;
+    update(id: string, guildId: string | undefined, data: import("@amanda/discordtypings").MemberData): Promise<MemberCache>;
+    remove(id: string, guildId?: string | undefined): Promise<void>;
+    filter(fn: (member?: import("@amanda/discordtypings").MemberData, index?: number, array?: Array<import("@amanda/discordtypings").MemberData>) => unknown, guildId: string | undefined, ids: Array<string>): Promise<Array<MemberCache>>;
+    find(fn: (member?: import("@amanda/discordtypings").MemberData, index?: number, array?: Array<string>) => boolean, guildId?: string | undefined, ids?: Array<string> | undefined): Promise<MemberCache | null>;
     buildId(userId: string, guildId?: string): string;
 }
 export = MemberCache;

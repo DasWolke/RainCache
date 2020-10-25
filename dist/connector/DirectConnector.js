@@ -10,7 +10,7 @@ class DirectConnector extends BaseConnector_1.default {
     }
     initialize() {
         this.ready = true;
-        return Promise.resolve(null);
+        return Promise.resolve(undefined);
     }
     receive(event) {
         this.emit("event", event);

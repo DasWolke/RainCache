@@ -79,7 +79,7 @@ class BaseCache<T> {
 	 * @param objectId id of the parent object of the index
 	 */
 	public async getIndexMembers(objectId: string = this.boundGuild as string) {
-		return this.storageEngine?.getListMembers(this.buildId(objectId));
+		return this.storageEngine?.getListMembers(this.buildId(objectId)) || [];
 	}
 
 	/**

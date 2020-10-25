@@ -33,9 +33,9 @@ class ChannelMapCache extends BaseCache<import("../types").ChannelMap> {
 			return this;
 		}
 		const channelMapId = this.buildId(this._buildMapId(id, type));
-		const channelMap = await this.storageEngine.getListMembers(channelMapId);
+		const channelMap = await this.storageEngine?.getListMembers(channelMapId);
 		if (channelMap) {
-			return new ChannelMapCache(this.storageEngine, this._buildMap(id, channelMap, type));
+			return new ChannelMapCache(this.storageEngine as BaseStorageEngine<import("../types").ChannelMap>, this._buildMap(id, channelMap, type));
 		} else {
 			return null;
 		}
@@ -67,9 +67,9 @@ class ChannelMapCache extends BaseCache<import("../types").ChannelMap> {
 		}
 		const channelMapId = this.buildId(this._buildMapId(id, type));
 		await this.remove(id, type);
-		await this.storageEngine.addToList(channelMapId, data);
+		await this.storageEngine?.addToList(channelMapId, data);
 		if (this.boundObject) return this;
-		return new ChannelMapCache(this.storageEngine, this._buildMap(id, data, type));
+		return new ChannelMapCache(this.storageEngine as BaseStorageEngine<import("../types").ChannelMap>, this._buildMap(id, data, type));
 	}
 
 	/**
@@ -80,9 +80,9 @@ class ChannelMapCache extends BaseCache<import("../types").ChannelMap> {
 	 */
 	public async remove(id: string, type: "guild" | "user" = "guild"): Promise<void> {
 		const channelMapId = this.buildId(this._buildMapId(id, type));
-		const channelMap = await this.storageEngine.getListMembers(channelMapId);
+		const channelMap = await this.storageEngine?.getListMembers(channelMapId);
 		if (channelMap) {
-			void this.storageEngine.remove(channelMapId);
+			void this.storageEngine?.remove(channelMapId);
 		} else {
 			return undefined;
 		}

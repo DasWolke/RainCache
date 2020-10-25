@@ -16,10 +16,11 @@ class ChannelCache extends BaseCache_1.default {
         }
     }
     async get(id) {
+        var _a;
         if (this.boundObject) {
             return this;
         }
-        const channel = await this.storageEngine.get(this.buildId(id));
+        const channel = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.get(this.buildId(id)));
         if (channel) {
             return new ChannelCache(this.storageEngine, this.channelMap, this.permissionOverwrites.bindChannel(channel.id), this.recipients, channel);
         }
@@ -28,6 +29,7 @@ class ChannelCache extends BaseCache_1.default {
         }
     }
     async update(id, data) {
+        var _a, _b;
         if (this.boundObject) {
             this.bindObject(data);
         }
@@ -47,52 +49,61 @@ class ChannelCache extends BaseCache_1.default {
         delete data.permission_overwrites;
         delete data.recipients;
         await this.addToIndex([id]);
-        await this.storageEngine.upsert(this.buildId(id), data);
+        await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.upsert(this.buildId(id), data));
         if (this.boundObject)
             return this;
-        const channel = await this.storageEngine.get(this.buildId(id));
+        const channel = await ((_b = this.storageEngine) === null || _b === void 0 ? void 0 : _b.get(this.buildId(id)));
         if (channel)
             return new ChannelCache(this.storageEngine, this.channelMap, this.permissionOverwrites.bindChannel(channel.id), this.recipients, channel);
         else
             return this;
     }
     async remove(id) {
-        const channel = await this.storageEngine.get(this.buildId(id));
+        var _a, _b;
+        const channel = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.get(this.buildId(id)));
         if (channel) {
             await this.removeFromIndex(id);
-            return this.storageEngine.remove(this.buildId(id));
+            return (_b = this.storageEngine) === null || _b === void 0 ? void 0 : _b.remove(this.buildId(id));
         }
         else {
             return undefined;
         }
     }
     async filter(fn, channelMap) {
-        const channels = await this.storageEngine.filter(fn, channelMap, this.namespace) || [];
+        var _a;
+        const channels = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.filter(fn, channelMap, this.namespace)) || [];
         return channels.map(c => new ChannelCache(this.storageEngine, this.channelMap, this.permissionOverwrites.bindChannel(c.id), this.recipients, c));
     }
     async find(fn, channelMap) {
-        const channel = await this.storageEngine.find(fn, channelMap, this.namespace);
+        var _a;
+        const channel = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.find(fn, channelMap, this.namespace));
         if (!channel)
             return null;
         return new ChannelCache(this.storageEngine, this.channelMap, this.permissionOverwrites.bindChannel(channel.id), this.recipients, channel);
     }
     async addToIndex(ids) {
-        return this.storageEngine.addToList(this.namespace, ids);
+        var _a;
+        return (_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.addToList(this.namespace, ids);
     }
     async removeFromIndex(id) {
-        return this.storageEngine.removeFromList(this.namespace, id);
+        var _a;
+        return (_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.removeFromList(this.namespace, id);
     }
     async isIndexed(id) {
-        return this.storageEngine.isListMember(this.namespace, id) || false;
+        var _a;
+        return ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.isListMember(this.namespace, id)) || false;
     }
     async getIndexMembers() {
-        return this.storageEngine.getListMembers(this.namespace) || [];
+        var _a;
+        return ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.getListMembers(this.namespace)) || [];
     }
     async removeIndex() {
-        return this.storageEngine.removeList(this.namespace);
+        var _a;
+        return (_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.removeList(this.namespace);
     }
     async getIndexCount() {
-        return this.storageEngine.getListCount(this.namespace) || 0;
+        var _a;
+        return ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.getListCount(this.namespace)) || 0;
     }
 }
 module.exports = ChannelCache;

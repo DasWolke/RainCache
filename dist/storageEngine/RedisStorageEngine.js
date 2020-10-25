@@ -9,7 +9,7 @@ class RedisStorageEngine extends BaseStorageEngine_1.default {
         super();
         this.client = null;
         this.ready = false;
-        this.useHash = options.useHash;
+        this.useHash = options.useHash || false;
         this.options = options;
     }
     initialize() {
@@ -23,8 +23,9 @@ class RedisStorageEngine extends BaseStorageEngine_1.default {
     }
     get(id, useHash = this.useHash) {
         return new Promise((res, rej) => {
+            var _a, _b;
             if (useHash) {
-                return this.client?.HGETALL(id, (err, data) => {
+                return (_a = this.client) === null || _a === void 0 ? void 0 : _a.HGETALL(id, (err, data) => {
                     if (err)
                         rej(err);
                     else
@@ -32,7 +33,7 @@ class RedisStorageEngine extends BaseStorageEngine_1.default {
                 });
             }
             else {
-                return this.client?.GET(id, (err, data) => {
+                return (_b = this.client) === null || _b === void 0 ? void 0 : _b.GET(id, (err, data) => {
                     if (err)
                         return rej(err);
                     else
@@ -44,8 +45,9 @@ class RedisStorageEngine extends BaseStorageEngine_1.default {
     upsert(id, updateData, useHash = this.useHash) {
         let data;
         return new Promise(async (res, rej) => {
+            var _a, _b;
             if (useHash) {
-                this.client?.HMSET(id, updateData, (err) => {
+                (_a = this.client) === null || _a === void 0 ? void 0 : _a.HMSET(id, updateData, (err) => {
                     if (err)
                         void rej(err);
                     else
@@ -61,7 +63,7 @@ class RedisStorageEngine extends BaseStorageEngine_1.default {
                 }
                 data = data || {};
                 Object.assign(data, updateData);
-                this.client?.SET(id, this.prepareData(data), (err) => {
+                (_b = this.client) === null || _b === void 0 ? void 0 : _b.SET(id, this.prepareData(data), (err) => {
                     if (err)
                         void rej(err);
                     else
@@ -72,11 +74,13 @@ class RedisStorageEngine extends BaseStorageEngine_1.default {
     }
     remove(id, useHash = this.useHash) {
         return new Promise((res, rej) => {
+            var _a, _b;
             if (useHash) {
-                this.client?.HKEYS(id, (err, hashKeys) => {
+                (_a = this.client) === null || _a === void 0 ? void 0 : _a.HKEYS(id, (err, hashKeys) => {
+                    var _a;
                     if (err)
                         void rej(err);
-                    this.client?.HDEL(id, hashKeys, (e) => {
+                    (_a = this.client) === null || _a === void 0 ? void 0 : _a.HDEL(id, hashKeys, (e) => {
                         if (e)
                             void rej(e);
                         else
@@ -85,7 +89,7 @@ class RedisStorageEngine extends BaseStorageEngine_1.default {
                 });
             }
             else {
-                this.client?.DEL(id, (err) => {
+                (_b = this.client) === null || _b === void 0 ? void 0 : _b.DEL(id, (err) => {
                     if (err)
                         void rej(err);
                     else
@@ -136,7 +140,8 @@ class RedisStorageEngine extends BaseStorageEngine_1.default {
     }
     getListMembers(listId) {
         return new Promise((res, rej) => {
-            this.client?.SMEMBERS(listId, (err, data) => {
+            var _a;
+            (_a = this.client) === null || _a === void 0 ? void 0 : _a.SMEMBERS(listId, (err, data) => {
                 if (err)
                     return rej(err);
                 else
@@ -146,7 +151,8 @@ class RedisStorageEngine extends BaseStorageEngine_1.default {
     }
     addToList(listId, ids) {
         return new Promise((res, rej) => {
-            this.client?.SADD(listId, ids, (err) => {
+            var _a;
+            (_a = this.client) === null || _a === void 0 ? void 0 : _a.SADD(listId, ids, (err) => {
                 if (err)
                     void rej(err);
                 else
@@ -156,7 +162,8 @@ class RedisStorageEngine extends BaseStorageEngine_1.default {
     }
     isListMember(listId, id) {
         return new Promise((res, rej) => {
-            this.client?.SISMEMBER(listId, id, (err, resp) => {
+            var _a;
+            (_a = this.client) === null || _a === void 0 ? void 0 : _a.SISMEMBER(listId, id, (err, resp) => {
                 if (err)
                     return rej(err);
                 else
@@ -166,7 +173,8 @@ class RedisStorageEngine extends BaseStorageEngine_1.default {
     }
     removeFromList(listId, id) {
         return new Promise((res, rej) => {
-            this.client?.SREM(listId, id, (err) => {
+            var _a;
+            (_a = this.client) === null || _a === void 0 ? void 0 : _a.SREM(listId, id, (err) => {
                 if (err)
                     void rej(err);
                 else
@@ -179,7 +187,8 @@ class RedisStorageEngine extends BaseStorageEngine_1.default {
     }
     getListCount(listId) {
         return new Promise((res, rej) => {
-            this.client?.SCARD(listId, (err, resp) => {
+            var _a;
+            (_a = this.client) === null || _a === void 0 ? void 0 : _a.SCARD(listId, (err, resp) => {
                 if (err)
                     return rej(err);
                 else

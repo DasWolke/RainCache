@@ -50,9 +50,9 @@ class GuildCache extends BaseCache<import("@amanda/discordtypings").GuildData> {
 		if (this.boundObject) {
 			return this;
 		}
-		const guild = await this.storageEngine.get(this.buildId(id));
+		const guild = await this.storageEngine?.get(this.buildId(id));
 		if (guild) {
-			return new GuildCache(this.storageEngine, this.channels.bindGuild(guild.id), this.roles.bindGuild(guild.id), this.members.bindGuild(guild.id), this.emojis.bindGuild(guild.id), this.presences.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id), guild);
+			return new GuildCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").GuildData>, this.channels.bindGuild(guild.id), this.roles.bindGuild(guild.id), this.members.bindGuild(guild.id), this.emojis.bindGuild(guild.id), this.presences.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id), guild);
 		} else {
 			return null;
 		}
@@ -112,24 +112,32 @@ class GuildCache extends BaseCache<import("@amanda/discordtypings").GuildData> {
 			// console.log(`Cached ${data.roles.length} roles from guild ${id}|${data.name}`);
 		}
 		if (data.emojis && data.emojis.length > 0) {
-			const emojiPromiseBatch = [];
+			const emojiPromiseBatch: Array<Promise<any>> = [];
 			for (const emoji of data.emojis) {
 				emojiPromiseBatch.push(this.emojis.update(emoji.id, id, emoji));
 			}
 			await Promise.all(emojiPromiseBatch);
 		}
+		// @ts-ignore Shut up lmao
 		delete data.members;
+		// @ts-ignore
 		delete data.voice_states;
+		// @ts-ignore
 		delete data.roles;
+		// @ts-ignore
 		delete data.presences;
+		// @ts-ignore
 		delete data.emojis;
+		// @ts-ignore
 		delete data.features;
+		// @ts-ignore
 		delete data.channels;
 		await this.addToIndex([id]);
-		await this.storageEngine.upsert(this.buildId(id), data);
+		await this.storageEngine?.upsert(this.buildId(id), data);
 		if (this.boundObject) return this;
-		const guild = await this.storageEngine.get(this.buildId(id));
-		return new GuildCache(this.storageEngine, this.channels.bindGuild(guild.id), this.roles.bindGuild(guild.id), this.members.bindGuild(guild.id), this.emojis.bindGuild(guild.id), this.presences.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id), guild);
+		const guild = await this.storageEngine?.get(this.buildId(id));
+		if (!guild) return this;
+		return new GuildCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").GuildData>, this.channels.bindGuild(guild.id), this.roles.bindGuild(guild.id), this.members.bindGuild(guild.id), this.emojis.bindGuild(guild.id), this.presences.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id), guild);
 	}
 
 	/**
@@ -137,7 +145,7 @@ class GuildCache extends BaseCache<import("@amanda/discordtypings").GuildData> {
 	 * @param id id of the guild to remove
 	 */
 	public async remove(id: string): Promise<void> {
-		const guild = await this.storageEngine.get(this.buildId(id));
+		const guild = await this.storageEngine?.get(this.buildId(id));
 		if (guild) {
 			const channelMap = await this.guildChannelMap.get(id);
 			const roles = await this.roles.getIndexMembers(id);
@@ -149,7 +157,7 @@ class GuildCache extends BaseCache<import("@amanda/discordtypings").GuildData> {
 			for (const role of roles) {
 				await this.roles.remove(role, id);
 			}
-			for (const channel of channelMap.boundObject?.channels) {
+			for (const channel of channelMap?.boundObject?.channels || []) {
 				await this.channels.remove(channel);
 			}
 			for (const member of members) {
@@ -157,9 +165,9 @@ class GuildCache extends BaseCache<import("@amanda/discordtypings").GuildData> {
 			}
 			await this.guildChannelMap.remove(id);
 			await this.removeFromIndex(id);
-			return this.storageEngine.remove(this.buildId(id));
+			return this.storageEngine?.remove(this.buildId(id));
 		} else {
-			return null;
+			return undefined;
 		}
 	}
 
@@ -169,8 +177,9 @@ class GuildCache extends BaseCache<import("@amanda/discordtypings").GuildData> {
 	 * @returns array of bound guild caches
 	 */
 	public async filter(fn: (emoji?: import("@amanda/discordtypings").GuildData, index?: number, array?: Array<import("@amanda/discordtypings").GuildData>) => unknown): Promise<Array<GuildCache>> {
-		const guilds = await this.storageEngine.filter(fn, undefined, this.namespace);
-		return guilds.map(g => new GuildCache(this.storageEngine, this.channels, this.roles.bindGuild(g.id), this.members.bindGuild(g.id), this.emojis.bindGuild(g.id), this.presences.bindGuild(g.id), this.guildChannelMap.bindGuild(g.id), g));
+		const guilds = await this.storageEngine?.filter(fn, undefined, this.namespace);
+		if (!guilds) return [];
+		return guilds.map(g => new GuildCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").GuildData>, this.channels, this.roles.bindGuild(g.id), this.members.bindGuild(g.id), this.emojis.bindGuild(g.id), this.presences.bindGuild(g.id), this.guildChannelMap.bindGuild(g.id), g));
 	}
 
 	/**
@@ -178,10 +187,10 @@ class GuildCache extends BaseCache<import("@amanda/discordtypings").GuildData> {
 	 * @param fn Filter function
 	 * @returns returns a bound guild cache
 	 */
-	public async find(fn: (emoji?: import("@amanda/discordtypings").GuildData, index?: number, array?: Array<string>) => unknown): Promise<GuildCache> {
-		const guild = await this.storageEngine.find(fn, undefined, this.namespace);
+	public async find(fn: (emoji?: import("@amanda/discordtypings").GuildData, index?: number, array?: Array<string>) => unknown): Promise<GuildCache | null> {
+		const guild = await this.storageEngine?.find(fn, undefined, this.namespace);
 		if (!guild) return null;
-		return new GuildCache(this.storageEngine, this.channels.bindGuild(guild.id), this.roles.bindGuild(guild.id), this.members.bindGuild(guild.id), this.emojis.bindGuild(guild.id), this.presences.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id), guild);
+		return new GuildCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").GuildData>, this.channels.bindGuild(guild.id), this.roles.bindGuild(guild.id), this.members.bindGuild(guild.id), this.emojis.bindGuild(guild.id), this.presences.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id), guild);
 	}
 
 	/**
@@ -189,7 +198,7 @@ class GuildCache extends BaseCache<import("@amanda/discordtypings").GuildData> {
 	 * @param ids ids of the guilds
 	 */
 	public async addToIndex(ids: Array<string>): Promise<void> {
-		return this.storageEngine.addToList(this.namespace, ids);
+		return this.storageEngine?.addToList(this.namespace, ids);
 	}
 
 	/**
@@ -197,7 +206,7 @@ class GuildCache extends BaseCache<import("@amanda/discordtypings").GuildData> {
 	 * @param id id of the guild
 	 */
 	public async removeFromIndex(id: string): Promise<void> {
-		return this.storageEngine.removeFromList(this.namespace, id);
+		return this.storageEngine?.removeFromList(this.namespace, id);
 	}
 
 	/**
@@ -206,7 +215,7 @@ class GuildCache extends BaseCache<import("@amanda/discordtypings").GuildData> {
 	 * @returns True if this guild is cached and false if not
 	 */
 	public async isIndexed(id: string): Promise<boolean> {
-		return this.storageEngine.isListMember(this.namespace, id);
+		return this.storageEngine?.isListMember(this.namespace, id) || false;
 	}
 
 	/**
@@ -214,14 +223,14 @@ class GuildCache extends BaseCache<import("@amanda/discordtypings").GuildData> {
 	 * @returns array of guild ids
 	 */
 	public async getIndexMembers(): Promise<Array<string>> {
-		return this.storageEngine.getListMembers(this.namespace);
+		return this.storageEngine?.getListMembers(this.namespace) || [];
 	}
 
 	/**
 	 * Remove the guild index, you should probably not call this at all :<
 	 */
 	public async removeIndex(): Promise<void> {
-		return this.storageEngine.removeList(this.namespace);
+		return this.storageEngine?.removeList(this.namespace);
 	}
 
 	/**
@@ -229,7 +238,7 @@ class GuildCache extends BaseCache<import("@amanda/discordtypings").GuildData> {
 	 * @returns Number of guilds currently cached
 	 */
 	public async getIndexCount(): Promise<number> {
-		return this.storageEngine.getListCount(this.namespace);
+		return this.storageEngine?.getListCount(this.namespace) || 0;
 	}
 }
 

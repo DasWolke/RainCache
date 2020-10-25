@@ -13,11 +13,12 @@ class ChannelMapCache extends BaseCache_1.default {
         }
     }
     async get(id, type = "guild") {
+        var _a;
         if (this.boundObject) {
             return this;
         }
         const channelMapId = this.buildId(this._buildMapId(id, type));
-        const channelMap = await this.storageEngine.getListMembers(channelMapId);
+        const channelMap = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.getListMembers(channelMapId));
         if (channelMap) {
             return new ChannelMapCache(this.storageEngine, this._buildMap(id, channelMap, type));
         }
@@ -26,6 +27,7 @@ class ChannelMapCache extends BaseCache_1.default {
         }
     }
     async update(id, data, type = "guild", remove = false) {
+        var _a;
         if (this.boundObject) {
             this.bindObject(this._buildMap(id, data, type));
         }
@@ -41,16 +43,17 @@ class ChannelMapCache extends BaseCache_1.default {
         }
         const channelMapId = this.buildId(this._buildMapId(id, type));
         await this.remove(id, type);
-        await this.storageEngine.addToList(channelMapId, data);
+        await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.addToList(channelMapId, data));
         if (this.boundObject)
             return this;
         return new ChannelMapCache(this.storageEngine, this._buildMap(id, data, type));
     }
     async remove(id, type = "guild") {
+        var _a, _b;
         const channelMapId = this.buildId(this._buildMapId(id, type));
-        const channelMap = await this.storageEngine.getListMembers(channelMapId);
+        const channelMap = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.getListMembers(channelMapId));
         if (channelMap) {
-            void this.storageEngine.remove(channelMapId);
+            void ((_b = this.storageEngine) === null || _b === void 0 ? void 0 : _b.remove(channelMapId));
         }
         else {
             return undefined;

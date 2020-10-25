@@ -19,10 +19,11 @@ class GuildCache extends BaseCache_1.default {
         }
     }
     async get(id) {
+        var _a;
         if (this.boundObject) {
             return this;
         }
-        const guild = await this.storageEngine.get(this.buildId(id));
+        const guild = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.get(this.buildId(id)));
         if (guild) {
             return new GuildCache(this.storageEngine, this.channels.bindGuild(guild.id), this.roles.bindGuild(guild.id), this.members.bindGuild(guild.id), this.emojis.bindGuild(guild.id), this.presences.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id), guild);
         }
@@ -31,6 +32,7 @@ class GuildCache extends BaseCache_1.default {
         }
     }
     async update(id, data) {
+        var _a, _b;
         if (this.boundObject) {
             this.bindObject(data);
         }
@@ -78,14 +80,17 @@ class GuildCache extends BaseCache_1.default {
         delete data.features;
         delete data.channels;
         await this.addToIndex([id]);
-        await this.storageEngine.upsert(this.buildId(id), data);
+        await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.upsert(this.buildId(id), data));
         if (this.boundObject)
             return this;
-        const guild = await this.storageEngine.get(this.buildId(id));
+        const guild = await ((_b = this.storageEngine) === null || _b === void 0 ? void 0 : _b.get(this.buildId(id)));
+        if (!guild)
+            return this;
         return new GuildCache(this.storageEngine, this.channels.bindGuild(guild.id), this.roles.bindGuild(guild.id), this.members.bindGuild(guild.id), this.emojis.bindGuild(guild.id), this.presences.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id), guild);
     }
     async remove(id) {
-        const guild = await this.storageEngine.get(this.buildId(id));
+        var _a, _b, _c;
+        const guild = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.get(this.buildId(id)));
         if (guild) {
             const channelMap = await this.guildChannelMap.get(id);
             const roles = await this.roles.getIndexMembers(id);
@@ -97,7 +102,7 @@ class GuildCache extends BaseCache_1.default {
             for (const role of roles) {
                 await this.roles.remove(role, id);
             }
-            for (const channel of channelMap.boundObject?.channels) {
+            for (const channel of ((_b = channelMap === null || channelMap === void 0 ? void 0 : channelMap.boundObject) === null || _b === void 0 ? void 0 : _b.channels) || []) {
                 await this.channels.remove(channel);
             }
             for (const member of members) {
@@ -105,39 +110,49 @@ class GuildCache extends BaseCache_1.default {
             }
             await this.guildChannelMap.remove(id);
             await this.removeFromIndex(id);
-            return this.storageEngine.remove(this.buildId(id));
+            return (_c = this.storageEngine) === null || _c === void 0 ? void 0 : _c.remove(this.buildId(id));
         }
         else {
-            return null;
+            return undefined;
         }
     }
     async filter(fn) {
-        const guilds = await this.storageEngine.filter(fn, undefined, this.namespace);
+        var _a;
+        const guilds = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.filter(fn, undefined, this.namespace));
+        if (!guilds)
+            return [];
         return guilds.map(g => new GuildCache(this.storageEngine, this.channels, this.roles.bindGuild(g.id), this.members.bindGuild(g.id), this.emojis.bindGuild(g.id), this.presences.bindGuild(g.id), this.guildChannelMap.bindGuild(g.id), g));
     }
     async find(fn) {
-        const guild = await this.storageEngine.find(fn, undefined, this.namespace);
+        var _a;
+        const guild = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.find(fn, undefined, this.namespace));
         if (!guild)
             return null;
         return new GuildCache(this.storageEngine, this.channels.bindGuild(guild.id), this.roles.bindGuild(guild.id), this.members.bindGuild(guild.id), this.emojis.bindGuild(guild.id), this.presences.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id), guild);
     }
     async addToIndex(ids) {
-        return this.storageEngine.addToList(this.namespace, ids);
+        var _a;
+        return (_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.addToList(this.namespace, ids);
     }
     async removeFromIndex(id) {
-        return this.storageEngine.removeFromList(this.namespace, id);
+        var _a;
+        return (_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.removeFromList(this.namespace, id);
     }
     async isIndexed(id) {
-        return this.storageEngine.isListMember(this.namespace, id);
+        var _a;
+        return ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.isListMember(this.namespace, id)) || false;
     }
     async getIndexMembers() {
-        return this.storageEngine.getListMembers(this.namespace);
+        var _a;
+        return ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.getListMembers(this.namespace)) || [];
     }
     async removeIndex() {
-        return this.storageEngine.removeList(this.namespace);
+        var _a;
+        return (_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.removeList(this.namespace);
     }
     async getIndexCount() {
-        return this.storageEngine.getListCount(this.namespace);
+        var _a;
+        return ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.getListCount(this.namespace)) || 0;
     }
 }
 module.exports = GuildCache;

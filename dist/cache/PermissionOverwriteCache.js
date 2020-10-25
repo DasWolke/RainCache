@@ -14,10 +14,11 @@ class PermissionOverwriteCache extends BaseCache_1.default {
         }
     }
     async get(id, channelId = this.boundChannel) {
+        var _a;
         if (this.boundObject) {
             return this;
         }
-        const permissionOverwrite = await this.storageEngine.get(this.buildId(id, channelId));
+        const permissionOverwrite = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.get(this.buildId(id, channelId)));
         if (permissionOverwrite) {
             return new PermissionOverwriteCache(this.storageEngine, permissionOverwrite);
         }
@@ -26,31 +27,37 @@ class PermissionOverwriteCache extends BaseCache_1.default {
         }
     }
     async update(id, channelId = this.boundChannel, data) {
+        var _a;
         if (this.boundObject) {
             this.bindObject(data);
         }
         await super.addToIndex([id], channelId);
-        await this.storageEngine.upsert(this.buildId(id, channelId), data);
+        await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.upsert(this.buildId(id, channelId), data));
         if (this.boundObject)
             return this;
         return new PermissionOverwriteCache(this.storageEngine, data);
     }
     async remove(id, channelId = this.boundChannel) {
-        const permissionOverwrite = await this.storageEngine.get(this.buildId(id, channelId));
+        var _a, _b;
+        const permissionOverwrite = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.get(this.buildId(id, channelId)));
         if (permissionOverwrite) {
             await super.removeFromIndex(id, channelId);
-            return this.storageEngine.remove(this.buildId(id, channelId));
+            return (_b = this.storageEngine) === null || _b === void 0 ? void 0 : _b.remove(this.buildId(id, channelId));
         }
         else {
-            return null;
+            return undefined;
         }
     }
-    async filter(fn, channelId = this.boundChannel, ids = null) {
-        const permissionOverwrites = await this.storageEngine.filter(fn, ids, super.buildId(channelId));
+    async filter(fn, channelId = this.boundChannel, ids = undefined) {
+        var _a;
+        const permissionOverwrites = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.filter(fn, ids, super.buildId(channelId)));
+        if (!permissionOverwrites)
+            return [];
         return permissionOverwrites.map(p => new PermissionOverwriteCache(this.storageEngine, p));
     }
-    async find(fn, channelId = this.boundChannel, ids = null) {
-        const permissionOverwrite = await this.storageEngine.find(fn, ids, super.buildId(channelId));
+    async find(fn, channelId = this.boundChannel, ids = undefined) {
+        var _a;
+        const permissionOverwrite = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.find(fn, ids, super.buildId(channelId)));
         if (!permissionOverwrite)
             return null;
         return new PermissionOverwriteCache(this.storageEngine, permissionOverwrite);

@@ -13,7 +13,7 @@ declare class GuildCache extends BaseCache<import("@amanda/discordtypings").Guil
     update(id: string, data: import("@amanda/discordtypings").GuildData): Promise<GuildCache>;
     remove(id: string): Promise<void>;
     filter(fn: (emoji?: import("@amanda/discordtypings").GuildData, index?: number, array?: Array<import("@amanda/discordtypings").GuildData>) => unknown): Promise<Array<GuildCache>>;
-    find(fn: (emoji?: import("@amanda/discordtypings").GuildData, index?: number, array?: Array<string>) => unknown): Promise<GuildCache>;
+    find(fn: (emoji?: import("@amanda/discordtypings").GuildData, index?: number, array?: Array<string>) => unknown): Promise<GuildCache | null>;
     addToIndex(ids: Array<string>): Promise<void>;
     removeFromIndex(id: string): Promise<void>;
     isIndexed(id: string): Promise<boolean>;

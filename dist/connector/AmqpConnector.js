@@ -19,12 +19,16 @@ class AmqpConnector extends BaseConnector_1.default {
         this.ready = true;
         this.channel.assertQueue(this.options.amqpQueue, { durable: false, autoDelete: true });
         this.channel.consume(this.options.amqpQueue, (event) => {
-            this.channel.ack(event);
-            this.emit("event", JSON.parse(event.content.toString()));
+            var _a;
+            if (event)
+                (_a = this.channel) === null || _a === void 0 ? void 0 : _a.ack(event);
+            if (event)
+                this.emit("event", JSON.parse(event.content.toString()));
         });
     }
     async send(event) {
-        this.channel.sendToQueue(this.options.sendQueue, Buffer.from(JSON.stringify(event)));
+        var _a;
+        (_a = this.channel) === null || _a === void 0 ? void 0 : _a.sendToQueue(this.options.sendQueue, Buffer.from(JSON.stringify(event)));
     }
 }
 module.exports = AmqpConnector;

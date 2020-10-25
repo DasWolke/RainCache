@@ -12,43 +12,52 @@ class VoiceStateCache extends BaseCache_1.default {
             this.bindObject(boundObject);
         }
     }
-    async get(id = this.boundObject?.user_id, guildId) {
+    async get(id, guildId) {
+        var _a, _b;
+        if (id === void 0) { id = (_a = this.boundObject) === null || _a === void 0 ? void 0 : _a.user_id; }
         if (this.boundObject) {
             return this;
         }
-        const state = await this.storageEngine.get(this.buildId(id, guildId));
+        const state = await ((_b = this.storageEngine) === null || _b === void 0 ? void 0 : _b.get(this.buildId(id, guildId)));
         if (!state) {
             return null;
         }
         return new VoiceStateCache(this.storageEngine, state);
     }
     async update(id, guildId, data) {
+        var _a;
         if (this.boundObject) {
             this.bindObject(data);
         }
         delete data.member;
         await this.addToIndex([id]);
-        await this.storageEngine.upsert(this.buildId(id, guildId), data);
+        await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.upsert(this.buildId(id, guildId), data));
         if (this.boundObject)
             return this;
         return new VoiceStateCache(this.storageEngine, data);
     }
-    async remove(id = this.boundObject?.user_id, guildId) {
+    async remove(id, guildId) {
+        var _a, _b;
+        if (id === void 0) { id = (_a = this.boundObject) === null || _a === void 0 ? void 0 : _a.user_id; }
         const state = await this.isIndexed(id, guildId);
         if (state) {
             await this.removeFromIndex(id, guildId);
-            return this.storageEngine.remove(this.buildId(id, guildId));
+            return (_b = this.storageEngine) === null || _b === void 0 ? void 0 : _b.remove(this.buildId(id, guildId));
         }
         else {
-            return null;
+            return undefined;
         }
     }
-    async filter(fn, ids = null) {
-        const states = await this.storageEngine.filter(fn, ids, this.namespace);
+    async filter(fn, ids = undefined) {
+        var _a;
+        const states = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.filter(fn, ids, this.namespace));
+        if (!states)
+            return [];
         return states.map(s => new VoiceStateCache(this.storageEngine, s));
     }
-    async find(fn, ids = null) {
-        const state = await this.storageEngine.find(fn, ids, this.namespace);
+    async find(fn, ids = undefined) {
+        var _a;
+        const state = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.find(fn, ids, this.namespace));
         if (!state)
             return null;
         return new VoiceStateCache(this.storageEngine, state);
@@ -58,19 +67,24 @@ class VoiceStateCache extends BaseCache_1.default {
         return this;
     }
     async removeFromIndex(id, guildId) {
-        return this.storageEngine.removeFromList(this.namespace, this.buildId(id, guildId));
+        var _a;
+        return (_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.removeFromList(this.namespace, this.buildId(id, guildId));
     }
     async isIndexed(id, guildId) {
-        return this.storageEngine.isListMember(this.namespace, this.buildId(id, guildId));
+        var _a;
+        return ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.isListMember(this.namespace, this.buildId(id, guildId))) || false;
     }
     async getIndexMembers() {
-        return this.storageEngine.getListMembers(this.namespace);
+        var _a;
+        return ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.getListMembers(this.namespace)) || [];
     }
     async removeIndex() {
-        return this.storageEngine.removeList(this.namespace);
+        var _a;
+        return (_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.removeList(this.namespace);
     }
     async getIndexCount() {
-        return this.storageEngine.getListCount(this.namespace);
+        var _a;
+        return ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.getListCount(this.namespace)) || 0;
     }
     buildId(userId, guildId) {
         if (!guildId) {

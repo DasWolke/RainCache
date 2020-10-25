@@ -6,8 +6,8 @@ declare class RoleCache extends BaseCache<import("@amanda/discordtypings").RoleD
     get(id: string, guildId: string): Promise<RoleCache | null>;
     update(id: string, guildId: string, data: import("@amanda/discordtypings").RoleData): Promise<RoleCache>;
     remove(id: string, guildId: string): Promise<void>;
-    filter(fn: (role?: import("@amanda/discordtypings").RoleData, index?: number, array?: Array<import("@amanda/discordtypings").RoleData>) => unknown, guildId?: string, ids?: Array<string>): Promise<Array<RoleCache>>;
-    find(fn: (role?: import("@amanda/discordtypings").RoleData, index?: number, array?: Array<string>) => unknown, guildId?: string, ids?: Array<string>): Promise<RoleCache>;
+    filter(fn: (role?: import("@amanda/discordtypings").RoleData, index?: number, array?: Array<import("@amanda/discordtypings").RoleData>) => unknown, guildId?: string | undefined, ids?: Array<string> | undefined): Promise<Array<RoleCache>>;
+    find(fn: (role?: import("@amanda/discordtypings").RoleData, index?: number, array?: Array<string>) => unknown, guildId?: string | undefined, ids?: Array<string> | undefined): Promise<RoleCache | null>;
     buildId(roleId: string, guildId?: string): string;
 }
 export = RoleCache;
