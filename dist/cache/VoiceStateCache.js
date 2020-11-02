@@ -65,6 +65,10 @@ class VoiceStateCache extends BaseCache_1.default {
         this.user_id = userId;
         return this;
     }
+    async addToIndex(id, guildID) {
+        var _a;
+        return (_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.addToList(this.namespace, this.buildId(id, guildID));
+    }
     async removeFromIndex(id, guildId) {
         var _a;
         return (_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.removeFromList(this.namespace, this.buildId(id, guildId));

@@ -104,6 +104,14 @@ class VoiceStateCache extends BaseCache<import("@amanda/discordtypings").VoiceSt
 	}
 
 	/**
+	 * Add a voice state to the voicestates index
+	 * @param id id of the voice state
+	 */
+	public async addToIndex(id: string, guildID: string | undefined): Promise<void> {
+		return this.storageEngine?.addToList(this.namespace, this.buildId(id, guildID));
+	}
+
+	/**
 	 * Remove a VoiceState from the index
 	 * @param id id of the user
 	 */
