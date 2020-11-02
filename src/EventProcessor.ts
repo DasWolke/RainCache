@@ -127,8 +127,15 @@ class EventProcessor extends EventEmitter {
 			break;
 		}
 		case "MESSAGE_CREATE": {
-			if (event.d.author && !event.d.webhook_id) {
-				await this.userCache?.update(event.d.author.id, event.d.author);
+			if (event.d.webhook_id) return;
+			if (event.d.member && event.d.author) await this.memberCache?.update(event.d.author.id, event.d.guild_id, { guild_id: event.d.guild_id, user: event.d.author, id: event.d.author.id, ...event.d.member });
+			else if (event.d.author) await this.userCache?.update(event.d.author.id, event.d.author);
+
+			if (event.d.mentions && event.d.mentions.length > 0 && event.d.guild_id) {
+				await Promise.all(event.d.mentions.map(user => {
+					if (user.member) this.memberCache?.update(user.id, event.d.guild_id, user.member);
+					else this.userCache?.update(user.id, user);
+				}));
 			}
 			break;
 		}

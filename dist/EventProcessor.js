@@ -32,7 +32,7 @@ class EventProcessor extends events_1.EventEmitter {
         return event;
     }
     async process(event) {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r;
         switch (event.t) {
             case "READY":
                 await this.processReady(event);
@@ -108,8 +108,20 @@ class EventProcessor extends events_1.EventEmitter {
                 break;
             }
             case "MESSAGE_CREATE": {
-                if (event.d.author && !event.d.webhook_id) {
-                    await ((_m = this.userCache) === null || _m === void 0 ? void 0 : _m.update(event.d.author.id, event.d.author));
+                if (event.d.webhook_id)
+                    return;
+                if (event.d.member && event.d.author)
+                    await ((_m = this.memberCache) === null || _m === void 0 ? void 0 : _m.update(event.d.author.id, event.d.guild_id, { guild_id: event.d.guild_id, user: event.d.author, id: event.d.author.id, ...event.d.member }));
+                else if (event.d.author)
+                    await ((_o = this.userCache) === null || _o === void 0 ? void 0 : _o.update(event.d.author.id, event.d.author));
+                if (event.d.mentions && event.d.mentions.length > 0 && event.d.guild_id) {
+                    await Promise.all(event.d.mentions.map(user => {
+                        var _a, _b;
+                        if (user.member)
+                            (_a = this.memberCache) === null || _a === void 0 ? void 0 : _a.update(user.id, event.d.guild_id, user.member);
+                        else
+                            (_b = this.userCache) === null || _b === void 0 ? void 0 : _b.update(user.id, user);
+                    }));
                 }
                 break;
             }
@@ -117,11 +129,11 @@ class EventProcessor extends events_1.EventEmitter {
                 if (!event.d.guild_id)
                     return;
                 if (event.d.member && event.d.user_id && event.d.guild_id)
-                    await ((_o = this.memberCache) === null || _o === void 0 ? void 0 : _o.update(event.d.user_id, event.d.guild_id, { guild_id: event.d.guild_id, ...event.d.member }));
+                    await ((_p = this.memberCache) === null || _p === void 0 ? void 0 : _p.update(event.d.user_id, event.d.guild_id, { guild_id: event.d.guild_id, ...event.d.member }));
                 if (event.d.channel_id != null)
-                    await ((_p = this.voiceStateCache) === null || _p === void 0 ? void 0 : _p.update(event.d.user_id, event.d.guild_id, event.d));
+                    await ((_q = this.voiceStateCache) === null || _q === void 0 ? void 0 : _q.update(event.d.user_id, event.d.guild_id, event.d));
                 else
-                    await ((_q = this.voiceStateCache) === null || _q === void 0 ? void 0 : _q.remove(event.d.user_id, event.d.guild_id));
+                    await ((_r = this.voiceStateCache) === null || _r === void 0 ? void 0 : _r.remove(event.d.user_id, event.d.guild_id));
                 break;
             }
             default:

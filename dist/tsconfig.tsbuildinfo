@@ -517,7 +517,7 @@
         "affectsGlobalScope": false
       },
       "../src/eventprocessor.ts": {
-        "version": "5c177a641368ce62308ef62de14970b131d080c79f41d9a9bd121df11dea95ff",
+        "version": "2fd4d0713d351aeae6da28eae990561f4c03bdc86ff991a4a522e94a0d2ba774",
         "signature": "6af59d277efc141f88a95837912e2c6b4b2df04629f987624083cae2121d5322",
         "affectsGlobalScope": false
       },
