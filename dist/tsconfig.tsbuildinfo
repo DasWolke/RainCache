@@ -207,13 +207,13 @@
         "affectsGlobalScope": true
       },
       "../src/storageengine/basestorageengine.ts": {
-        "version": "ac1412778dedd8a42ce4621f72df9fe0553f36449e259c8fa24484c74efa5c13",
-        "signature": "0fc5bd02a57a10ea0c5e6c958ab12286b77d265555f0c1bd24012a9ea5c7fc50",
+        "version": "4adbfee2595fa62e5632d8229a568a6d22fca14bf987fe8d60a489b36be098ee",
+        "signature": "c1b20b3846b721168c4a07b1e033dd310841b58654d3e1e86de79a18917c3093",
         "affectsGlobalScope": false
       },
       "../src/cache/basecache.ts": {
-        "version": "79737cf1b6894b99bf26e3d0689af95ec7034da2df7202fbd24561be1b527265",
-        "signature": "fb107f830ed8dd8a57ef6a08e45a92ffdd3db663381c76da70be24ac97b7f83d",
+        "version": "3068f740773033d9e2672fd6f54389b6026dc9c2466fcb48d954702c8a57a041",
+        "signature": "204f9cf9f221636acd64d31e6afa8ae2bcd2db8f68b627e64e94498be63e8e68",
         "affectsGlobalScope": false
       },
       "../node_modules/@amanda/discordtypings/index.d.ts": {
@@ -222,37 +222,37 @@
         "affectsGlobalScope": false
       },
       "../src/cache/channelmapcache.ts": {
-        "version": "15fd922fe6028f06c144788e21348e362c25e9b74b405a764a2705a37d8847ef",
+        "version": "6fdb233c6637ae73bfc9ad3d92fba1720754988eb8592053ec4cfedc67dad388",
         "signature": "868f7cb029887db9e6dabafd09978e7453807c43ddad32ae57d10beeb8175c65",
         "affectsGlobalScope": false
       },
       "../src/cache/permissionoverwritecache.ts": {
-        "version": "bf6dda1890c8daeb41de3b047f0bbcd855210408453b2729e87db2500a069684",
+        "version": "c08660e173887dd0497d6e499220efc9e8cac05b7a1a778e4a40485b30830d5c",
         "signature": "fb3d072e9c613e4d135e7a4c2d0b35aca4be3be57c62716c72b8de11bb91d265",
         "affectsGlobalScope": false
       },
       "../src/cache/usercache.ts": {
-        "version": "519c2abf682b64d22b0796247f916e22701f185eb8995ab2ae69051f2e87f86f",
-        "signature": "9c3fc647c69201f39f9c92c1df1b83781c57d93f0da52fb6e963938a9dd92e96",
+        "version": "c1ad22a1b0274de70a1b88893cceebe2c6cd70d5c4b33170342ce9b16f3faccf",
+        "signature": "9e58078c22bf01e176ce4551589bdc60938eae9e23806056e00958b604f18d49",
         "affectsGlobalScope": false
       },
       "../src/cache/channelcache.ts": {
-        "version": "567dd781fba8f9803a687a5d5c0f21fc604e4fcdb7d8efff52a4c448b061cc51",
-        "signature": "1a1071dbe6e07df9c3afb23a9c8c5b38326046f416399faaa2def16f35325644",
+        "version": "eb8f1bcc3f01b3a5ce344ba3cdb376dacdb5d3338f85ce015caa93e6b004c8c9",
+        "signature": "6cfef13c89b7751c2d11a9f99da725ba8bab271d63a6a17165b9ebba23e503a7",
         "affectsGlobalScope": false
       },
       "../src/cache/rolecache.ts": {
-        "version": "6d8f8715111386ccd1c5b3795eecd7e01f3cdc9696bd6bde49b16a51e0a602c3",
+        "version": "2eb4a7a1ae5eb743a941af299684888f36f6e0d3f1a02c39d2f9f0337f975e2a",
         "signature": "4789d7ffe1769065d55b7e3e20badd52b4b2d8d5be34ad80e3d34d8d724d86dd",
         "affectsGlobalScope": false
       },
       "../src/cache/membercache.ts": {
-        "version": "7cf6ae824981d2e7839ebe93e5d352ca6b67e9a84e8d9124993f94b2ce6100bb",
+        "version": "ecb148a5b4666fbf1d949a8f943b7051462750b9520d1d77c8acbb3580fb00dc",
         "signature": "7671f73b2f0310f79cd28ab76a55c359080359c0228aaa94c1e4d0d6186a7c31",
         "affectsGlobalScope": false
       },
       "../src/cache/emojicache.ts": {
-        "version": "355e10cd1739c6026df0688397ea6754f6b0b9ccfe23ff9e4f174c798d3ff973",
+        "version": "578b6af09657a3e5524ea9c9ef3d0b06b32eb8befd176c3e5a5e49b55eea0642",
         "signature": "850481439f978d8389f9d2e595c49bfa872cbcd0a819b524177e99bf545393ea",
         "affectsGlobalScope": false
       },
@@ -262,12 +262,12 @@
         "affectsGlobalScope": false
       },
       "../src/cache/guildcache.ts": {
-        "version": "e3697ae91286a435290ebaa4cd0775552a74b8745d6ac92bf65472ef5eba3489",
-        "signature": "bfe70e095da5f2da7ab6b97ae794a3b60c3ebee2ae4c4a1c3f9cf9ebed1d9d24",
+        "version": "13812623c1c08a00a73ad5e693c73fdb2f86307ffff4d4c7620421e291fc3eb4",
+        "signature": "f82a83c82f06e23fa354eb80ac73260d2ab0ac9e19d1914d78088a5cd8783394",
         "affectsGlobalScope": false
       },
       "../src/cache/voicestatecache.ts": {
-        "version": "9d8454d2a41fbfc99df30f870e0073e2615d39742653357446a4c6a3aa3ffcd7",
+        "version": "a878f68c964f40ef8689c11c61401083bbfbfa4567155315baa87745e1e9113b",
         "signature": "6329aad7b487f16969f92d0be7fc6fbb95ccf7d736f5c678d66c05c5594913a9",
         "affectsGlobalScope": false
       },
@@ -522,8 +522,8 @@
         "affectsGlobalScope": false
       },
       "../src/storageengine/redisstorageengine.ts": {
-        "version": "a8536d73365d84cd3691dd01b9dac79167cc0453813a349579eae209824c480d",
-        "signature": "b2e319ec0be0d0375e20f861bd07b8168e663d18c66b82aa31a8803d3b3b6b59",
+        "version": "e33bb84404067aec079c39594b65c8e014598e09c4cf8c611855d4676b4bc0b9",
+        "signature": "6421a661b5563d38ffbd607a2727c6f778656c499bb5b6ffd33d61f6b3213f29",
         "affectsGlobalScope": false
       },
       "../src/connector/baseconnector.ts": {

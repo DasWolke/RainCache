@@ -8,7 +8,7 @@ class BaseStorageEngine {
     upsert(id, data) { }
     remove(id, useHash) { }
     getListMembers(listId) { return ["null"]; }
-    addToList(listId, ids) { }
+    addToList(listId, id) { }
     isListMember(listId, id) { return false; }
     removeFromList(listId, id) { }
     removeList(listId) { }

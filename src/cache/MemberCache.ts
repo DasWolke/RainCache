@@ -75,7 +75,7 @@ class MemberCache extends BaseCache<import("@amanda/discordtypings").MemberData>
 			// @ts-ignore
 			delete data.user;
 		}
-		await this.addToIndex([id], guildId);
+		await this.addToIndex(id, guildId);
 		await this.storageEngine?.upsert(this.buildId(id, guildId), data);
 		if (this.boundObject) return this;
 		// @ts-ignore

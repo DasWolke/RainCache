@@ -79,7 +79,7 @@ class GuildCache extends BaseCache_1.default {
         delete data.emojis;
         delete data.features;
         delete data.channels;
-        await this.addToIndex([id]);
+        await this.addToIndex(id);
         await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.upsert(this.buildId(id), data));
         if (this.boundObject)
             return this;
@@ -130,9 +130,9 @@ class GuildCache extends BaseCache_1.default {
             return null;
         return new GuildCache(this.storageEngine, this.channels.bindGuild(guild.id), this.roles.bindGuild(guild.id), this.members.bindGuild(guild.id), this.emojis.bindGuild(guild.id), this.presences.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id), guild);
     }
-    async addToIndex(ids) {
+    async addToIndex(id) {
         var _a;
-        return (_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.addToList(this.namespace, ids);
+        return (_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.addToList(this.namespace, id);
     }
     async removeFromIndex(id) {
         var _a;

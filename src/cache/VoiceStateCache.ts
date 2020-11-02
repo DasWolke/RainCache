@@ -31,9 +31,7 @@ class VoiceStateCache extends BaseCache<import("@amanda/discordtypings").VoiceSt
 			return this;
 		}
 		const state = await this.storageEngine?.get(this.buildId(id as string, guildId));
-		if (!state) {
-			return null;
-		}
+		if (!state) return null;
 		return new VoiceStateCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").VoiceStateData>, state);
 	}
 
@@ -50,7 +48,7 @@ class VoiceStateCache extends BaseCache<import("@amanda/discordtypings").VoiceSt
 
 		delete data.member;
 
-		await this.addToIndex([id]);
+		await this.addToIndex(id, guildId);
 		await this.storageEngine?.upsert(this.buildId(id, guildId), data);
 		if (this.boundObject) return this;
 		return new VoiceStateCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").VoiceStateData>, data);
@@ -62,7 +60,7 @@ class VoiceStateCache extends BaseCache<import("@amanda/discordtypings").VoiceSt
 	 * @param guildId guild id
 	 */
 	public async remove(id = this.boundObject?.user_id, guildId: string): Promise<void> {
-		const state = await this.isIndexed(id as string, guildId);
+		const state = await this.get(id, guildId);
 		if (state) {
 			await this.removeFromIndex(id as string, guildId);
 			return this.storageEngine?.remove(this.buildId(id as string, guildId));

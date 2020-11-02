@@ -67,7 +67,7 @@ class ChannelMapCache extends BaseCache<import("../types").ChannelMap> {
 		}
 		const channelMapId = this.buildId(this._buildMapId(id, type));
 		await this.remove(id, type);
-		await this.storageEngine?.addToList(channelMapId, data);
+		await Promise.all(data.map(id => this.storageEngine?.addToList(channelMapId, id)));
 		if (this.boundObject) return this;
 		return new ChannelMapCache(this.storageEngine as BaseStorageEngine<import("../types").ChannelMap>, this._buildMap(id, data, type));
 	}

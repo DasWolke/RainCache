@@ -72,7 +72,7 @@ class ChannelCache extends BaseCache<import("../types").Channel> {
 		}
 		delete data.permission_overwrites;
 		delete data.recipients;
-		await this.addToIndex([id]);
+		await this.addToIndex(id);
 		await this.storageEngine?.upsert(this.buildId(id), data);
 		if (this.boundObject) return this;
 		const channel = await this.storageEngine?.get(this.buildId(id));
@@ -119,10 +119,10 @@ class ChannelCache extends BaseCache<import("../types").Channel> {
 
 	/**
 	 * Add channels to the channel index
-	 * @param ids ids of the channels
+	 * @param id ids of the channels
 	 */
-	public async addToIndex(ids: Array<string>): Promise<void> {
-		return this.storageEngine?.addToList(this.namespace, ids);
+	public async addToIndex(id: string): Promise<void> {
+		return this.storageEngine?.addToList(this.namespace, id);
 	}
 
 	/**

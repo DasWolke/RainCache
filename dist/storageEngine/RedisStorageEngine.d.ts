@@ -12,7 +12,7 @@ declare class RedisStorageEngine<T> extends BaseStorageEngine<T> {
     filter(fn: (value?: T, index?: number, array?: Array<T>) => unknown, ids: Array<string>, namespace: string): Promise<Array<any>>;
     find(fn: (value?: T, index?: number, array?: Array<string>) => boolean, ids: string[] | null | undefined, namespace: string): Promise<T | null>;
     getListMembers(listId: string): Promise<Array<string>>;
-    addToList(listId: string, ids: Array<string>): Promise<void>;
+    addToList(listId: string, id: string): Promise<void>;
     isListMember(listId: string, id: string): Promise<boolean>;
     removeFromList(listId: string, id: string): Promise<void>;
     removeList(listId: string): Promise<void>;

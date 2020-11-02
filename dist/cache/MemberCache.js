@@ -43,7 +43,7 @@ class MemberCache extends BaseCache_1.default {
             await this.user.update(data.user.id, data.user);
             delete data.user;
         }
-        await this.addToIndex([id], guildId);
+        await this.addToIndex(id, guildId);
         await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.upsert(this.buildId(id, guildId), data));
         if (this.boundObject)
             return this;

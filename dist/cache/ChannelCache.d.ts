@@ -11,7 +11,7 @@ declare class ChannelCache extends BaseCache<import("../types").Channel> {
     remove(id: string): Promise<void>;
     filter(fn: (channel?: import("../types").Channel, index?: number, array?: Array<import("../types").Channel>) => unknown, channelMap?: Array<string>): Promise<Array<ChannelCache>>;
     find(fn: (channel?: import("@amanda/discordtypings").ChannelData) => unknown, channelMap: Array<string>): Promise<ChannelCache | null>;
-    addToIndex(ids: Array<string>): Promise<void>;
+    addToIndex(id: string): Promise<void>;
     removeFromIndex(id: string): Promise<void>;
     isIndexed(id: string): Promise<boolean>;
     getIndexMembers(): Promise<Array<string>>;

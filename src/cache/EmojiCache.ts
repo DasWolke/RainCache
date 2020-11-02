@@ -52,7 +52,7 @@ class EmojiCache extends BaseCache<import("@amanda/discordtypings").EmojiData> {
 		if (this.boundObject) {
 			this.bindObject(data);
 		}
-		await this.addToIndex([id], guildId);
+		await this.addToIndex(id, guildId);
 		await this.storageEngine?.upsert(this.buildId(id, guildId), data);
 		if (this.boundObject) return this;
 		return new EmojiCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").EmojiData>, data);

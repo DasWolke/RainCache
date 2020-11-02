@@ -30,7 +30,7 @@ class UserCache extends BaseCache_1.default {
         if (this.boundObject) {
             this.bindObject(data);
         }
-        await this.addToIndex([id]);
+        await this.addToIndex(id);
         await ((_b = this.storageEngine) === null || _b === void 0 ? void 0 : _b.upsert(this.buildId(id), data));
         if (this.boundObject)
             return this;
@@ -66,9 +66,9 @@ class UserCache extends BaseCache_1.default {
         this.id = userId;
         return this;
     }
-    async addToIndex(ids) {
+    async addToIndex(id) {
         var _a;
-        return (_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.addToList(this.namespace, ids);
+        return (_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.addToList(this.namespace, id);
     }
     async removeFromIndex(id) {
         var _a;

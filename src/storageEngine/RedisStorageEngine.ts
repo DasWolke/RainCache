@@ -195,11 +195,11 @@ class RedisStorageEngine<T> extends BaseStorageEngine<T> {
 	/**
 	 * Add an id (or a list of them) to a list
 	 * @param listId id of the list
-	 * @param ids array of ids that should be added
+	 * @param id array of ids that should be added
 	 */
-	public addToList(listId: string, ids: Array<string>): Promise<void> {
+	public addToList(listId: string, id: string): Promise<void> {
 		return new Promise((res, rej) => {
-			this.client?.SADD(listId, ids, (err) => {
+			this.client?.SADD(listId, id, (err) => {
 				if (err) void rej(err);
 				else void res(undefined);
 			});

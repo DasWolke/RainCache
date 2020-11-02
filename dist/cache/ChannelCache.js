@@ -48,7 +48,7 @@ class ChannelCache extends BaseCache_1.default {
         }
         delete data.permission_overwrites;
         delete data.recipients;
-        await this.addToIndex([id]);
+        await this.addToIndex(id);
         await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.upsert(this.buildId(id), data));
         if (this.boundObject)
             return this;
@@ -81,9 +81,9 @@ class ChannelCache extends BaseCache_1.default {
             return null;
         return new ChannelCache(this.storageEngine, this.channelMap, this.permissionOverwrites.bindChannel(channel.id), this.recipients, channel);
     }
-    async addToIndex(ids) {
+    async addToIndex(id) {
         var _a;
-        return (_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.addToList(this.namespace, ids);
+        return (_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.addToList(this.namespace, id);
     }
     async removeFromIndex(id) {
         var _a;

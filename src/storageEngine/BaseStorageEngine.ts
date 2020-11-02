@@ -24,7 +24,7 @@ class BaseStorageEngine<T> {
 
 	public getListMembers(listId: string): Array<string> | Promise<Array<string>> { return ["null"]; }
 
-	public addToList(listId: string, ids: Array<string>): void | Promise<void> {}
+	public addToList(listId: string, id: string): void | Promise<void> {}
 
 	public isListMember(listId: string, id: string): boolean | Promise<boolean> { return false; }
 

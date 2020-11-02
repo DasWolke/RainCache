@@ -62,7 +62,7 @@ class RoleCache extends BaseCache<import("@amanda/discordtypings").RoleData> {
 		if (!data.id) {
 			data.id = id;
 		}
-		await this.addToIndex([id], guildId);
+		await this.addToIndex(id, guildId);
 		await this.storageEngine?.upsert(this.buildId(id, guildId), data);
 		if (this.boundObject) return this;
 		return new RoleCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").RoleData>, data);

@@ -149,10 +149,10 @@ class RedisStorageEngine extends BaseStorageEngine_1.default {
             });
         });
     }
-    addToList(listId, ids) {
+    addToList(listId, id) {
         return new Promise((res, rej) => {
             var _a;
-            (_a = this.client) === null || _a === void 0 ? void 0 : _a.SADD(listId, ids, (err) => {
+            (_a = this.client) === null || _a === void 0 ? void 0 : _a.SADD(listId, id, (err) => {
                 if (err)
                     void rej(err);
                 else

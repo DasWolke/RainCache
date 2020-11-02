@@ -19,9 +19,8 @@ class VoiceStateCache extends BaseCache_1.default {
             return this;
         }
         const state = await ((_b = this.storageEngine) === null || _b === void 0 ? void 0 : _b.get(this.buildId(id, guildId)));
-        if (!state) {
+        if (!state)
             return null;
-        }
         return new VoiceStateCache(this.storageEngine, state);
     }
     async update(id, guildId, data) {
@@ -30,7 +29,7 @@ class VoiceStateCache extends BaseCache_1.default {
             this.bindObject(data);
         }
         delete data.member;
-        await this.addToIndex([id]);
+        await this.addToIndex(id, guildId);
         await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.upsert(this.buildId(id, guildId), data));
         if (this.boundObject)
             return this;
@@ -39,7 +38,7 @@ class VoiceStateCache extends BaseCache_1.default {
     async remove(id, guildId) {
         var _a, _b;
         if (id === void 0) { id = (_a = this.boundObject) === null || _a === void 0 ? void 0 : _a.user_id; }
-        const state = await this.isIndexed(id, guildId);
+        const state = await this.get(id, guildId);
         if (state) {
             await this.removeFromIndex(id, guildId);
             return (_b = this.storageEngine) === null || _b === void 0 ? void 0 : _b.remove(this.buildId(id, guildId));

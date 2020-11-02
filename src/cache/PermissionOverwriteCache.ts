@@ -55,7 +55,7 @@ class PermissionOverwriteCache extends BaseCache<any> {
 		if (this.boundObject) {
 			this.bindObject(data);
 		}
-		await super.addToIndex([id], channelId);
+		await super.addToIndex(id, channelId);
 		await this.storageEngine?.upsert(this.buildId(id, channelId), data);
 		if (this.boundObject) return this;
 		return new PermissionOverwriteCache(this.storageEngine as BaseStorageEngine<any>, data);

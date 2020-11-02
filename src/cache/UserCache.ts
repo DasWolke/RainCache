@@ -47,7 +47,7 @@ class UserCache extends BaseCache<import("@amanda/discordtypings").UserData> {
 		if (this.boundObject) {
 			this.bindObject(data);
 		}
-		await this.addToIndex([id as string]);
+		await this.addToIndex(id as string);
 		await this.storageEngine?.upsert(this.buildId(id as string), data);
 		if (this.boundObject) return this;
 		return new UserCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").UserData>, data);
@@ -103,10 +103,10 @@ class UserCache extends BaseCache<import("@amanda/discordtypings").UserData> {
 
 	/**
 	 * Add users to the index
-	 * @param ids ids of the users
+	 * @param id ids of the users
 	 */
-	public async addToIndex(ids: Array<string>): Promise<void> {
-		return this.storageEngine?.addToList(this.namespace, ids);
+	public async addToIndex(id: string): Promise<void> {
+		return this.storageEngine?.addToList(this.namespace, id);
 	}
 
 	/**

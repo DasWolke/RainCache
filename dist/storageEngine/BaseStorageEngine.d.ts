@@ -7,7 +7,7 @@ declare class BaseStorageEngine<T> {
     upsert(id: string, data: T): void | Promise<void>;
     remove(id: string, useHash?: boolean): void | Promise<void>;
     getListMembers(listId: string): Array<string> | Promise<Array<string>>;
-    addToList(listId: string, ids: Array<string>): void | Promise<void>;
+    addToList(listId: string, id: string): void | Promise<void>;
     isListMember(listId: string, id: string): boolean | Promise<boolean>;
     removeFromList(listId: string, id: string): void | Promise<void>;
     removeList(listId: string): void | Promise<void>;

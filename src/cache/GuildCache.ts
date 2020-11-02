@@ -132,7 +132,7 @@ class GuildCache extends BaseCache<import("@amanda/discordtypings").GuildData> {
 		delete data.features;
 		// @ts-ignore
 		delete data.channels;
-		await this.addToIndex([id]);
+		await this.addToIndex(id);
 		await this.storageEngine?.upsert(this.buildId(id), data);
 		if (this.boundObject) return this;
 		const guild = await this.storageEngine?.get(this.buildId(id));
@@ -195,10 +195,10 @@ class GuildCache extends BaseCache<import("@amanda/discordtypings").GuildData> {
 
 	/**
 	 * Add a guild to the guild index
-	 * @param ids ids of the guilds
+	 * @param id ids of the guilds
 	 */
-	public async addToIndex(ids: Array<string>): Promise<void> {
-		return this.storageEngine?.addToList(this.namespace, ids);
+	public async addToIndex(id: string): Promise<void> {
+		return this.storageEngine?.addToList(this.namespace, id);
 	}
 
 	/**

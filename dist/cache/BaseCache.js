@@ -17,9 +17,9 @@ class BaseCache {
     buildId(id) {
         return `${this.namespace}.${id}`;
     }
-    async addToIndex(ids, objectId = this.boundGuild) {
+    async addToIndex(id, objectId = this.boundGuild) {
         var _a;
-        return (_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.addToList(this.buildId(objectId), ids);
+        return (_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.addToList(this.buildId(objectId), id);
     }
     async removeFromIndex(id, objectId = this.boundGuild) {
         var _a;

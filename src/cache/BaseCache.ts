@@ -48,11 +48,11 @@ class BaseCache<T> {
 
 	/**
 	 * Add ids to the index of a namespace
-	 * @param ids ids to add
+	 * @param id ids to add
 	 * @param objectId id of the parent object of the index
 	 */
-	public async addToIndex(ids: Array<string>, objectId: string = this.boundGuild as string): Promise<void> {
-		return this.storageEngine?.addToList(this.buildId(objectId), ids);
+	public async addToIndex(id: string, objectId: string = this.boundGuild as string): Promise<void> {
+		return this.storageEngine?.addToList(this.buildId(objectId), id);
 	}
 
 	/**
