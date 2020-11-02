@@ -32,7 +32,7 @@ class EventProcessor extends events_1.EventEmitter {
         return event;
     }
     async process(event) {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q;
         switch (event.t) {
             case "READY":
                 await this.processReady(event);
@@ -111,6 +111,17 @@ class EventProcessor extends events_1.EventEmitter {
                 if (event.d.author && !event.d.webhook_id) {
                     await ((_m = this.userCache) === null || _m === void 0 ? void 0 : _m.update(event.d.author.id, event.d.author));
                 }
+                break;
+            }
+            case "VOICE_STATE_UPDATE": {
+                if (!event.d.guild_id)
+                    return;
+                if (event.d.member && event.d.user_id && event.d.guild_id)
+                    await ((_o = this.memberCache) === null || _o === void 0 ? void 0 : _o.update(event.d.user_id, event.d.guild_id, { guild_id: event.d.guild_id, ...event.d.member }));
+                if (event.d.channel_id != null)
+                    await ((_p = this.voiceStateCache) === null || _p === void 0 ? void 0 : _p.update(event.d.user_id, event.d.guild_id, event.d));
+                else
+                    await ((_q = this.voiceStateCache) === null || _q === void 0 ? void 0 : _q.remove(event.d.user_id, event.d.guild_id));
                 break;
             }
             default:

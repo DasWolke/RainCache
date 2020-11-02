@@ -132,6 +132,14 @@ class EventProcessor extends EventEmitter {
 			}
 			break;
 		}
+		case "VOICE_STATE_UPDATE": {
+			if (!event.d.guild_id) return;
+			if (event.d.member && event.d.user_id && event.d.guild_id) await this.memberCache?.update(event.d.user_id, event.d.guild_id, { guild_id: event.d.guild_id, ...event.d.member });
+
+			if (event.d.channel_id != null) await this.voiceStateCache?.update(event.d.user_id, event.d.guild_id, event.d);
+			else await this.voiceStateCache?.remove(event.d.user_id, event.d.guild_id);
+			break;
+		}
 		default:
 			if (event.t !== "PRESENCE_UPDATE") {
 				this.emit("debug", `Unknown Event ${event.t}`);
