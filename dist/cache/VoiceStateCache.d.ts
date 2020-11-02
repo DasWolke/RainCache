@@ -8,7 +8,7 @@ declare class VoiceStateCache extends BaseCache<import("@amanda/discordtypings")
     filter(fn: (state?: import("@amanda/discordtypings").VoiceStateData, index?: number, array?: Array<import("@amanda/discordtypings").VoiceStateData>) => unknown, ids?: Array<string> | undefined): Promise<Array<VoiceStateCache>>;
     find(fn: (state?: import("@amanda/discordtypings").VoiceStateData, index?: number, array?: Array<string>) => unknown, ids?: Array<string> | undefined): Promise<VoiceStateCache | null>;
     bindUserId(userId: string): VoiceStateCache;
-    addToIndex(id: string, guildID: string | undefined): Promise<void>;
+    addToIndex(id: string): Promise<void>;
     removeFromIndex(id: string, guildId?: string): Promise<void>;
     isIndexed(id: string, guildId?: string): Promise<boolean>;
     getIndexMembers(): Promise<Array<string>>;

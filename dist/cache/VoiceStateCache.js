@@ -29,7 +29,7 @@ class VoiceStateCache extends BaseCache_1.default {
             this.bindObject(data);
         }
         delete data.member;
-        await this.addToIndex(id, guildId);
+        await this.addToIndex(id);
         await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.upsert(this.buildId(id, guildId), data));
         if (this.boundObject)
             return this;
@@ -65,9 +65,9 @@ class VoiceStateCache extends BaseCache_1.default {
         this.user_id = userId;
         return this;
     }
-    async addToIndex(id, guildID) {
+    async addToIndex(id) {
         var _a;
-        return (_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.addToList(this.namespace, this.buildId(id, guildID));
+        return (_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.addToList(this.namespace, id);
     }
     async removeFromIndex(id, guildId) {
         var _a;

@@ -267,8 +267,8 @@
         "affectsGlobalScope": false
       },
       "../src/cache/voicestatecache.ts": {
-        "version": "78e7b73aafa99d52c927945ab726813f4474e3fc3d1c669799207c3f356f410b",
-        "signature": "fa4006f4560ab89618849b80f95448a6518e5672da1dd14f0712770be5b3e1dd",
+        "version": "161daf04b2b1e0e8b086734290332754424d162c61409fadc812d65e1b96cba9",
+        "signature": "e55bd14963c94f54334ffaa8c6cd7d764dadf14d8934a9d772afce76d735fe90",
         "affectsGlobalScope": false
       },
       "../node_modules/@types/node/globals.d.ts": {

@@ -48,7 +48,7 @@ class VoiceStateCache extends BaseCache<import("@amanda/discordtypings").VoiceSt
 
 		delete data.member;
 
-		await this.addToIndex(id, guildId);
+		await this.addToIndex(id);
 		await this.storageEngine?.upsert(this.buildId(id, guildId), data);
 		if (this.boundObject) return this;
 		return new VoiceStateCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").VoiceStateData>, data);
@@ -107,8 +107,8 @@ class VoiceStateCache extends BaseCache<import("@amanda/discordtypings").VoiceSt
 	 * Add a voice state to the voicestates index
 	 * @param id id of the voice state
 	 */
-	public async addToIndex(id: string, guildID: string | undefined): Promise<void> {
-		return this.storageEngine?.addToList(this.namespace, this.buildId(id, guildID));
+	public async addToIndex(id: string): Promise<void> {
+		return this.storageEngine?.addToList(this.namespace, id);
 	}
 
 	/**
