@@ -16,8 +16,8 @@ class MemberCache extends BaseCache<import("@amanda/discordtypings").MemberData>
 	 * @param userCache user cache instance
 	 * @param boundObject Bind an object to this instance
 	 */
-	public constructor(storageEngine: BaseStorageEngine<import("@amanda/discordtypings").MemberData>, userCache: import("./UserCache"), boundObject?: import("@amanda/discordtypings").MemberData) {
-		super();
+	public constructor(storageEngine: BaseStorageEngine<import("@amanda/discordtypings").MemberData>, userCache: import("./UserCache"), rain: import("../RainCache")<any, any>, boundObject?: import("@amanda/discordtypings").MemberData) {
+		super(rain);
 		this.storageEngine = storageEngine;
 		this.namespace = "member";
 		this.user = userCache;
@@ -42,7 +42,7 @@ class MemberCache extends BaseCache<import("@amanda/discordtypings").MemberData>
 			return null;
 		}
 		// @ts-ignore
-		return new MemberCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").MemberData>, this.user.bindUserId(member.id), member);
+		return new MemberCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").MemberData>, this.user.bindUserId(member.id), this.rain, member);
 	}
 
 	/**
@@ -76,10 +76,10 @@ class MemberCache extends BaseCache<import("@amanda/discordtypings").MemberData>
 			delete data.user;
 		}
 		await this.addToIndex(id, guildId);
-		await this.storageEngine?.upsert(this.buildId(id, guildId), data);
+		await this.storageEngine?.upsert(this.buildId(id, guildId), this.structurize(data));
 		if (this.boundObject) return this;
 		// @ts-ignore
-		return new MemberCache(this.storageEngine, this.user.bindUserId(data.id), data);
+		return new MemberCache(this.storageEngine, this.user.bindUserId(data.id), this.rain, data);
 	}
 
 	/**
@@ -105,7 +105,7 @@ class MemberCache extends BaseCache<import("@amanda/discordtypings").MemberData>
 	public async filter(fn: (member?: import("@amanda/discordtypings").MemberData, index?: number, array?: Array<import("@amanda/discordtypings").MemberData>) => unknown, guildId = this.boundGuild, ids: Array<string>): Promise<Array<MemberCache>> {
 		const members = await this.storageEngine?.filter(fn, ids, super.buildId(guildId as string));
 		// @ts-ignore
-		return members.map(m => new MemberCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").MemberData>, this.user.bindUserId(m.id), m).bindGuild(this.boundGuild));
+		return members.map(m => new MemberCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").MemberData>, this.user.bindUserId(m.id), this.rain, m).bindGuild(this.boundGuild));
 	}
 
 	/**
@@ -117,7 +117,7 @@ class MemberCache extends BaseCache<import("@amanda/discordtypings").MemberData>
 		const member = await this.storageEngine?.find(fn, ids, super.buildId(guildId as string));
 		if (!member) return null;
 		// @ts-ignore
-		return new MemberCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").MemberData>, this.user.bindUserId(member.id), member);
+		return new MemberCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").MemberData>, this.user.bindUserId(member.id), this.rain, member);
 	}
 
 	/**

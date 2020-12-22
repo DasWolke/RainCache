@@ -42,6 +42,19 @@ class RainCache extends events_1.EventEmitter {
         if (!options.disabledEvents) {
             options.disabledEvents = {};
         }
+        if (!options.structureDefs) {
+            options.structureDefs = {
+                guild: { whitelist: [], blacklist: [] },
+                channel: { whitelist: [], blacklist: [] },
+                member: { whitelist: [], blacklist: [] },
+                user: { whitelist: [], blacklist: [] },
+                role: { whitelist: [], blacklist: [] },
+                emoji: { whitelist: [], blacklist: [] },
+                presence: { whitelist: [], blacklist: [] },
+                permOverwrite: { whitelist: [], blacklist: [] },
+                voiceState: { whitelist: [], blacklist: [] }
+            };
+        }
         this.options = options;
         this.ready = false;
         this.inbound = inboundConnector;
@@ -53,10 +66,16 @@ class RainCache extends events_1.EventEmitter {
             DirectConnector: DirectConnector_1.default
         };
     }
+    get Connectors() {
+        return RainCache.Connectors;
+    }
     static get Engines() {
         return {
             RedisStorageEngine: RedisStorageEngine_1.default
         };
+    }
+    get Engines() {
+        return RainCache.Engines;
     }
     async initialize() {
         try {
@@ -99,7 +118,7 @@ class RainCache extends events_1.EventEmitter {
                 try {
                     await this.eventProcessor.inbound(event);
                     if (this.outbound) {
-                        await this.outbound.send(event);
+                        this.outbound.send(event);
                     }
                 }
                 catch (e) {
@@ -116,43 +135,43 @@ class RainCache extends events_1.EventEmitter {
         const caches = {};
         if (cacheClasses["role"]) {
             const engine = this._getEngine(engines, "role");
-            caches["role"] = new cacheClasses["role"](engine);
+            caches["role"] = new cacheClasses["role"](engine, this);
         }
         if (cacheClasses["emoji"]) {
             const engine = this._getEngine(engines, "emoji");
-            caches["emoji"] = new cacheClasses["emoji"](engine);
+            caches["emoji"] = new cacheClasses["emoji"](engine, this);
         }
         if (cacheClasses["permOverwrite"]) {
             const engine = this._getEngine(engines, "permOverwrite");
-            caches["permOverwrite"] = new cacheClasses["permOverwrite"](engine);
+            caches["permOverwrite"] = new cacheClasses["permOverwrite"](engine, this);
         }
         if (cacheClasses["user"]) {
             const engine = this._getEngine(engines, "user");
-            caches["user"] = new cacheClasses["user"](engine);
+            caches["user"] = new cacheClasses["user"](engine, this);
         }
         if (cacheClasses["member"]) {
             const engine = this._getEngine(engines, "member");
-            caches["member"] = new cacheClasses["member"](engine, caches["user"]);
+            caches["member"] = new cacheClasses["member"](engine, caches["user"], this);
         }
         if (cacheClasses["presence"]) {
             const engine = this._getEngine(engines, "presence");
-            caches["presence"] = new cacheClasses["presence"](engine, caches["user"]);
+            caches["presence"] = new cacheClasses["presence"](engine, caches["user"], this);
         }
         if (cacheClasses["channelMap"]) {
             const engine = this._getEngine(engines, "channelMap");
-            caches["channelMap"] = new cacheClasses["channelMap"](engine);
+            caches["channelMap"] = new cacheClasses["channelMap"](engine, this);
         }
         if (cacheClasses["channel"]) {
             const engine = this._getEngine(engines, "channel");
-            caches["channel"] = new cacheClasses["channel"](engine, caches["channelMap"], caches["permOverwrite"], caches["user"]);
+            caches["channel"] = new cacheClasses["channel"](engine, caches["channelMap"], caches["permOverwrite"], caches["user"], this);
         }
         if (cacheClasses["guild"]) {
             const engine = this._getEngine(engines, "guild");
-            caches["guild"] = new cacheClasses["guild"](engine, caches["channel"], caches["role"], caches["member"], caches["emoji"], caches["presence"], caches["channelMap"]);
+            caches["guild"] = new cacheClasses["guild"](engine, caches["channel"], caches["role"], caches["member"], caches["emoji"], caches["presence"], caches["channelMap"], this);
         }
         if (cacheClasses["voiceState"]) {
             const engine = this._getEngine(engines, "voiceState");
-            caches["voiceState"] = new cacheClasses["voiceState"](engine);
+            caches["voiceState"] = new cacheClasses["voiceState"](engine, this);
         }
         return caches;
     }

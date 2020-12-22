@@ -4,8 +4,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 const BaseCache_1 = __importDefault(require("./BaseCache"));
 class EmojiCache extends BaseCache_1.default {
-    constructor(storageEngine, boundObject) {
-        super();
+    constructor(storageEngine, rain, boundObject) {
+        super(rain);
         this.namespace = "emoji";
         this.storageEngine = storageEngine;
         if (boundObject) {
@@ -19,7 +19,7 @@ class EmojiCache extends BaseCache_1.default {
         }
         const emoji = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.get(this.buildId(id, guildId)));
         if (emoji) {
-            return new EmojiCache(this.storageEngine, emoji);
+            return new EmojiCache(this.storageEngine, this.rain, emoji);
         }
         else {
             return null;
@@ -31,10 +31,10 @@ class EmojiCache extends BaseCache_1.default {
             this.bindObject(data);
         }
         await this.addToIndex(id, guildId);
-        await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.upsert(this.buildId(id, guildId), data));
+        await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.upsert(this.buildId(id, guildId), this.structurize(data)));
         if (this.boundObject)
             return this;
-        return new EmojiCache(this.storageEngine, data);
+        return new EmojiCache(this.storageEngine, this.rain, data);
     }
     async remove(id, guildId = this.boundGuild) {
         var _a, _b;
@@ -54,7 +54,7 @@ class EmojiCache extends BaseCache_1.default {
         const emojis = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.filter(fn, ids, super.buildId(guildId)));
         if (!emojis)
             return [];
-        return emojis.map(e => new EmojiCache(this.storageEngine, e));
+        return emojis.map(e => new EmojiCache(this.storageEngine, this.rain, e));
     }
     async find(fn, guildId, ids) {
         var _a;
@@ -63,7 +63,7 @@ class EmojiCache extends BaseCache_1.default {
         const emoji = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.find(fn, ids, super.buildId(guildId)));
         if (!emoji)
             return null;
-        return new EmojiCache(this.storageEngine, emoji);
+        return new EmojiCache(this.storageEngine, this.rain, emoji);
     }
     buildId(emojiId, guildId) {
         if (!guildId) {

@@ -5,7 +5,7 @@ declare class ChannelCache extends BaseCache<import("../types").Channel> {
     permissionOverwrites: import("./PermissionOverwriteCache");
     recipients: import("./UserCache");
     namespace: "channel";
-    constructor(storageEngine: BaseStorageEngine<import("../types").Channel>, channelMap: import("./ChannelMapCache"), permissionOverwriteCache: import("./PermissionOverwriteCache"), userCache: import("./UserCache"), boundObject?: import("../types").Channel);
+    constructor(storageEngine: BaseStorageEngine<import("../types").Channel>, channelMap: import("./ChannelMapCache"), permissionOverwriteCache: import("./PermissionOverwriteCache"), userCache: import("./UserCache"), rain: import("../RainCache")<any, any>, boundObject?: import("../types").Channel);
     get(id: string): Promise<ChannelCache | null>;
     update(id: string, data: import("../types").Channel): Promise<ChannelCache>;
     remove(id: string): Promise<void>;

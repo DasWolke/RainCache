@@ -24,17 +24,17 @@ import VoiceStateCache from "./cache/VoiceStateCache";
  */
 class RainCache<Inbound extends BaseConnector, Outbound extends BaseConnector> extends EventEmitter {
 	public options: import("./types").RainCacheOptions;
-	ready: boolean;
-	inbound: Inbound;
-	outbound: Outbound;
-	cache: import("./types").Caches;
-	eventProcessor: EventProcessor;
+	public ready: boolean;
+	public inbound: Inbound;
+	public outbound: Outbound;
+	public cache: import("./types").Caches;
+	public eventProcessor: EventProcessor;
 
 	/**
 	 * Create a new Cache instance
 	 * @param options Options that should be used by RainCache
 	 */
-	constructor(options: import("./types").RainCacheOptions, inboundConnector: Inbound, outboundConnector: Outbound) {
+	public constructor(options: import("./types").RainCacheOptions, inboundConnector: Inbound, outboundConnector: Outbound) {
 		super();
 		if (!options.storage) {
 			throw new Error("No storage engines were passed");
@@ -69,26 +69,47 @@ class RainCache<Inbound extends BaseConnector, Outbound extends BaseConnector> e
 		if (!options.disabledEvents) {
 			options.disabledEvents = {};
 		}
+		if (!options.structureDefs) {
+			options.structureDefs = {
+				guild: { whitelist: [], blacklist: [] },
+				channel: { whitelist: [], blacklist: [] },
+				member: { whitelist: [], blacklist: [] },
+				user: { whitelist: [], blacklist: [] },
+				role: { whitelist: [], blacklist: [] },
+				emoji: { whitelist: [], blacklist: [] },
+				presence: { whitelist: [], blacklist: [] },
+				permOverwrite: { whitelist: [], blacklist: [] },
+				voiceState: { whitelist: [], blacklist: [] }
+			};
+		}
 		this.options = options;
 		this.ready = false;
 		this.inbound = inboundConnector;
 		this.outbound = outboundConnector;
 	}
 
-	static get Connectors() {
+	public static get Connectors() {
 		return {
 			AmqpConnector,
 			DirectConnector
 		};
 	}
 
-	static get Engines() {
+	public get Connectors() {
+		return RainCache.Connectors;
+	}
+
+	public static get Engines() {
 		return {
 			RedisStorageEngine
 		};
 	}
 
-	async initialize() {
+	public get Engines() {
+		return RainCache.Engines;
+	}
+
+	public async initialize() {
 		try {
 			for (const engine in this.options.storage) {
 				// eslint-disable-next-line no-prototype-builtins
@@ -130,7 +151,7 @@ class RainCache<Inbound extends BaseConnector, Outbound extends BaseConnector> e
 				try {
 					await this.eventProcessor.inbound(event);
 					if (this.outbound) {
-						await this.outbound.send(event);
+						this.outbound.send(event);
 					}
 				}
 				catch (e) {
@@ -144,52 +165,52 @@ class RainCache<Inbound extends BaseConnector, Outbound extends BaseConnector> e
 		this.ready = true;
 	}
 
-	_createCaches(engines: import("./types").RainCacheOptions["storage"], cacheClasses: import("./types").CacheTypes) {
+	private _createCaches(engines: import("./types").RainCacheOptions["storage"], cacheClasses: import("./types").CacheTypes) {
 		const caches: import("./types").Caches = {} as import("./types").Caches;
 		if (cacheClasses["role"]) {
 			const engine = this._getEngine(engines, "role");
-			caches["role"] = new cacheClasses["role"](engine);
+			caches["role"] = new cacheClasses["role"](engine, this);
 		}
 		if (cacheClasses["emoji"]) {
 			const engine = this._getEngine(engines, "emoji");
-			caches["emoji"] = new cacheClasses["emoji"](engine);
+			caches["emoji"] = new cacheClasses["emoji"](engine, this);
 		}
 		if (cacheClasses["permOverwrite"]) {
 			const engine = this._getEngine(engines, "permOverwrite");
-			caches["permOverwrite"] = new cacheClasses["permOverwrite"](engine);
+			caches["permOverwrite"] = new cacheClasses["permOverwrite"](engine, this);
 		}
 		if (cacheClasses["user"]) {
 			const engine = this._getEngine(engines, "user");
-			caches["user"] = new cacheClasses["user"](engine);
+			caches["user"] = new cacheClasses["user"](engine, this);
 		}
 		if (cacheClasses["member"]) {
 			const engine = this._getEngine(engines, "member");
-			caches["member"] = new cacheClasses["member"](engine, caches["user"]);
+			caches["member"] = new cacheClasses["member"](engine, caches["user"], this);
 		}
 		if (cacheClasses["presence"]) {
 			const engine = this._getEngine(engines, "presence");
-			caches["presence"] = new cacheClasses["presence"](engine, caches["user"]);
+			caches["presence"] = new cacheClasses["presence"](engine, caches["user"], this);
 		}
 		if (cacheClasses["channelMap"]) {
 			const engine = this._getEngine(engines, "channelMap");
-			caches["channelMap"] = new cacheClasses["channelMap"](engine);
+			caches["channelMap"] = new cacheClasses["channelMap"](engine, this);
 		}
 		if (cacheClasses["channel"]) {
 			const engine = this._getEngine(engines, "channel");
-			caches["channel"] = new cacheClasses["channel"](engine, caches["channelMap"], caches["permOverwrite"], caches["user"]);
+			caches["channel"] = new cacheClasses["channel"](engine, caches["channelMap"], caches["permOverwrite"], caches["user"], this);
 		}
 		if (cacheClasses["guild"]) {
 			const engine = this._getEngine(engines, "guild");
-			caches["guild"] = new cacheClasses["guild"](engine, caches["channel"], caches["role"], caches["member"], caches["emoji"], caches["presence"], caches["channelMap"]);
+			caches["guild"] = new cacheClasses["guild"](engine, caches["channel"], caches["role"], caches["member"], caches["emoji"], caches["presence"], caches["channelMap"], this);
 		}
 		if (cacheClasses["voiceState"]) {
 			const engine = this._getEngine(engines, "voiceState");
-			caches["voiceState"] = new cacheClasses["voiceState"](engine);
+			caches["voiceState"] = new cacheClasses["voiceState"](engine, this);
 		}
 		return caches;
 	}
 
-	_getEngine(engines: import("./types").RainCacheOptions["storage"], engine: keyof import("./types").RainCacheOptions["storage"]) {
+	private _getEngine(engines: import("./types").RainCacheOptions["storage"], engine: keyof import("./types").RainCacheOptions["storage"]) {
 		return engines[engine] || engines["default"];
 	}
 }

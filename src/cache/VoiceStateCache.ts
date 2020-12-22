@@ -12,8 +12,8 @@ class VoiceStateCache extends BaseCache<import("@amanda/discordtypings").VoiceSt
 	 * @param storageEngine Storage engine to use for this cache
 	 * @param boundObject Optional, may be used to bind a user object to the cache
 	 */
-	public constructor(storageEngine: BaseStorageEngine<import("@amanda/discordtypings").VoiceStateData>, boundObject?: import("@amanda/discordtypings").VoiceStateData) {
-		super();
+	public constructor(storageEngine: BaseStorageEngine<import("@amanda/discordtypings").VoiceStateData>, rain: import("../RainCache")<any, any>, boundObject?: import("@amanda/discordtypings").VoiceStateData) {
+		super(rain);
 		this.storageEngine = storageEngine;
 		this.namespace = "voicestates";
 		if (boundObject) {
@@ -32,7 +32,7 @@ class VoiceStateCache extends BaseCache<import("@amanda/discordtypings").VoiceSt
 		}
 		const state = await this.storageEngine?.get(this.buildId(id as string, guildId));
 		if (!state) return null;
-		return new VoiceStateCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").VoiceStateData>, state);
+		return new VoiceStateCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").VoiceStateData>, this.rain, state);
 	}
 
 	/**
@@ -49,9 +49,9 @@ class VoiceStateCache extends BaseCache<import("@amanda/discordtypings").VoiceSt
 		delete data.member;
 
 		await this.addToIndex(id);
-		await this.storageEngine?.upsert(this.buildId(id, guildId), data);
+		await this.storageEngine?.upsert(this.buildId(id, guildId), this.structurize(data));
 		if (this.boundObject) return this;
-		return new VoiceStateCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").VoiceStateData>, data);
+		return new VoiceStateCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").VoiceStateData>, this.rain, data);
 	}
 
 	/**
@@ -77,7 +77,7 @@ class VoiceStateCache extends BaseCache<import("@amanda/discordtypings").VoiceSt
 	public async filter(fn: (state?: import("@amanda/discordtypings").VoiceStateData, index?: number, array?: Array<import("@amanda/discordtypings").VoiceStateData>) => unknown, ids: Array<string> | undefined = undefined): Promise<Array<VoiceStateCache>> {
 		const states = await this.storageEngine?.filter(fn, ids, this.namespace);
 		if (!states) return [];
-		return states.map(s => new VoiceStateCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").VoiceStateData>, s));
+		return states.map(s => new VoiceStateCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").VoiceStateData>, this.rain, s));
 	}
 
 	/**
@@ -89,7 +89,7 @@ class VoiceStateCache extends BaseCache<import("@amanda/discordtypings").VoiceSt
 	public async find(fn: (state?: import("@amanda/discordtypings").VoiceStateData, index?: number, array?: Array<string>) => unknown, ids: Array<string> | undefined = undefined): Promise<VoiceStateCache | null> {
 		const state = await this.storageEngine?.find(fn, ids, this.namespace);
 		if (!state) return null;
-		return new VoiceStateCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").VoiceStateData>, state);
+		return new VoiceStateCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").VoiceStateData>, this.rain, state);
 	}
 
 	/**

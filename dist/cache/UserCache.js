@@ -4,17 +4,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 const BaseCache_1 = __importDefault(require("./BaseCache"));
 class UserCache extends BaseCache_1.default {
-    constructor(storageEngine, boundObject) {
-        super();
+    constructor(storageEngine, rain, boundObject) {
+        super(rain);
         this.storageEngine = storageEngine;
         this.namespace = "user";
         if (boundObject) {
             this.bindObject(boundObject);
         }
     }
-    async get(id) {
+    async get(id = (_a = this.boundObject) === null || _a === void 0 ? void 0 : _a.id) {
         var _a, _b;
-        if (id === void 0) { id = (_a = this.boundObject) === null || _a === void 0 ? void 0 : _a.id; }
         if (this.boundObject) {
             return this;
         }
@@ -22,23 +21,21 @@ class UserCache extends BaseCache_1.default {
         if (!user) {
             return null;
         }
-        return new UserCache(this.storageEngine, user);
+        return new UserCache(this.storageEngine, this.rain, user);
     }
-    async update(id, data) {
+    async update(id = (_a = this.boundObject) === null || _a === void 0 ? void 0 : _a.id, data) {
         var _a, _b;
-        if (id === void 0) { id = (_a = this.boundObject) === null || _a === void 0 ? void 0 : _a.id; }
         if (this.boundObject) {
             this.bindObject(data);
         }
         await this.addToIndex(id);
-        await ((_b = this.storageEngine) === null || _b === void 0 ? void 0 : _b.upsert(this.buildId(id), data));
+        await ((_b = this.storageEngine) === null || _b === void 0 ? void 0 : _b.upsert(this.buildId(id), this.structurize(data)));
         if (this.boundObject)
             return this;
-        return new UserCache(this.storageEngine, data);
+        return new UserCache(this.storageEngine, this.rain, data);
     }
-    async remove(id) {
+    async remove(id = (_a = this.boundObject) === null || _a === void 0 ? void 0 : _a.id) {
         var _a, _b, _c;
-        if (id === void 0) { id = (_a = this.boundObject) === null || _a === void 0 ? void 0 : _a.id; }
         const user = await ((_b = this.storageEngine) === null || _b === void 0 ? void 0 : _b.get(this.buildId(id)));
         if (user) {
             await this.removeFromIndex(id);
@@ -53,14 +50,14 @@ class UserCache extends BaseCache_1.default {
         const users = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.filter(fn, ids, this.namespace));
         if (!users)
             return [];
-        return users.map(u => new UserCache(this.storageEngine, u));
+        return users.map(u => new UserCache(this.storageEngine, this.rain, u));
     }
     async find(fn, ids = undefined) {
         var _a;
         const user = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.find(fn, ids, this.namespace));
         if (!user)
             return null;
-        return new UserCache(this.storageEngine, user);
+        return new UserCache(this.storageEngine, this.rain, user);
     }
     bindUserId(userId) {
         this.id = userId;

@@ -14,8 +14,8 @@ class ChannelMapCache extends BaseCache<import("../types").ChannelMap> {
 	 * @param storageEngine storage engine to use for this cache
 	 * @param boundObject Optional, may be used to bind the map object to the cache
 	 */
-	public constructor(storageEngine: BaseStorageEngine<import("../types").ChannelMap>, boundObject?: import("../types").ChannelMap) {
-		super();
+	public constructor(storageEngine: BaseStorageEngine<import("../types").ChannelMap>, rain: import("../RainCache")<any, any>, boundObject?: import("../types").ChannelMap) {
+		super(rain);
 		this.storageEngine = storageEngine;
 		this.namespace = "channelmap";
 		if (boundObject) {
@@ -35,7 +35,7 @@ class ChannelMapCache extends BaseCache<import("../types").ChannelMap> {
 		const channelMapId = this.buildId(this._buildMapId(id, type));
 		const channelMap = await this.storageEngine?.getListMembers(channelMapId);
 		if (channelMap) {
-			return new ChannelMapCache(this.storageEngine as BaseStorageEngine<import("../types").ChannelMap>, this._buildMap(id, channelMap, type));
+			return new ChannelMapCache(this.storageEngine as BaseStorageEngine<import("../types").ChannelMap>, this.rain, this._buildMap(id, channelMap, type));
 		} else {
 			return null;
 		}
@@ -67,9 +67,9 @@ class ChannelMapCache extends BaseCache<import("../types").ChannelMap> {
 		}
 		const channelMapId = this.buildId(this._buildMapId(id, type));
 		await this.remove(id, type);
-		await Promise.all(data.map(id => this.storageEngine?.addToList(channelMapId, id)));
+		await Promise.all(data.map(i => this.storageEngine?.addToList(channelMapId, i)));
 		if (this.boundObject) return this;
-		return new ChannelMapCache(this.storageEngine as BaseStorageEngine<import("../types").ChannelMap>, this._buildMap(id, data, type));
+		return new ChannelMapCache(this.storageEngine as BaseStorageEngine<import("../types").ChannelMap>, this.rain, this._buildMap(id, data, type));
 	}
 
 	/**

@@ -1,5 +1,4 @@
 import BaseStorageEngine from "./storageEngine/BaseStorageEngine";
-import BaseCache from "./cache/BaseCache";
 export interface Caches {
     guild: import("./cache/GuildCache");
     channel: import("./cache/ChannelCache");
@@ -43,17 +42,32 @@ export interface RainCacheOptions {
         [event: string]: boolean;
     };
     cacheClasses?: {
-        guild?: typeof BaseCache;
-        channel?: typeof BaseCache;
-        member?: typeof BaseCache;
-        role?: typeof BaseCache;
-        user?: typeof BaseCache;
-        emoji?: typeof BaseCache;
-        channelMap?: typeof BaseCache;
-        presence?: typeof BaseCache;
-        permOverwrite?: typeof BaseCache;
-        voiceState?: typeof BaseCache;
+        guild?: any;
+        channel?: any;
+        member?: any;
+        role?: any;
+        user?: any;
+        emoji?: any;
+        channelMap?: any;
+        presence?: any;
+        permOverwrite?: any;
+        voiceState?: any;
     };
+    structureDefs?: {
+        guild?: StructureOptions<import("@amanda/discordtypings").GuildData>;
+        channel?: StructureOptions<import("@amanda/discordtypings").ChannelData>;
+        member?: StructureOptions<import("@amanda/discordtypings").MemberData>;
+        role?: StructureOptions<import("@amanda/discordtypings").RoleData>;
+        user?: StructureOptions<import("@amanda/discordtypings").UserData>;
+        emoji?: StructureOptions<import("@amanda/discordtypings").EmojiData>;
+        presence?: StructureOptions<import("@amanda/discordtypings").PresenceData>;
+        permOverwrite?: StructureOptions<import("@amanda/discordtypings").PermissionOverwriteData>;
+        voiceState?: StructureOptions<import("@amanda/discordtypings").VoiceStateData>;
+    };
+}
+export interface StructureOptions<T> {
+    whitelist?: Array<keyof T>;
+    blacklist?: Array<keyof T>;
 }
 export interface RedisStorageOptions {
     useHash?: boolean;

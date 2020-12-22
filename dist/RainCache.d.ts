@@ -17,11 +17,18 @@ declare class RainCache<Inbound extends BaseConnector, Outbound extends BaseConn
         AmqpConnector: typeof AmqpConnector;
         DirectConnector: typeof DirectConnector;
     };
+    get Connectors(): {
+        AmqpConnector: typeof AmqpConnector;
+        DirectConnector: typeof DirectConnector;
+    };
     static get Engines(): {
         RedisStorageEngine: typeof RedisStorageEngine;
     };
+    get Engines(): {
+        RedisStorageEngine: typeof RedisStorageEngine;
+    };
     initialize(): Promise<void>;
-    _createCaches(engines: import("./types").RainCacheOptions["storage"], cacheClasses: import("./types").CacheTypes): import("./types").Caches;
-    _getEngine(engines: import("./types").RainCacheOptions["storage"], engine: keyof import("./types").RainCacheOptions["storage"]): import("./storageEngine/BaseStorageEngine")<any>;
+    private _createCaches;
+    private _getEngine;
 }
 export = RainCache;

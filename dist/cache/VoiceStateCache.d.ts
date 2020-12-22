@@ -1,7 +1,7 @@
 import BaseCache from "./BaseCache";
 import BaseStorageEngine from "../storageEngine/BaseStorageEngine";
 declare class VoiceStateCache extends BaseCache<import("@amanda/discordtypings").VoiceStateData> {
-    constructor(storageEngine: BaseStorageEngine<import("@amanda/discordtypings").VoiceStateData>, boundObject?: import("@amanda/discordtypings").VoiceStateData);
+    constructor(storageEngine: BaseStorageEngine<import("@amanda/discordtypings").VoiceStateData>, rain: import("../RainCache")<any, any>, boundObject?: import("@amanda/discordtypings").VoiceStateData);
     get(id: string | undefined, guildId: string): Promise<VoiceStateCache | null>;
     update(id: string, guildId: string, data: import("@amanda/discordtypings").VoiceStateData): Promise<VoiceStateCache>;
     remove(id: string | undefined, guildId: string): Promise<void>;

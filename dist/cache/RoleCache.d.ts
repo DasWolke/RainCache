@@ -2,7 +2,7 @@ import BaseCache from "./BaseCache";
 import BaseStorageEngine from "../storageEngine/BaseStorageEngine";
 declare class RoleCache extends BaseCache<import("@amanda/discordtypings").RoleData> {
     namespace: "role";
-    constructor(storageEngine: BaseStorageEngine<import("@amanda/discordtypings").RoleData>, boundObject?: import("@amanda/discordtypings").RoleData);
+    constructor(storageEngine: BaseStorageEngine<import("@amanda/discordtypings").RoleData>, rain: import("../RainCache")<any, any>, boundObject?: import("@amanda/discordtypings").RoleData);
     get(id: string, guildId: string): Promise<RoleCache | null>;
     update(id: string, guildId: string, data: import("@amanda/discordtypings").RoleData): Promise<RoleCache>;
     remove(id: string, guildId: string): Promise<void>;

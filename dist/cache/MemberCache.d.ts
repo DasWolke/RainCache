@@ -3,7 +3,7 @@ import BaseStorageEngine from "../storageEngine/BaseStorageEngine";
 declare class MemberCache extends BaseCache<import("@amanda/discordtypings").MemberData> {
     namespace: "member";
     user: import("./UserCache");
-    constructor(storageEngine: BaseStorageEngine<import("@amanda/discordtypings").MemberData>, userCache: import("./UserCache"), boundObject?: import("@amanda/discordtypings").MemberData);
+    constructor(storageEngine: BaseStorageEngine<import("@amanda/discordtypings").MemberData>, userCache: import("./UserCache"), rain: import("../RainCache")<any, any>, boundObject?: import("@amanda/discordtypings").MemberData);
     get(id: string, guildId?: string | undefined): Promise<MemberCache | null>;
     update(id: string, guildId: string | undefined, data: import("@amanda/discordtypings").MemberData): Promise<MemberCache>;
     remove(id: string, guildId?: string | undefined): Promise<void>;

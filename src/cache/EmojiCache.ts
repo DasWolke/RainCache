@@ -14,8 +14,8 @@ class EmojiCache extends BaseCache<import("@amanda/discordtypings").EmojiData> {
 	 * @param storageEngine storage engine to use for this cache
 	 * @param boundObject Optional, may be used to bind an emoji object to the cache
 	 */
-	public constructor(storageEngine: BaseStorageEngine<import("@amanda/discordtypings").EmojiData>, boundObject?: import("@amanda/discordtypings").EmojiData) {
-		super();
+	public constructor(storageEngine: BaseStorageEngine<import("@amanda/discordtypings").EmojiData>, rain: import("../RainCache")<any, any>, boundObject?: import("@amanda/discordtypings").EmojiData) {
+		super(rain);
 		this.namespace = "emoji";
 		this.storageEngine = storageEngine;
 		if (boundObject) {
@@ -35,7 +35,7 @@ class EmojiCache extends BaseCache<import("@amanda/discordtypings").EmojiData> {
 		}
 		const emoji = await this.storageEngine?.get(this.buildId(id, guildId));
 		if (emoji) {
-			return new EmojiCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").EmojiData>, emoji);
+			return new EmojiCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").EmojiData>, this.rain, emoji);
 		} else {
 			return null;
 		}
@@ -53,9 +53,9 @@ class EmojiCache extends BaseCache<import("@amanda/discordtypings").EmojiData> {
 			this.bindObject(data);
 		}
 		await this.addToIndex(id, guildId);
-		await this.storageEngine?.upsert(this.buildId(id, guildId), data);
+		await this.storageEngine?.upsert(this.buildId(id, guildId), this.structurize(data));
 		if (this.boundObject) return this;
-		return new EmojiCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").EmojiData>, data);
+		return new EmojiCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").EmojiData>, this.rain, data);
 	}
 
 	/**
@@ -84,7 +84,7 @@ class EmojiCache extends BaseCache<import("@amanda/discordtypings").EmojiData> {
 		if (!guildId && this.boundGuild) guildId = this.boundGuild;
 		const emojis = await this.storageEngine?.filter(fn, ids, super.buildId(guildId as string));
 		if (!emojis) return [];
-		return emojis.map(e => new EmojiCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").EmojiData>, e));
+		return emojis.map(e => new EmojiCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").EmojiData>, this.rain, e));
 	}
 
 	/**
@@ -98,7 +98,7 @@ class EmojiCache extends BaseCache<import("@amanda/discordtypings").EmojiData> {
 		if (!guildId && this.boundGuild) guildId = this.boundGuild;
 		const emoji = await this.storageEngine?.find(fn, ids, super.buildId(guildId));
 		if (!emoji) return null;
-		return new EmojiCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").EmojiData>, emoji);
+		return new EmojiCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").EmojiData>, this.rain, emoji);
 	}
 
 	/**

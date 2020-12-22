@@ -1,9 +1,10 @@
 "use strict";
 class BaseCache {
-    constructor() {
+    constructor(rain) {
         this.boundObject = null;
         this.storageEngine = null;
         this.namespace = "base";
+        this.rain = rain;
     }
     bindObject(boundObject) {
         this.dataTimestamp = new Date();
@@ -38,6 +39,37 @@ class BaseCache {
     }
     async getIndexCount(objectId = this.boundGuild) {
         return this.storageEngine.getListCount(this.buildId(objectId));
+    }
+    structurize(data) {
+        if (this.namespace === "base")
+            throw new Error("Do not call structurize in BaseCache instances. Only extensions.");
+        let ns = this.namespace;
+        if (this.namespace === "permissionoverwrite")
+            ns = "permOverwrite";
+        else if (this.namespace === "voicestates")
+            ns = "voiceState";
+        const structDefs = this.rain.options.structureDefs;
+        if (!structDefs)
+            throw new Error("Did you delete the structureDefs property from your RainCache instance?");
+        const options = structDefs[ns];
+        if (!options)
+            throw new Error(`Unknown structure: ${ns}`);
+        const keys = Object.keys(data);
+        if (options.whitelist.length) {
+            for (const key of keys) {
+                if (!options.whitelist.includes(key))
+                    delete data[key];
+            }
+        }
+        else {
+            if (options.blacklist.length) {
+                for (const key of keys) {
+                    if (options.blacklist.includes(key))
+                        delete data[key];
+                }
+            }
+        }
+        return data;
     }
 }
 module.exports = BaseCache;

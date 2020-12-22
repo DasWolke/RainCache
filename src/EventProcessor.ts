@@ -13,7 +13,9 @@ class EventProcessor extends EventEmitter {
 	public permOverwriteCache?: import("./cache/PermissionOverwriteCache");
 	public voiceStateCache?: import("./cache/VoiceStateCache");
 	public ready: boolean;
-	public presenceQueue: any;
+	public presenceQueue: {
+		[key: string]: { status: number; game: import("@amanda/discordtypings").ActivityData; id: string; user: import("@amanda/discordtypings").UserData };
+	};
 	public presenceFlush: NodeJS.Timeout;
 
 	public constructor(options: import("./types").EventProcessorOptions = { disabledEvents: {}, presenceInterval: 1000 * 5 }) {
@@ -40,10 +42,7 @@ class EventProcessor extends EventEmitter {
 	}
 
 	public async inbound(event: import("./types").DiscordPacket) {
-		if (this.options.disabledEvents[event.t]) {
-			return event;
-		}
-		await this.process(event);
+		if (!this.options.disabledEvents[event.t]) await this.process(event);
 		return event;
 	}
 
@@ -198,6 +197,8 @@ class EventProcessor extends EventEmitter {
 		case 0:
 		case 2:
 		case 4:
+		case 5:
+		case 6:
 			await this.channelMapCache?.update(channelCreateEvent.d.guild_id, [channelCreateEvent.d.id], "guild");
 			// this.emit('debug', `Caching guild channel ${channelCreateEvent.d.id}`);
 			return this.channelCache?.update(channelCreateEvent.d.id, channelCreateEvent.d);
@@ -220,6 +221,8 @@ class EventProcessor extends EventEmitter {
 		switch (channelDeleteEvent.d.type) {
 		case 0:
 		case 2:
+		case 5:
+		case 6:
 			await this.channelMapCache?.update(channelDeleteEvent.d.guild_id, [channelDeleteEvent.d.id], "guild", true);
 			return this.channelCache?.remove(channelDeleteEvent.d.id);
 		default:
@@ -238,6 +241,7 @@ class EventProcessor extends EventEmitter {
 		for (const key in queue) {
 			// eslint-disable-next-line no-prototype-builtins
 			if (queue.hasOwnProperty(key)) {
+				// @ts-ignore
 				presenceUpdatePromises.push(this.presenceCache?.update(key, queue[key]));
 			}
 		}

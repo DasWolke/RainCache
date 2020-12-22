@@ -4,8 +4,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 const BaseCache_1 = __importDefault(require("./BaseCache"));
 class ChannelCache extends BaseCache_1.default {
-    constructor(storageEngine, channelMap, permissionOverwriteCache, userCache, boundObject) {
-        super();
+    constructor(storageEngine, channelMap, permissionOverwriteCache, userCache, rain, boundObject) {
+        super(rain);
         this.storageEngine = storageEngine;
         this.namespace = "channel";
         this.channelMap = channelMap;
@@ -22,7 +22,7 @@ class ChannelCache extends BaseCache_1.default {
         }
         const channel = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.get(this.buildId(id)));
         if (channel) {
-            return new ChannelCache(this.storageEngine, this.channelMap, this.permissionOverwrites.bindChannel(channel.id), this.recipients, channel);
+            return new ChannelCache(this.storageEngine, this.channelMap, this.permissionOverwrites.bindChannel(channel.id), this.recipients, this.rain, channel);
         }
         else {
             return null;
@@ -49,12 +49,12 @@ class ChannelCache extends BaseCache_1.default {
         delete data.permission_overwrites;
         delete data.recipients;
         await this.addToIndex(id);
-        await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.upsert(this.buildId(id), data));
+        await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.upsert(this.buildId(id), this.structurize(data)));
         if (this.boundObject)
             return this;
         const channel = await ((_b = this.storageEngine) === null || _b === void 0 ? void 0 : _b.get(this.buildId(id)));
         if (channel)
-            return new ChannelCache(this.storageEngine, this.channelMap, this.permissionOverwrites.bindChannel(channel.id), this.recipients, channel);
+            return new ChannelCache(this.storageEngine, this.channelMap, this.permissionOverwrites.bindChannel(channel.id), this.recipients, this.rain, channel);
         else
             return this;
     }
@@ -72,14 +72,14 @@ class ChannelCache extends BaseCache_1.default {
     async filter(fn, channelMap) {
         var _a;
         const channels = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.filter(fn, channelMap, this.namespace)) || [];
-        return channels.map(c => new ChannelCache(this.storageEngine, this.channelMap, this.permissionOverwrites.bindChannel(c.id), this.recipients, c));
+        return channels.map(c => new ChannelCache(this.storageEngine, this.channelMap, this.permissionOverwrites.bindChannel(c.id), this.recipients, this.rain, c));
     }
     async find(fn, channelMap) {
         var _a;
         const channel = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.find(fn, channelMap, this.namespace));
         if (!channel)
             return null;
-        return new ChannelCache(this.storageEngine, this.channelMap, this.permissionOverwrites.bindChannel(channel.id), this.recipients, channel);
+        return new ChannelCache(this.storageEngine, this.channelMap, this.permissionOverwrites.bindChannel(channel.id), this.recipients, this.rain, channel);
     }
     async addToIndex(id) {
         var _a;

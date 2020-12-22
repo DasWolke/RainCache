@@ -8,7 +8,7 @@ declare class GuildCache extends BaseCache<import("@amanda/discordtypings").Guil
     presences: import("./PresenceCache");
     guildChannelMap: import("./ChannelMapCache");
     namespace: "guild";
-    constructor(storageEngine: BaseStorageEngine<import("@amanda/discordtypings").GuildData>, channelCache: import("./ChannelCache"), roleCache: import("./RoleCache"), memberCache: import("./MemberCache"), emojiCache: import("./EmojiCache"), presenceCache: import("./PresenceCache"), guildToChannelCache: import("./ChannelMapCache"), boundObject?: import("@amanda/discordtypings").GuildData);
+    constructor(storageEngine: BaseStorageEngine<import("@amanda/discordtypings").GuildData>, channelCache: import("./ChannelCache"), roleCache: import("./RoleCache"), memberCache: import("./MemberCache"), emojiCache: import("./EmojiCache"), presenceCache: import("./PresenceCache"), guildToChannelCache: import("./ChannelMapCache"), rain: import("../RainCache")<any, any>, boundObject?: import("@amanda/discordtypings").GuildData);
     get(id: string): Promise<GuildCache | null>;
     update(id: string, data: import("@amanda/discordtypings").GuildData): Promise<GuildCache>;
     remove(id: string): Promise<void>;

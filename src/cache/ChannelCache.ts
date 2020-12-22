@@ -20,8 +20,8 @@ class ChannelCache extends BaseCache<import("../types").Channel> {
 	 * @param userCache Instantiated UserCache class
 	 * @param boundObject Optional, may be used to bind a channel object to this cache
 	 */
-	public constructor(storageEngine: BaseStorageEngine<import("../types").Channel>, channelMap: import("./ChannelMapCache"), permissionOverwriteCache: import("./PermissionOverwriteCache"), userCache: import("./UserCache"), boundObject?: import("../types").Channel) {
-		super();
+	public constructor(storageEngine: BaseStorageEngine<import("../types").Channel>, channelMap: import("./ChannelMapCache"), permissionOverwriteCache: import("./PermissionOverwriteCache"), userCache: import("./UserCache"), rain: import("../RainCache")<any, any>, boundObject?: import("../types").Channel) {
+		super(rain);
 		this.storageEngine = storageEngine;
 		this.namespace = "channel";
 		this.channelMap = channelMap;
@@ -43,7 +43,7 @@ class ChannelCache extends BaseCache<import("../types").Channel> {
 		}
 		const channel = await this.storageEngine?.get(this.buildId(id));
 		if (channel) {
-			return new ChannelCache(this.storageEngine as BaseStorageEngine<import("../types").Channel>, this.channelMap, this.permissionOverwrites.bindChannel(channel.id), this.recipients, channel);
+			return new ChannelCache(this.storageEngine as BaseStorageEngine<import("../types").Channel>, this.channelMap, this.permissionOverwrites.bindChannel(channel.id), this.recipients, this.rain, channel);
 		} else {
 			return null;
 		}
@@ -73,10 +73,10 @@ class ChannelCache extends BaseCache<import("../types").Channel> {
 		delete data.permission_overwrites;
 		delete data.recipients;
 		await this.addToIndex(id);
-		await this.storageEngine?.upsert(this.buildId(id), data);
+		await this.storageEngine?.upsert(this.buildId(id), this.structurize(data));
 		if (this.boundObject) return this;
 		const channel = await this.storageEngine?.get(this.buildId(id));
-		if (channel) return new ChannelCache(this.storageEngine as BaseStorageEngine<import("../types").Channel>, this.channelMap, this.permissionOverwrites.bindChannel(channel.id), this.recipients, channel);
+		if (channel) return new ChannelCache(this.storageEngine as BaseStorageEngine<import("../types").Channel>, this.channelMap, this.permissionOverwrites.bindChannel(channel.id), this.recipients, this.rain, channel);
 		else return this;
 	}
 
@@ -102,7 +102,7 @@ class ChannelCache extends BaseCache<import("../types").Channel> {
 	 */
 	public async filter(fn: (channel?: import("../types").Channel, index?: number, array?: Array<import("../types").Channel>) => unknown, channelMap?: Array<string>): Promise<Array<ChannelCache>> {
 		const channels = await this.storageEngine?.filter(fn, channelMap, this.namespace) || [];
-		return channels.map(c => new ChannelCache(this.storageEngine as BaseStorageEngine<import("../types").Channel>, this.channelMap, this.permissionOverwrites.bindChannel(c.id), this.recipients, c));
+		return channels.map(c => new ChannelCache(this.storageEngine as BaseStorageEngine<import("../types").Channel>, this.channelMap, this.permissionOverwrites.bindChannel(c.id), this.recipients, this.rain, c));
 	}
 
 	/**
@@ -114,7 +114,7 @@ class ChannelCache extends BaseCache<import("../types").Channel> {
 	public async find(fn: (channel?: import("@amanda/discordtypings").ChannelData) => unknown, channelMap: Array<string>): Promise<ChannelCache | null> {
 		const channel = await this.storageEngine?.find(fn, channelMap, this.namespace);
 		if (!channel) return null;
-		return new ChannelCache(this.storageEngine as BaseStorageEngine<import("../types").Channel>, this.channelMap, this.permissionOverwrites.bindChannel(channel.id), this.recipients, channel);
+		return new ChannelCache(this.storageEngine as BaseStorageEngine<import("../types").Channel>, this.channelMap, this.permissionOverwrites.bindChannel(channel.id), this.recipients, this.rain, channel);
 	}
 
 	/**

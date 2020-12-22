@@ -4,8 +4,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 const BaseCache_1 = __importDefault(require("./BaseCache"));
 class RoleCache extends BaseCache_1.default {
-    constructor(storageEngine, boundObject) {
-        super();
+    constructor(storageEngine, rain, boundObject) {
+        super(rain);
         this.storageEngine = storageEngine;
         this.namespace = "role";
         if (boundObject) {
@@ -21,7 +21,7 @@ class RoleCache extends BaseCache_1.default {
         if (!role) {
             return null;
         }
-        return new RoleCache(this.storageEngine, role);
+        return new RoleCache(this.storageEngine, this.rain, role);
     }
     async update(id, guildId, data) {
         var _a;
@@ -38,10 +38,10 @@ class RoleCache extends BaseCache_1.default {
             data.id = id;
         }
         await this.addToIndex(id, guildId);
-        await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.upsert(this.buildId(id, guildId), data));
+        await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.upsert(this.buildId(id, guildId), this.structurize(data)));
         if (this.boundObject)
             return this;
-        return new RoleCache(this.storageEngine, data);
+        return new RoleCache(this.storageEngine, this.rain, data);
     }
     async remove(id, guildId) {
         var _a, _b;
@@ -59,14 +59,14 @@ class RoleCache extends BaseCache_1.default {
         const roles = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.filter(fn, ids, super.buildId(guildId)));
         if (!roles)
             return [];
-        return roles.map(r => new RoleCache(this.storageEngine, r));
+        return roles.map(r => new RoleCache(this.storageEngine, this.rain, r));
     }
     async find(fn, guildId = this.boundGuild, ids = undefined) {
         var _a;
         const role = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.find(fn, ids, super.buildId(guildId)));
         if (!role)
             return null;
-        return new RoleCache(this.storageEngine, role);
+        return new RoleCache(this.storageEngine, this.rain, role);
     }
     buildId(roleId, guildId) {
         if (!guildId) {

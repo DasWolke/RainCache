@@ -16,8 +16,8 @@ class PermissionOverwriteCache extends BaseCache<any> {
 	 * @param storageEngine Storage engine to use for this cache
 	 * @param boundObject Optional, may be used to bind a permission overwrite object to this cache
 	 */
-	public constructor(storageEngine: BaseStorageEngine<any>, boundObject?: any) {
-		super();
+	public constructor(storageEngine: BaseStorageEngine<any>, rain: import("../RainCache")<any, any>, boundObject?: any) {
+		super(rain);
 		this.storageEngine = storageEngine;
 		this.namespace = "permissionoverwrite";
 		this.boundChannel = "";
@@ -38,7 +38,7 @@ class PermissionOverwriteCache extends BaseCache<any> {
 		}
 		const permissionOverwrite = await this.storageEngine?.get(this.buildId(id, channelId));
 		if (permissionOverwrite) {
-			return new PermissionOverwriteCache(this.storageEngine as BaseStorageEngine<any>, permissionOverwrite);
+			return new PermissionOverwriteCache(this.storageEngine as BaseStorageEngine<any>, this.rain, permissionOverwrite);
 		} else {
 			return null;
 		}
@@ -56,9 +56,9 @@ class PermissionOverwriteCache extends BaseCache<any> {
 			this.bindObject(data);
 		}
 		await super.addToIndex(id, channelId);
-		await this.storageEngine?.upsert(this.buildId(id, channelId), data);
+		await this.storageEngine?.upsert(this.buildId(id, channelId), this.structurize(data));
 		if (this.boundObject) return this;
-		return new PermissionOverwriteCache(this.storageEngine as BaseStorageEngine<any>, data);
+		return new PermissionOverwriteCache(this.storageEngine as BaseStorageEngine<any>, this.rain, data);
 	}
 
 	/**
@@ -86,7 +86,7 @@ class PermissionOverwriteCache extends BaseCache<any> {
 	public async filter(fn: (overwrite?: any, index?: number, array?: Array<any>) => unknown, channelId: string = this.boundChannel, ids: Array<string> | undefined = undefined): Promise<Array<PermissionOverwriteCache>> {
 		const permissionOverwrites = await this.storageEngine?.filter(fn, ids, super.buildId(channelId));
 		if (!permissionOverwrites) return [];
-		return permissionOverwrites.map(p => new PermissionOverwriteCache(this.storageEngine as BaseStorageEngine<any>, p));
+		return permissionOverwrites.map(p => new PermissionOverwriteCache(this.storageEngine as BaseStorageEngine<any>, this.rain, p));
 	}
 
 	/**
@@ -99,7 +99,7 @@ class PermissionOverwriteCache extends BaseCache<any> {
 	public async find(fn: (overwrite?: any, index?: any, array?: Array<string>) => unknown, channelId: string = this.boundChannel, ids: Array<string> | undefined = undefined): Promise<PermissionOverwriteCache | null> {
 		const permissionOverwrite = await this.storageEngine?.find(fn, ids, super.buildId(channelId));
 		if (!permissionOverwrite) return null;
-		return new PermissionOverwriteCache(this.storageEngine as BaseStorageEngine<any>, permissionOverwrite);
+		return new PermissionOverwriteCache(this.storageEngine as BaseStorageEngine<any>, this.rain, permissionOverwrite);
 	}
 
 	/**

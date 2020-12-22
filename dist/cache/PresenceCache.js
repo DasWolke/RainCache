@@ -4,8 +4,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 const BaseCache_1 = __importDefault(require("./BaseCache"));
 class PresenceCache extends BaseCache_1.default {
-    constructor(storageEngine, userCache, boundObject) {
-        super();
+    constructor(storageEngine, userCache, rain, boundObject) {
+        super(rain);
         this.storageEngine = storageEngine;
         this.namespace = "presence";
         this.users = userCache;
@@ -20,7 +20,7 @@ class PresenceCache extends BaseCache_1.default {
         }
         const presence = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.get(this.buildId(id)));
         if (presence) {
-            return new PresenceCache(this.storageEngine, this.users.bindUserId(id), presence);
+            return new PresenceCache(this.storageEngine, this.users.bindUserId(id), this.rain, presence);
         }
         else {
             return null;
@@ -41,10 +41,10 @@ class PresenceCache extends BaseCache_1.default {
             await this.users.update(data.user.id, data.user);
             delete data.user;
         }
-        await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.upsert(this.buildId(id), data));
+        await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.upsert(this.buildId(id), this.structurize(data)));
         if (this.boundObject)
             return this;
-        return new PresenceCache(this.storageEngine, this.users, data);
+        return new PresenceCache(this.storageEngine, this.users, this.rain, data);
     }
     async remove(id) {
         var _a, _b;

@@ -23,7 +23,7 @@ Then run the following command in a terminal `npm install raincache`
 
 #### Example:
 ```js
-const RainCache = require('raincache');
+const RainCache = require("raincache");
 // Load the Amqp Connector
 const AmqpConnector = RainCache.Connectors.AmqpConnector;
 // Load the redis storage engine class
@@ -36,7 +36,7 @@ const cache = new RainCache({
 	storage: {
 		default: new RedisStorageEngine({
 			redisOptions: {
-				host: 'localhost'
+				host: "localhost"
 			}
 		})
 	}, debug: false},
@@ -48,7 +48,7 @@ const init = async () => {
 };
 // Declare an asynchronous init method
 init().then(() => {
-	console.log('Cache initialized');
+	console.log("Cache initialized");
 }).catch(e => console.error(e));
 // Run the init function
 ```

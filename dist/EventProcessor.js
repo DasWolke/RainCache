@@ -25,10 +25,8 @@ class EventProcessor extends events_1.EventEmitter {
         }, this.options.presenceInterval);
     }
     async inbound(event) {
-        if (this.options.disabledEvents[event.t]) {
-            return event;
-        }
-        await this.process(event);
+        if (!this.options.disabledEvents[event.t])
+            await this.process(event);
         return event;
     }
     async process(event) {
@@ -184,6 +182,8 @@ class EventProcessor extends events_1.EventEmitter {
             case 0:
             case 2:
             case 4:
+            case 5:
+            case 6:
                 await ((_a = this.channelMapCache) === null || _a === void 0 ? void 0 : _a.update(channelCreateEvent.d.guild_id, [channelCreateEvent.d.id], "guild"));
                 return (_b = this.channelCache) === null || _b === void 0 ? void 0 : _b.update(channelCreateEvent.d.id, channelCreateEvent.d);
             default:
@@ -203,6 +203,8 @@ class EventProcessor extends events_1.EventEmitter {
         switch (channelDeleteEvent.d.type) {
             case 0:
             case 2:
+            case 5:
+            case 6:
                 await ((_a = this.channelMapCache) === null || _a === void 0 ? void 0 : _a.update(channelDeleteEvent.d.guild_id, [channelDeleteEvent.d.id], "guild", true));
                 return (_b = this.channelCache) === null || _b === void 0 ? void 0 : _b.remove(channelDeleteEvent.d.id);
             default:

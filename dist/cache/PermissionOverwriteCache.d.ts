@@ -3,7 +3,7 @@ import BaseStorageEngine from "../storageEngine/BaseStorageEngine";
 declare class PermissionOverwriteCache extends BaseCache<any> {
     boundChannel: string;
     namespace: "permissionoverwrite";
-    constructor(storageEngine: BaseStorageEngine<any>, boundObject?: any);
+    constructor(storageEngine: BaseStorageEngine<any>, rain: import("../RainCache")<any, any>, boundObject?: any);
     get(id: string, channelId?: string): Promise<PermissionOverwriteCache | null>;
     update(id: string, channelId: string | undefined, data: any): Promise<PermissionOverwriteCache>;
     remove(id: string, channelId?: string): Promise<void>;

@@ -4,24 +4,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 const BaseCache_1 = __importDefault(require("./BaseCache"));
 class VoiceStateCache extends BaseCache_1.default {
-    constructor(storageEngine, boundObject) {
-        super();
+    constructor(storageEngine, rain, boundObject) {
+        super(rain);
         this.storageEngine = storageEngine;
         this.namespace = "voicestates";
         if (boundObject) {
             this.bindObject(boundObject);
         }
     }
-    async get(id, guildId) {
+    async get(id = (_a = this.boundObject) === null || _a === void 0 ? void 0 : _a.user_id, guildId) {
         var _a, _b;
-        if (id === void 0) { id = (_a = this.boundObject) === null || _a === void 0 ? void 0 : _a.user_id; }
         if (this.boundObject) {
             return this;
         }
         const state = await ((_b = this.storageEngine) === null || _b === void 0 ? void 0 : _b.get(this.buildId(id, guildId)));
         if (!state)
             return null;
-        return new VoiceStateCache(this.storageEngine, state);
+        return new VoiceStateCache(this.storageEngine, this.rain, state);
     }
     async update(id, guildId, data) {
         var _a;
@@ -30,14 +29,13 @@ class VoiceStateCache extends BaseCache_1.default {
         }
         delete data.member;
         await this.addToIndex(id);
-        await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.upsert(this.buildId(id, guildId), data));
+        await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.upsert(this.buildId(id, guildId), this.structurize(data)));
         if (this.boundObject)
             return this;
-        return new VoiceStateCache(this.storageEngine, data);
+        return new VoiceStateCache(this.storageEngine, this.rain, data);
     }
-    async remove(id, guildId) {
+    async remove(id = (_a = this.boundObject) === null || _a === void 0 ? void 0 : _a.user_id, guildId) {
         var _a, _b;
-        if (id === void 0) { id = (_a = this.boundObject) === null || _a === void 0 ? void 0 : _a.user_id; }
         const state = await this.get(id, guildId);
         if (state) {
             await this.removeFromIndex(id, guildId);
@@ -52,14 +50,14 @@ class VoiceStateCache extends BaseCache_1.default {
         const states = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.filter(fn, ids, this.namespace));
         if (!states)
             return [];
-        return states.map(s => new VoiceStateCache(this.storageEngine, s));
+        return states.map(s => new VoiceStateCache(this.storageEngine, this.rain, s));
     }
     async find(fn, ids = undefined) {
         var _a;
         const state = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.find(fn, ids, this.namespace));
         if (!state)
             return null;
-        return new VoiceStateCache(this.storageEngine, state);
+        return new VoiceStateCache(this.storageEngine, this.rain, state);
     }
     bindUserId(userId) {
         this.user_id = userId;

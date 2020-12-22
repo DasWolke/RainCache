@@ -13,7 +13,14 @@ declare class EventProcessor extends EventEmitter {
     permOverwriteCache?: import("./cache/PermissionOverwriteCache");
     voiceStateCache?: import("./cache/VoiceStateCache");
     ready: boolean;
-    presenceQueue: any;
+    presenceQueue: {
+        [key: string]: {
+            status: number;
+            game: import("@amanda/discordtypings").ActivityData;
+            id: string;
+            user: import("@amanda/discordtypings").UserData;
+        };
+    };
     presenceFlush: NodeJS.Timeout;
     constructor(options?: import("./types").EventProcessorOptions);
     inbound(event: import("./types").DiscordPacket): Promise<import("./types").DiscordPacket>;

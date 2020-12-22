@@ -1,9 +1,9 @@
 {
   "name": "raincache",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "A pluggable discord cache worker",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/RainCache.js",
+  "types": "./dist/RainCache.d.ts",
   "scripts": {
     "build:src": "tsc -p ."
   },

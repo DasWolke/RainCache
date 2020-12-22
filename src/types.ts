@@ -64,26 +64,44 @@ export interface RainCacheOptions {
 	 */
 	cacheClasses?: {
 		/** cache class to use for guilds, defaults to the GuildCache */
-		guild?: typeof BaseCache;
+		guild?: any;
 		/** cache class to use for channels, defaults to ChannelCache */
-		channel?: typeof BaseCache;
+		channel?: any;
 		/** cache class to use for channels, defaults to ChannelMapCache */
-		member?: typeof BaseCache;
+		member?: any;
 		/** cache class to use for roles, defaults to RoleCache */
-		role?: typeof BaseCache;
+		role?: any;
 		/** cache class to use for users, defaults to UserCache */
-		user?: typeof BaseCache;
+		user?: any;
 		/** cache class to use for emojis, defaults to EmojiCache */
-		emoji?: typeof BaseCache;
+		emoji?: any;
 		/** cache class to use for channel relations, defaults to ChannelMapCache */
-		channelMap?: typeof BaseCache;
+		channelMap?: any;
 		/** cache class to use for presences, defaults to PresenceCache */
-		presence?: typeof BaseCache;
+		presence?: any;
 		/** cache class to use for permission overwrites, defaults to PermissionOverwriteCache */
-		permOverwrite?: typeof BaseCache;
+		permOverwrite?: any;
 		/** cache class to use for voice states, defaults to VoiceStateCache */
-		voiceState?: typeof BaseCache;
+		voiceState?: any;
 	};
+	structureDefs?: {
+		guild?: StructureOptions<import("@amanda/discordtypings").GuildData>;
+		channel?: StructureOptions<import("@amanda/discordtypings").ChannelData>;
+		member?: StructureOptions<import("@amanda/discordtypings").MemberData>;
+		role?: StructureOptions<import("@amanda/discordtypings").RoleData>;
+		user?: StructureOptions<import("@amanda/discordtypings").UserData>;
+		emoji?: StructureOptions<import("@amanda/discordtypings").EmojiData>;
+		presence?: StructureOptions<import("@amanda/discordtypings").PresenceData>;
+		permOverwrite?: StructureOptions<import("@amanda/discordtypings").PermissionOverwriteData>;
+		voiceState?: StructureOptions<import("@amanda/discordtypings").VoiceStateData>;
+	}
+}
+
+export interface StructureOptions<T> {
+	/** Deny all properties to be stored except for the ones specified here. Overrides blacklist entirely. */
+	whitelist?: Array<keyof T>;
+	/** Allow all properties to be stored except for the ones specified here. Is overrided by whitelist entirely. */
+	blacklist?: Array<keyof T>;
 }
 
 export interface RedisStorageOptions {

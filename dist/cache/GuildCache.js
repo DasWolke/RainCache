@@ -4,8 +4,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 const BaseCache_1 = __importDefault(require("./BaseCache"));
 class GuildCache extends BaseCache_1.default {
-    constructor(storageEngine, channelCache, roleCache, memberCache, emojiCache, presenceCache, guildToChannelCache, boundObject) {
-        super();
+    constructor(storageEngine, channelCache, roleCache, memberCache, emojiCache, presenceCache, guildToChannelCache, rain, boundObject) {
+        super(rain);
         this.storageEngine = storageEngine;
         this.namespace = "guild";
         this.channels = channelCache;
@@ -25,7 +25,7 @@ class GuildCache extends BaseCache_1.default {
         }
         const guild = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.get(this.buildId(id)));
         if (guild) {
-            return new GuildCache(this.storageEngine, this.channels.bindGuild(guild.id), this.roles.bindGuild(guild.id), this.members.bindGuild(guild.id), this.emojis.bindGuild(guild.id), this.presences.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id), guild);
+            return new GuildCache(this.storageEngine, this.channels.bindGuild(guild.id), this.roles.bindGuild(guild.id), this.members.bindGuild(guild.id), this.emojis.bindGuild(guild.id), this.presences.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id), this.rain, guild);
         }
         else {
             return null;
@@ -80,16 +80,16 @@ class GuildCache extends BaseCache_1.default {
         delete data.features;
         delete data.channels;
         await this.addToIndex(id);
-        await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.upsert(this.buildId(id), data));
+        await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.upsert(this.buildId(id), this.structurize(data)));
         if (this.boundObject)
             return this;
         const guild = await ((_b = this.storageEngine) === null || _b === void 0 ? void 0 : _b.get(this.buildId(id)));
         if (!guild)
             return this;
-        return new GuildCache(this.storageEngine, this.channels.bindGuild(guild.id), this.roles.bindGuild(guild.id), this.members.bindGuild(guild.id), this.emojis.bindGuild(guild.id), this.presences.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id), guild);
+        return new GuildCache(this.storageEngine, this.channels.bindGuild(guild.id), this.roles.bindGuild(guild.id), this.members.bindGuild(guild.id), this.emojis.bindGuild(guild.id), this.presences.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id), this.rain, guild);
     }
     async remove(id) {
-        var _a, _b, _c;
+        var _a, _b, _c, _d;
         const guild = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.get(this.buildId(id)));
         if (guild) {
             const channelMap = await this.guildChannelMap.get(id);
@@ -102,7 +102,7 @@ class GuildCache extends BaseCache_1.default {
             for (const role of roles) {
                 await this.roles.remove(role, id);
             }
-            for (const channel of ((_b = channelMap === null || channelMap === void 0 ? void 0 : channelMap.boundObject) === null || _b === void 0 ? void 0 : _b.channels) || []) {
+            for (const channel of ((_c = (_b = channelMap) === null || _b === void 0 ? void 0 : _b.boundObject) === null || _c === void 0 ? void 0 : _c.channels) || []) {
                 await this.channels.remove(channel);
             }
             for (const member of members) {
@@ -110,7 +110,7 @@ class GuildCache extends BaseCache_1.default {
             }
             await this.guildChannelMap.remove(id);
             await this.removeFromIndex(id);
-            return (_c = this.storageEngine) === null || _c === void 0 ? void 0 : _c.remove(this.buildId(id));
+            return (_d = this.storageEngine) === null || _d === void 0 ? void 0 : _d.remove(this.buildId(id));
         }
         else {
             return undefined;
@@ -121,14 +121,14 @@ class GuildCache extends BaseCache_1.default {
         const guilds = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.filter(fn, undefined, this.namespace));
         if (!guilds)
             return [];
-        return guilds.map(g => new GuildCache(this.storageEngine, this.channels, this.roles.bindGuild(g.id), this.members.bindGuild(g.id), this.emojis.bindGuild(g.id), this.presences.bindGuild(g.id), this.guildChannelMap.bindGuild(g.id), g));
+        return guilds.map(g => new GuildCache(this.storageEngine, this.channels, this.roles.bindGuild(g.id), this.members.bindGuild(g.id), this.emojis.bindGuild(g.id), this.presences.bindGuild(g.id), this.guildChannelMap.bindGuild(g.id), this.rain, g));
     }
     async find(fn) {
         var _a;
         const guild = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.find(fn, undefined, this.namespace));
         if (!guild)
             return null;
-        return new GuildCache(this.storageEngine, this.channels.bindGuild(guild.id), this.roles.bindGuild(guild.id), this.members.bindGuild(guild.id), this.emojis.bindGuild(guild.id), this.presences.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id), guild);
+        return new GuildCache(this.storageEngine, this.channels.bindGuild(guild.id), this.roles.bindGuild(guild.id), this.members.bindGuild(guild.id), this.emojis.bindGuild(guild.id), this.presences.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id), this.rain, guild);
     }
     async addToIndex(id) {
         var _a;

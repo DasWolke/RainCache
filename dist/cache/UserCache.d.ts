@@ -1,7 +1,7 @@
 import BaseCache from "./BaseCache";
 import BaseStorageEngine from "../storageEngine/BaseStorageEngine";
 declare class UserCache extends BaseCache<import("@amanda/discordtypings").UserData> {
-    constructor(storageEngine: BaseStorageEngine<import("@amanda/discordtypings").UserData>, boundObject?: import("@amanda/discordtypings").UserData);
+    constructor(storageEngine: BaseStorageEngine<import("@amanda/discordtypings").UserData>, rain: import("../RainCache")<any, any>, boundObject?: import("@amanda/discordtypings").UserData);
     get(id?: string | undefined): Promise<UserCache | null>;
     update(id: string | undefined, data: import("@amanda/discordtypings").UserData): Promise<UserCache>;
     remove(id?: string | undefined): Promise<void>;

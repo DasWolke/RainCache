@@ -15,8 +15,8 @@ class PresenceCache extends BaseCache<import("@amanda/discordtypings").PresenceD
 	 * @param storageEngine Storage engine to use for this cache
 	 * @param boundObject Optional, may be used to bind a presence object to the cache
 	 */
-	public constructor(storageEngine: BaseStorageEngine<import("@amanda/discordtypings").PresenceData>, userCache: import("./UserCache"), boundObject?: import("@amanda/discordtypings").PresenceData) {
-		super();
+	public constructor(storageEngine: BaseStorageEngine<import("@amanda/discordtypings").PresenceData>, userCache: import("./UserCache"), rain: import("../RainCache")<any, any>, boundObject?: import("@amanda/discordtypings").PresenceData) {
+		super(rain);
 		this.storageEngine = storageEngine;
 		this.namespace = "presence";
 		this.users = userCache;
@@ -36,7 +36,7 @@ class PresenceCache extends BaseCache<import("@amanda/discordtypings").PresenceD
 		}
 		const presence = await this.storageEngine?.get(this.buildId(id));
 		if (presence) {
-			return new PresenceCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").PresenceData>, this.users.bindUserId(id), presence);
+			return new PresenceCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").PresenceData>, this.users.bindUserId(id), this.rain, presence);
 		} else {
 			return null;
 		}
@@ -67,9 +67,9 @@ class PresenceCache extends BaseCache<import("@amanda/discordtypings").PresenceD
 			// @ts-ignore
 			delete data.user;
 		}
-		await this.storageEngine?.upsert(this.buildId(id), data);
+		await this.storageEngine?.upsert(this.buildId(id), this.structurize(data));
 		if (this.boundObject) return this;
-		return new PresenceCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").PresenceData>, this.users, data);
+		return new PresenceCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").PresenceData>, this.users, this.rain, data);
 	}
 
 	/**
