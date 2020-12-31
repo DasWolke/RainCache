@@ -118,6 +118,13 @@ class GuildCache extends BaseCache<import("@amanda/discordtypings").GuildData> {
 			}
 			await Promise.all(emojiPromiseBatch);
 		}
+		if (data.voice_states && data.voice_states.length > 0) {
+			const voicePromiseBatch: Array<Promise<any>> = [];
+			for (const state of data.voice_states) {
+				voicePromiseBatch.push(this.rain.cache.voiceState.update(state.user_id, id, state));
+			}
+			await Promise.all(voicePromiseBatch);
+		}
 		// @ts-ignore Shut up lmao
 		delete data.members;
 		// @ts-ignore
@@ -132,6 +139,8 @@ class GuildCache extends BaseCache<import("@amanda/discordtypings").GuildData> {
 		delete data.features;
 		// @ts-ignore
 		delete data.channels;
+		// @ts-ignore
+		delete data.voice_states;
 		await this.addToIndex(id);
 		await this.storageEngine?.upsert(this.buildId(id), this.structurize(data));
 		if (this.boundObject) return this;

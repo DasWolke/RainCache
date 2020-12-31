@@ -414,7 +414,7 @@
         "signature": "3711e391f736bc836d274d1a50e6b9965f87cd6505095a6555db0ca0989b4011"
       },
       "../src/cache/guildcache.ts": {
-        "version": "e03d428548ef1c2844be978b9941ccdd62fb88a7ae3cf60e41ab1e5d007762be",
+        "version": "ab025984ff7ac0e29d226463c0339e93772ae8d3ce90139cf533c05c9480c7e6",
         "signature": "fbca0d2eff1391bc0e9a71020fed477ac6d78189a2bb2732e3987cf8a45b4c08"
       },
       "../src/cache/voicestatecache.ts": {
@@ -971,6 +971,9 @@
         "../src/types.ts",
         "../src/storageengine/basestorageengine.ts"
       ],
+      "../src/storageengine/memorystorageengine.ts": [
+        "../src/storageengine/basestorageengine.ts"
+      ],
       "../src/connector/baseconnector.ts": [
         "../node_modules/@types/node/events.d.ts"
       ],
@@ -1101,9 +1104,6 @@
         "../src/cache/voicestatecache.ts",
         "../node_modules/@amanda/discordtypings/index.d.ts",
         "../node_modules/@types/node/events.d.ts"
-      ],
-      "../src/storageengine/memorystorageengine.ts": [
-        "../src/storageengine/basestorageengine.ts"
       ]
     },
     "semanticDiagnosticsPerFile": [
@@ -1193,6 +1193,8 @@
       "../node_modules/@types/node/base.d.ts",
       "../node_modules/@types/node/index.d.ts",
       "../node_modules/@types/redis/index.d.ts",
+      "../src/storageengine/redisstorageengine.ts",
+      "../src/storageengine/memorystorageengine.ts",
       "../src/connector/baseconnector.ts",
       "../node_modules/@types/bluebird/index.d.ts",
       "../node_modules/@types/amqplib/properties.d.ts",
@@ -1200,22 +1202,20 @@
       "../src/connector/amqpconnector.ts",
       "../src/connector/directconnector.ts",
       "../node_modules/@amanda/discordtypings/index.d.ts",
-      "../src/storageengine/memorystorageengine.ts",
+      "../src/cache/channelmapcache.ts",
+      "../src/cache/permissionoverwritecache.ts",
+      "../src/cache/usercache.ts",
+      "../src/cache/channelcache.ts",
+      "../src/cache/rolecache.ts",
+      "../src/cache/membercache.ts",
+      "../src/cache/emojicache.ts",
+      "../src/cache/presencecache.ts",
+      "../src/cache/voicestatecache.ts",
       "../src/raincache.ts",
       "../src/cache/basecache.ts",
-      "../src/cache/voicestatecache.ts",
-      "../src/cache/guildcache.ts",
-      "../src/cache/presencecache.ts",
-      "../src/cache/emojicache.ts",
-      "../src/cache/membercache.ts",
-      "../src/cache/rolecache.ts",
-      "../src/cache/channelcache.ts",
-      "../src/cache/usercache.ts",
-      "../src/cache/permissionoverwritecache.ts",
-      "../src/cache/channelmapcache.ts",
-      "../src/storageengine/redisstorageengine.ts",
       "../src/types.ts",
-      "../src/eventprocessor.ts"
+      "../src/eventprocessor.ts",
+      "../src/cache/guildcache.ts"
     ]
   },
   "version": "3.7.4"

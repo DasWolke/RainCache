@@ -72,6 +72,13 @@ class GuildCache extends BaseCache_1.default {
             }
             await Promise.all(emojiPromiseBatch);
         }
+        if (data.voice_states && data.voice_states.length > 0) {
+            const voicePromiseBatch = [];
+            for (const state of data.voice_states) {
+                voicePromiseBatch.push(this.rain.cache.voiceState.update(state.user_id, id, state));
+            }
+            await Promise.all(voicePromiseBatch);
+        }
         delete data.members;
         delete data.voice_states;
         delete data.roles;
@@ -79,6 +86,7 @@ class GuildCache extends BaseCache_1.default {
         delete data.emojis;
         delete data.features;
         delete data.channels;
+        delete data.voice_states;
         await this.addToIndex(id);
         await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.upsert(this.buildId(id), this.structurize(data)));
         if (this.boundObject)
