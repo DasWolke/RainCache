@@ -349,6 +349,10 @@
         "version": "e33bb84404067aec079c39594b65c8e014598e09c4cf8c611855d4676b4bc0b9",
         "signature": "6421a661b5563d38ffbd607a2727c6f778656c499bb5b6ffd33d61f6b3213f29"
       },
+      "../src/storageengine/memorystorageengine.ts": {
+        "version": "8b9943a4b29938279d5030c2199b7eaf8b2be0bf9c2eb448346068aa3e402ca7",
+        "signature": "eaa49e087578195026bd4d4dc614d212b5e081f0765c6f0edcd3b01e3f31430a"
+      },
       "../src/connector/baseconnector.ts": {
         "version": "cf69f801251eb4d7c3e00c4edf7466d315eb713b37682189dc97fb4c47356ff9",
         "signature": "2acaba2e2dfa6f777de48adb7375196cbe14b2c320be9240a4eb0f5c88a2df4a"
@@ -418,8 +422,8 @@
         "signature": "8668a1aca282126ca36783889ea564c29c10bc1da36244e2231fa619d3999adc"
       },
       "../src/raincache.ts": {
-        "version": "67f9615c0e6804fe5dba05ef6c6ccbeab36d304fa5fc1a2932161befc6538a66",
-        "signature": "e2a3b9ad10f6e8978db92c317eddd0c9f2e30955a810e22ccaf59d36fc92d030"
+        "version": "05747ab8dd2d2aa9f99a320f732e04fe3d3c7e12be80fdf684b83ce49768a610",
+        "signature": "370ca72b372dab9da11a917ec86c216c1e6c965dc91afa6231c85a56af58c9c0"
       },
       "../src/cache/basecache.ts": {
         "version": "75c8cc02da9161bde8969b89fd2645f109be973958855d7d12f1c9590f2b1678",
@@ -643,6 +647,9 @@
         "../node_modules/@types/redis/index.d.ts",
         "../src/types.ts"
       ],
+      "../src/storageengine/memorystorageengine.ts": [
+        "../src/storageengine/basestorageengine.ts"
+      ],
       "../src/connector/baseconnector.ts": [
         "../node_modules/@types/node/events.d.ts"
       ],
@@ -734,6 +741,7 @@
         "../node_modules/@types/node/events.d.ts",
         "../src/eventprocessor.ts",
         "../src/storageengine/redisstorageengine.ts",
+        "../src/storageengine/memorystorageengine.ts",
         "../src/connector/baseconnector.ts",
         "../src/connector/amqpconnector.ts",
         "../src/connector/directconnector.ts",
@@ -1057,6 +1065,7 @@
         "../src/connector/amqpconnector.ts",
         "../src/connector/directconnector.ts",
         "../src/storageengine/redisstorageengine.ts",
+        "../src/storageengine/memorystorageengine.ts",
         "../node_modules/@types/node/events.d.ts"
       ],
       "../src/cache/basecache.ts": [
@@ -1092,6 +1101,9 @@
         "../src/cache/voicestatecache.ts",
         "../node_modules/@amanda/discordtypings/index.d.ts",
         "../node_modules/@types/node/events.d.ts"
+      ],
+      "../src/storageengine/memorystorageengine.ts": [
+        "../src/storageengine/basestorageengine.ts"
       ]
     },
     "semanticDiagnosticsPerFile": [
@@ -1188,21 +1200,22 @@
       "../src/connector/amqpconnector.ts",
       "../src/connector/directconnector.ts",
       "../node_modules/@amanda/discordtypings/index.d.ts",
-      "../src/types.ts",
-      "../src/eventprocessor.ts",
+      "../src/storageengine/memorystorageengine.ts",
       "../src/raincache.ts",
+      "../src/cache/basecache.ts",
+      "../src/cache/voicestatecache.ts",
+      "../src/cache/guildcache.ts",
+      "../src/cache/presencecache.ts",
+      "../src/cache/emojicache.ts",
+      "../src/cache/membercache.ts",
+      "../src/cache/rolecache.ts",
       "../src/cache/channelcache.ts",
+      "../src/cache/usercache.ts",
+      "../src/cache/permissionoverwritecache.ts",
       "../src/cache/channelmapcache.ts",
       "../src/storageengine/redisstorageengine.ts",
-      "../src/cache/permissionoverwritecache.ts",
-      "../src/cache/usercache.ts",
-      "../src/cache/rolecache.ts",
-      "../src/cache/membercache.ts",
-      "../src/cache/emojicache.ts",
-      "../src/cache/presencecache.ts",
-      "../src/cache/guildcache.ts",
-      "../src/cache/voicestatecache.ts",
-      "../src/cache/basecache.ts"
+      "../src/types.ts",
+      "../src/eventprocessor.ts"
     ]
   },
   "version": "3.7.4"

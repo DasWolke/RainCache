@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 const events_1 = require("events");
 const EventProcessor_1 = __importDefault(require("./EventProcessor"));
 const RedisStorageEngine_1 = __importDefault(require("./storageEngine/RedisStorageEngine"));
+const MemoryStorageEngine_1 = __importDefault(require("./storageEngine/MemoryStorageEngine"));
 const AmqpConnector_1 = __importDefault(require("./connector/AmqpConnector"));
 const DirectConnector_1 = __importDefault(require("./connector/DirectConnector"));
 const GuildCache_1 = __importDefault(require("./cache/GuildCache"));
@@ -71,7 +72,8 @@ class RainCache extends events_1.EventEmitter {
     }
     static get Engines() {
         return {
-            RedisStorageEngine: RedisStorageEngine_1.default
+            RedisStorageEngine: RedisStorageEngine_1.default,
+            MemoryStorageEngine: MemoryStorageEngine_1.default
         };
     }
     get Engines() {

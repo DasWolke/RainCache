@@ -3,6 +3,7 @@ import { EventEmitter } from "events";
 import EventProcessor from "./EventProcessor";
 
 import RedisStorageEngine from "./storageEngine/RedisStorageEngine";
+import MemoryStorageEngine from "./storageEngine/MemoryStorageEngine";
 
 import BaseConnector from "./connector/BaseConnector";
 import AmqpConnector from "./connector/AmqpConnector";
@@ -101,7 +102,8 @@ class RainCache<Inbound extends BaseConnector, Outbound extends BaseConnector> e
 
 	public static get Engines() {
 		return {
-			RedisStorageEngine
+			RedisStorageEngine,
+			MemoryStorageEngine
 		};
 	}
 
