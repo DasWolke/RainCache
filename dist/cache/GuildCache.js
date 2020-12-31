@@ -75,6 +75,8 @@ class GuildCache extends BaseCache_1.default {
         if (data.voice_states && data.voice_states.length > 0) {
             const voicePromiseBatch = [];
             for (const state of data.voice_states) {
+                if (!state.guild_id)
+                    state.guild_id = id;
                 voicePromiseBatch.push(this.rain.cache.voiceState.update(state.user_id, id, state));
             }
             await Promise.all(voicePromiseBatch);

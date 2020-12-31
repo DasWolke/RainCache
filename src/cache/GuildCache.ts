@@ -121,6 +121,7 @@ class GuildCache extends BaseCache<import("@amanda/discordtypings").GuildData> {
 		if (data.voice_states && data.voice_states.length > 0) {
 			const voicePromiseBatch: Array<Promise<any>> = [];
 			for (const state of data.voice_states) {
+				if (!state.guild_id) state.guild_id = id;
 				voicePromiseBatch.push(this.rain.cache.voiceState.update(state.user_id, id, state));
 			}
 			await Promise.all(voicePromiseBatch);

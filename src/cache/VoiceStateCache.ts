@@ -48,6 +48,8 @@ class VoiceStateCache extends BaseCache<import("@amanda/discordtypings").VoiceSt
 
 		delete data.member;
 
+		if (!data.guild_id) data.guild_id = guildId;
+
 		await this.addToIndex(id);
 		await this.storageEngine?.upsert(this.buildId(id, guildId), this.structurize(data));
 		if (this.boundObject) return this;

@@ -414,11 +414,11 @@
         "signature": "3711e391f736bc836d274d1a50e6b9965f87cd6505095a6555db0ca0989b4011"
       },
       "../src/cache/guildcache.ts": {
-        "version": "ab025984ff7ac0e29d226463c0339e93772ae8d3ce90139cf533c05c9480c7e6",
+        "version": "5a55b23510c97aef427c6cf57f85a34052729a13a696f22d5e3717720c5d2a98",
         "signature": "fbca0d2eff1391bc0e9a71020fed477ac6d78189a2bb2732e3987cf8a45b4c08"
       },
       "../src/cache/voicestatecache.ts": {
-        "version": "3131e9ed91a6f035f2c6140e2fc45fdd6746aa90aa92465976bbfe6c71486298",
+        "version": "a3309acc4a0467093432fa8588ce7eaf18ef3b001c1fa6d90dd58d2aaca2089a",
         "signature": "8668a1aca282126ca36783889ea564c29c10bc1da36244e2231fa619d3999adc"
       },
       "../src/raincache.ts": {
@@ -1210,12 +1210,12 @@
       "../src/cache/membercache.ts",
       "../src/cache/emojicache.ts",
       "../src/cache/presencecache.ts",
-      "../src/cache/voicestatecache.ts",
       "../src/raincache.ts",
       "../src/cache/basecache.ts",
       "../src/types.ts",
       "../src/eventprocessor.ts",
-      "../src/cache/guildcache.ts"
+      "../src/cache/guildcache.ts",
+      "../src/cache/voicestatecache.ts"
     ]
   },
   "version": "3.7.4"

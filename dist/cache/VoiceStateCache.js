@@ -28,6 +28,8 @@ class VoiceStateCache extends BaseCache_1.default {
             this.bindObject(data);
         }
         delete data.member;
+        if (!data.guild_id)
+            data.guild_id = guildId;
         await this.addToIndex(id);
         await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.upsert(this.buildId(id, guildId), this.structurize(data)));
         if (this.boundObject)
