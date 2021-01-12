@@ -112,8 +112,7 @@ class BaseCache<T> {
 
 		const structDefs = this.rain.options.structureDefs;
 		if (!structDefs) throw new Error("Did you delete the structureDefs property from your RainCache instance?");
-		const options: { whitelist: Array<string>, blacklist: Array<string> } = structDefs[ns];
-		if (!options) throw new Error(`Unknown structure: ${ns}`);
+		const options: { whitelist: Array<string>, blacklist: Array<string> } = structDefs[ns] || { whitelist: [], blacklist: [] };
 
 		const keys = Object.keys(data);
 
