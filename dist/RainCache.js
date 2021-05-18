@@ -18,7 +18,14 @@ const EmojiCache_1 = __importDefault(require("./cache/EmojiCache"));
 const PresenceCache_1 = __importDefault(require("./cache/PresenceCache"));
 const PermissionOverwriteCache_1 = __importDefault(require("./cache/PermissionOverwriteCache"));
 const VoiceStateCache_1 = __importDefault(require("./cache/VoiceStateCache"));
+/**
+ * RainCache - Main class used for accessing caches via subclasses and initializing the whole library
+ */
 class RainCache extends events_1.EventEmitter {
+    /**
+     * Create a new Cache instance
+     * @param options Options that should be used by RainCache
+     */
     constructor(options, inboundConnector, outboundConnector) {
         super();
         if (!options.storage) {
@@ -26,19 +33,30 @@ class RainCache extends events_1.EventEmitter {
         }
         if (!options.cacheClasses) {
             options.cacheClasses = {
+                // @ts-ignore
                 guild: GuildCache_1.default,
+                // @ts-ignore
                 channel: ChannelCache_1.default,
+                // @ts-ignore
                 channelMap: ChannelMapCache_1.default,
+                // @ts-ignore
                 member: MemberCache_1.default,
+                // @ts-ignore
                 user: UserCache_1.default,
+                // @ts-ignore
                 role: RoleCache_1.default,
+                // @ts-ignore
                 emoji: EmojiCache_1.default,
+                // @ts-ignore
                 presence: PresenceCache_1.default,
+                // @ts-ignore
                 permOverwrite: PermissionOverwriteCache_1.default,
+                // @ts-ignore
                 voiceState: VoiceStateCache_1.default
             };
         }
         if (!options.storage.default) {
+            // maybe warn that no default engine was passed ? :thunkong:
         }
         if (!options.disabledEvents) {
             options.disabledEvents = {};
@@ -82,6 +100,7 @@ class RainCache extends events_1.EventEmitter {
     async initialize() {
         try {
             for (const engine in this.options.storage) {
+                // eslint-disable-next-line no-prototype-builtins
                 if (this.options.storage.hasOwnProperty(engine)) {
                     if (!this.options.storage[engine].ready) {
                         await this.options.storage[engine].initialize();
@@ -92,6 +111,7 @@ class RainCache extends events_1.EventEmitter {
         catch (e) {
             throw new Error("Failed to initialize storage engines");
         }
+        // @ts-ignore
         this.cache = this._createCaches(this.options.storage, this.options.cacheClasses);
         Object.assign(this, this.cache);
         this.eventProcessor = new EventProcessor_1.default({

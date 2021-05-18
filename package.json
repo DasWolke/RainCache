@@ -1,6 +1,6 @@
 {
   "name": "raincache",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "A pluggable discord cache worker",
   "main": "./dist/RainCache.js",
   "types": "./dist/RainCache.d.ts",
@@ -10,19 +10,20 @@
   "author": "wolke <wolke@weeb.sh>",
   "license": "MIT",
   "optionalDependencies": {
-    "amqplib": "^0.6.0",
-    "redis": "^3.0.2"
+    "amqplib": "^0.7.1",
+    "redis": "^3.1.2"
   },
   "dependencies": {
-    "@amanda/discordtypings": "github:AmandaDiscord/DiscordTypings",
-    "@types/amqplib": "^0.5.16",
-    "@types/node": "^14.14.2",
-    "@types/redis": "^2.8.28"
+    "@amanda/discordtypings": "github:AmandaDiscord/DiscordTypings"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^4.8.1",
-    "@typescript-eslint/parser": "^4.8.1",
-    "eslint": "^7.13.0",
-    "typescript": "~4.0.5"
-  }
+    "@types/amqplib": "^0.5.17",
+    "@types/node": "^15.3.0",
+    "@types/redis": "^2.8.28",
+    "@typescript-eslint/eslint-plugin": "^4.24.0",
+    "@typescript-eslint/parser": "^4.24.0",
+    "eslint": "^7.26.0",
+    "typescript": "~4.2.4"
+  },
+  "files": ["dist"]
 }

@@ -1,8 +1,14 @@
 "use strict";
+/* eslint-disable @typescript-eslint/no-empty-function */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/**
+ * Base Storage engine class defining the methods being used by RainCache that a storage engine is supposed to have
+ */
 class BaseStorageEngine {
     constructor() {
         this.ready = true;
     }
+    /** Initializes the engine, e.g. db connection, etc.. */
     initialize() { }
     get(id, useHash) { return null; }
     upsert(id, data) { }

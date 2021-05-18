@@ -1,6 +1,10 @@
+/**
+ * Base Storage engine class defining the methods being used by RainCache that a storage engine is supposed to have
+ */
 declare class BaseStorageEngine<T> {
     ready: boolean;
     constructor();
+    /** Initializes the engine, e.g. db connection, etc.. */
     initialize(): void | Promise<void>;
     get(id: string): T | null | Promise<T | null>;
     get(id: string, useHash?: boolean): string | Promise<string>;

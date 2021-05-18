@@ -52,6 +52,8 @@ class EventProcessor extends events_1.EventEmitter {
                 break;
             case "CHANNEL_CREATE":
             case "CHANNEL_UPDATE":
+                // console.log(event);
+                // console.log(event.d.permission_overwrites);
                 await this.onChannelCreate(event);
                 break;
             case "CHANNEL_DELETE":
@@ -92,14 +94,17 @@ class EventProcessor extends events_1.EventEmitter {
                     oldEmotes = [];
                 }
                 for (const emoji of event.d.emojis) {
+                    // @ts-ignore
                     const oldEmote = oldEmotes.find(e => e.id === emoji.id);
                     if (!oldEmote || oldEmote !== emoji) {
                         await ((_l = this.emojiCache) === null || _l === void 0 ? void 0 : _l.update(emoji.id, event.d.guild_id, emoji));
                     }
                 }
                 for (const oldEmote of oldEmotes) {
+                    // @ts-ignore
                     const newEmote = event.d.emojis.find(e => e.id === oldEmote.id);
                     if (!newEmote) {
+                        // @ts-ignore
                         await this.emojiCache.remove(oldEmote.id, event.d.guild_id);
                     }
                 }
@@ -143,9 +148,11 @@ class EventProcessor extends events_1.EventEmitter {
     }
     handlePresenceUpdate(presenceEvent) {
         if (presenceEvent.roles) {
+            // @ts-ignore
             delete presenceEvent.roles;
         }
         if (presenceEvent.guild_id) {
+            // @ts-ignore
             delete presenceEvent.guild_id;
         }
         if (this.presenceQueue[presenceEvent.user.id]) {
@@ -168,6 +175,7 @@ class EventProcessor extends events_1.EventEmitter {
     async processReady(readyEvent) {
         var _a, _b, _c;
         const updates = [];
+        // @ts-ignore
         updates.push((_a = this.userCache) === null || _a === void 0 ? void 0 : _a.update("self", { id: readyEvent.d.user.id }));
         updates.push((_b = this.userCache) === null || _b === void 0 ? void 0 : _b.update(readyEvent.d.user.id, readyEvent.d.user));
         for (const guild of readyEvent.d.guilds) {
@@ -185,6 +193,7 @@ class EventProcessor extends events_1.EventEmitter {
             case 5:
             case 6:
                 await ((_a = this.channelMapCache) === null || _a === void 0 ? void 0 : _a.update(channelCreateEvent.d.guild_id, [channelCreateEvent.d.id], "guild"));
+                // this.emit('debug', `Caching guild channel ${channelCreateEvent.d.id}`);
                 return (_b = this.channelCache) === null || _b === void 0 ? void 0 : _b.update(channelCreateEvent.d.id, channelCreateEvent.d);
             default:
                 break;
@@ -194,9 +203,11 @@ class EventProcessor extends events_1.EventEmitter {
                 this.emit("debug", `Empty Recipients array for dm ${channelCreateEvent.d.id}`);
                 return;
             }
+            // this.emit('debug', `Caching dm channel ${channelCreateEvent.d.id}`);
             await ((_c = this.channelMapCache) === null || _c === void 0 ? void 0 : _c.update(channelCreateEvent.d.recipients[0].id, [channelCreateEvent.d.id], "user"));
             return (_d = this.channelCache) === null || _d === void 0 ? void 0 : _d.update(channelCreateEvent.d.id, channelCreateEvent.d);
         }
+        //ignore channel categories for now.
     }
     async onChannelDelete(channelDeleteEvent) {
         var _a, _b, _c, _d;
@@ -221,7 +232,9 @@ class EventProcessor extends events_1.EventEmitter {
         this.presenceQueue = {};
         const presenceUpdatePromises = [];
         for (const key in queue) {
+            // eslint-disable-next-line no-prototype-builtins
             if (queue.hasOwnProperty(key)) {
+                // @ts-ignore
                 presenceUpdatePromises.push((_a = this.presenceCache) === null || _a === void 0 ? void 0 : _a.update(key, queue[key]));
             }
         }
