@@ -30,6 +30,8 @@
     "typescript": "~4.4.4"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE.md"
   ]
 }
