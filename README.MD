@@ -40,7 +40,7 @@ const cache = new RainCache({
 			}
 		})
 	}, debug: false},
-	con, con);
+	con, /* THIS PARAM IS FOR SENDING DATA OFF SOMEWHERE ELSE AFTER PROCESSING IS DONE */);
 
 const init = async () => {
 	// initialize the cache, the connector and the database connection

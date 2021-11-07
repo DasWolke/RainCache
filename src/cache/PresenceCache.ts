@@ -4,9 +4,9 @@ import BaseStorageEngine from "../storageEngine/BaseStorageEngine";
 /**
  * Cache responsible for storing presence related data
  */
-class PresenceCache extends BaseCache<import("@amanda/discordtypings").PresenceData> {
+class PresenceCache extends BaseCache<import("discord-typings").PresenceData> {
 	public namespace: "presence";
-	public users: import("./UserCache");
+	public userCache: import("./UserCache");
 
 	/**
 	 * Create a new Presence Cache
@@ -15,11 +15,11 @@ class PresenceCache extends BaseCache<import("@amanda/discordtypings").PresenceD
 	 * @param storageEngine Storage engine to use for this cache
 	 * @param boundObject Optional, may be used to bind a presence object to the cache
 	 */
-	public constructor(storageEngine: BaseStorageEngine<import("@amanda/discordtypings").PresenceData>, userCache: import("./UserCache"), rain: import("../RainCache")<any, any>, boundObject?: import("@amanda/discordtypings").PresenceData) {
+	public constructor(storageEngine: BaseStorageEngine<import("discord-typings").PresenceData>, userCache: import("./UserCache"), rain: import("../RainCache")<any, any>, boundObject?: import("discord-typings").PresenceData) {
 		super(rain);
 		this.storageEngine = storageEngine;
 		this.namespace = "presence";
-		this.users = userCache;
+		this.userCache = userCache;
 		if (boundObject) {
 			this.bindObject(boundObject);
 		}
@@ -36,7 +36,7 @@ class PresenceCache extends BaseCache<import("@amanda/discordtypings").PresenceD
 		}
 		const presence = await this.storageEngine?.get(this.buildId(id));
 		if (presence) {
-			return new PresenceCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").PresenceData>, this.users.bindUserId(id), this.rain, presence);
+			return new PresenceCache(this.storageEngine as BaseStorageEngine<import("discord-typings").PresenceData>, this.userCache.bindUserId(id), this.rain, presence);
 		} else {
 			return null;
 		}
@@ -50,26 +50,23 @@ class PresenceCache extends BaseCache<import("@amanda/discordtypings").PresenceD
 	 * @param data updated presence data of the user
 	 * @returns returns a bound presence cache
 	 */
-	public async update(id: string, data: import("@amanda/discordtypings").PresenceData): Promise<PresenceCache> {
+	public async update(id: string, data: Partial<import("discord-typings").PresenceData>): Promise<PresenceCache> {
 		if (this.boundObject) {
 			this.bindObject(data);
 		}
 		if (data.guild_id) {
-			// @ts-ignore It MUST? Watch me. Remove this ignore. It's funny.
 			delete data.guild_id;
 		}
 		if (data.roles) {
-			// @ts-ignore
 			delete data.roles;
 		}
 		if (data.user) {
-			await this.users.update(data.user.id, data.user);
-			// @ts-ignore
+			await this.userCache.update(data.user.id, data.user);
 			delete data.user;
 		}
 		await this.storageEngine?.upsert(this.buildId(id), this.structurize(data));
 		if (this.boundObject) return this;
-		return new PresenceCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").PresenceData>, this.users, this.rain, data);
+		return new PresenceCache(this.storageEngine as BaseStorageEngine<import("discord-typings").PresenceData>, this.userCache, this.rain, data as import("discord-typings").PresenceData);
 	}
 
 	/**

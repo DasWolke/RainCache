@@ -24,12 +24,18 @@ import VoiceStateCache from "./cache/VoiceStateCache";
  * RainCache - Main class used for accessing caches via subclasses and initializing the whole library
  */
 class RainCache<Inbound extends BaseConnector, Outbound extends BaseConnector> extends EventEmitter {
-	public options: import("./types").RainCacheOptions;
-	public ready: boolean;
+	public options: Required<import("./types").RainCacheOptions>;
+	public ready = false;
 	public inbound: Inbound;
 	public outbound: Outbound;
 	public cache: import("./types").Caches;
 	public eventProcessor: EventProcessor;
+
+	public static Connectors = { AmqpConnector, DirectConnector };
+	public Connectors = RainCache.Connectors;
+
+	public static Engines = { RedisStorageEngine, MemoryStorageEngine };
+	public Engines = RainCache.Engines;
 
 	/**
 	 * Create a new Cache instance
@@ -42,25 +48,15 @@ class RainCache<Inbound extends BaseConnector, Outbound extends BaseConnector> e
 		}
 		if (!options.cacheClasses) {
 			options.cacheClasses = {
-				// @ts-ignore
 				guild: GuildCache,
-				// @ts-ignore
 				channel: ChannelCache,
-				// @ts-ignore
 				channelMap: ChannelMap,
-				// @ts-ignore
 				member: MemberCache,
-				// @ts-ignore
 				user: UserCache,
-				// @ts-ignore
 				role: RoleCache,
-				// @ts-ignore
 				emoji: EmojiCache,
-				// @ts-ignore
 				presence: PresenceCache,
-				// @ts-ignore
 				permOverwrite: PermissionsOverwriteCache,
-				// @ts-ignore
 				voiceState: VoiceStateCache
 			};
 		}
@@ -83,39 +79,16 @@ class RainCache<Inbound extends BaseConnector, Outbound extends BaseConnector> e
 				voiceState: { whitelist: [], blacklist: [] }
 			};
 		}
-		this.options = options;
+		this.options = options as Required<import("./types").RainCacheOptions>;
 		this.ready = false;
 		this.inbound = inboundConnector;
 		this.outbound = outboundConnector;
 	}
 
-	public static get Connectors() {
-		return {
-			AmqpConnector,
-			DirectConnector
-		};
-	}
-
-	public get Connectors() {
-		return RainCache.Connectors;
-	}
-
-	public static get Engines() {
-		return {
-			RedisStorageEngine,
-			MemoryStorageEngine
-		};
-	}
-
-	public get Engines() {
-		return RainCache.Engines;
-	}
-
 	public async initialize() {
 		try {
 			for (const engine in this.options.storage) {
-				// eslint-disable-next-line no-prototype-builtins
-				if (this.options.storage.hasOwnProperty(engine)) {
+				if (Object.hasOwnProperty.call(this.options.storage, engine)) {
 					if (!this.options.storage[engine].ready) {
 						await this.options.storage[engine].initialize();
 					}
@@ -124,8 +97,7 @@ class RainCache<Inbound extends BaseConnector, Outbound extends BaseConnector> e
 		} catch (e) {
 			throw new Error("Failed to initialize storage engines");
 		}
-		// @ts-ignore
-		this.cache = this._createCaches(this.options.storage, this.options.cacheClasses);
+		this.cache = this._createCaches(this.options.storage, this.options.cacheClasses as import("./types").CacheTypes);
 		Object.assign(this, this.cache);
 		this.eventProcessor = new EventProcessor({
 			disabledEvents: this.options.disabledEvents || {},

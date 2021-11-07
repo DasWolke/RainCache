@@ -14,7 +14,7 @@ class EventProcessor extends EventEmitter {
 	public voiceStateCache?: import("./cache/VoiceStateCache");
 	public ready: boolean;
 	public presenceQueue: {
-		[key: string]: { status: number; game: import("@amanda/discordtypings").ActivityData; id: string; user: import("@amanda/discordtypings").UserData };
+		[key: string]: { status: number; activities: Array<import("discord-typings").ActivityData>; id: string; user: import("discord-typings").UserData };
 	};
 	public presenceFlush: NodeJS.Timeout;
 
@@ -109,18 +109,15 @@ class EventProcessor extends EventEmitter {
 				oldEmotes = [];
 			}
 			for (const emoji of event.d.emojis) {
-				// @ts-ignore
 				const oldEmote = oldEmotes.find(e => e.id === emoji.id);
 				if (!oldEmote || oldEmote !== emoji) {
 					await this.emojiCache?.update(emoji.id, event.d.guild_id, emoji);
 				}
 			}
 			for (const oldEmote of oldEmotes) {
-				// @ts-ignore
 				const newEmote = event.d.emojis.find(e => e.id === oldEmote.id);
 				if (!newEmote) {
-					// @ts-ignore
-					await this.emojiCache.remove(oldEmote.id, event.d.guild_id);
+					await this.emojiCache?.remove(oldEmote.id as string, event.d.guild_id);
 				}
 			}
 			break;
@@ -154,36 +151,33 @@ class EventProcessor extends EventEmitter {
 		}
 	}
 
-	private handlePresenceUpdate(presenceEvent: import("@amanda/discordtypings").PresenceData & { status: number }) {
+	private handlePresenceUpdate(presenceEvent: Partial<import("discord-typings").PresenceData & { status: number }>) {
 		if (presenceEvent.roles) {
-			// @ts-ignore
 			delete presenceEvent.roles;
 		}
 		if (presenceEvent.guild_id) {
-			// @ts-ignore
 			delete presenceEvent.guild_id;
 		}
-		if (this.presenceQueue[presenceEvent.user.id]) {
-			this.presenceQueue[presenceEvent.user.id] = Object.assign(this.presenceQueue[presenceEvent.user.id], {
+		if (this.presenceQueue[presenceEvent.user?.id as string]) {
+			this.presenceQueue[presenceEvent.user?.id as string] = Object.assign(this.presenceQueue[presenceEvent.user?.id as string], {
 				status: presenceEvent.status,
-				game: presenceEvent.game,
-				id: presenceEvent.user.id,
+				activities: presenceEvent.activities,
+				id: presenceEvent.user?.id,
 				user: presenceEvent.user
 			});
 		} else {
-			this.presenceQueue[presenceEvent.user.id] = {
-				status: presenceEvent.status,
-				game: presenceEvent.game,
-				id: presenceEvent.user.id,
-				user: presenceEvent.user
+			this.presenceQueue[presenceEvent.user?.id as string] = {
+				status: presenceEvent.status as number,
+				activities: presenceEvent.activities as Array<any>,
+				id: presenceEvent.user?.id as string,
+				user: presenceEvent.user as any
 			};
 		}
 	}
 
 	private async processReady(readyEvent: any) {
 		const updates: Array<Promise<any> | undefined> = [];
-		// @ts-ignore
-		updates.push(this.userCache?.update("self", { id: readyEvent.d.user.id }));
+		updates.push(this.userCache?.update("self", { id: readyEvent.d.user.id } as import("discord-typings").UserData));
 		updates.push(this.userCache?.update(readyEvent.d.user.id, readyEvent.d.user));
 		for (const guild of readyEvent.d.guilds) {
 			this.emit("debug", `Caching guild ${guild.id} from ready`);
@@ -239,10 +233,8 @@ class EventProcessor extends EventEmitter {
 		this.presenceQueue = {};
 		const presenceUpdatePromises: Array<Promise<any> | undefined> = [];
 		for (const key in queue) {
-			// eslint-disable-next-line no-prototype-builtins
-			if (queue.hasOwnProperty(key)) {
-				// @ts-ignore
-				presenceUpdatePromises.push(this.presenceCache?.update(key, queue[key]));
+			if (Object.hasOwnProperty.call(queue, key)) {
+				presenceUpdatePromises.push(this.presenceCache?.update(key, queue[key] as unknown as import("discord-typings").PresenceData));
 			}
 		}
 		await Promise.all(presenceUpdatePromises);

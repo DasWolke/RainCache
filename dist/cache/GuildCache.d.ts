@@ -3,12 +3,12 @@ import BaseStorageEngine from "../storageEngine/BaseStorageEngine";
 /**
  * Cache responsible for guilds
  */
-declare class GuildCache extends BaseCache<import("@amanda/discordtypings").GuildData> {
-    channels: import("./ChannelCache");
-    roles: import("./RoleCache");
-    members: import("./MemberCache");
-    emojis: import("./EmojiCache");
-    presences: import("./PresenceCache");
+declare class GuildCache extends BaseCache<import("discord-typings").GuildData> {
+    channelCache: import("./ChannelCache");
+    roleCache: import("./RoleCache");
+    memberCache: import("./MemberCache");
+    emojiCache: import("./EmojiCache");
+    presenceCache: import("./PresenceCache");
     guildChannelMap: import("./ChannelMapCache");
     namespace: "guild";
     /**
@@ -24,7 +24,7 @@ declare class GuildCache extends BaseCache<import("@amanda/discordtypings").Guil
      * @param guildToChannelCache Instantiated ChannelMap class
      * @param boundObject Optional, may be used to bind a guild object to the cache
      */
-    constructor(storageEngine: BaseStorageEngine<import("@amanda/discordtypings").GuildData>, channelCache: import("./ChannelCache"), roleCache: import("./RoleCache"), memberCache: import("./MemberCache"), emojiCache: import("./EmojiCache"), presenceCache: import("./PresenceCache"), guildToChannelCache: import("./ChannelMapCache"), rain: import("../RainCache")<any, any>, boundObject?: import("@amanda/discordtypings").GuildData);
+    constructor(storageEngine: BaseStorageEngine<import("discord-typings").GuildData>, channelCache: import("./ChannelCache"), roleCache: import("./RoleCache"), memberCache: import("./MemberCache"), emojiCache: import("./EmojiCache"), presenceCache: import("./PresenceCache"), guildToChannelCache: import("./ChannelMapCache"), rain: import("../RainCache")<any, any>, boundObject?: import("discord-typings").GuildData);
     /**
      * Retrieves a guild via id
      * @param id Discord id of the guild
@@ -42,7 +42,7 @@ declare class GuildCache extends BaseCache<import("@amanda/discordtypings").Guil
      * @param data.emojis Array of emojis
      * @returns returns a bound guild cache
      */
-    update(id: string, data: import("@amanda/discordtypings").GuildData): Promise<GuildCache>;
+    update(id: string, data: Partial<import("discord-typings").GuildData>): Promise<GuildCache>;
     /**
      * Removes a guild and associated elements from the cache.
      * @param id id of the guild to remove
@@ -53,13 +53,13 @@ declare class GuildCache extends BaseCache<import("@amanda/discordtypings").Guil
      * @param fn Filter function
      * @returns array of bound guild caches
      */
-    filter(fn: (emoji?: import("@amanda/discordtypings").GuildData, index?: number, array?: Array<import("@amanda/discordtypings").GuildData>) => unknown): Promise<Array<GuildCache>>;
+    filter(fn: (emoji?: import("discord-typings").GuildData, index?: number, array?: Array<import("discord-typings").GuildData>) => unknown): Promise<Array<GuildCache>>;
     /**
      * Filter through the collection of guilds and return the first match
      * @param fn Filter function
      * @returns returns a bound guild cache
      */
-    find(fn: (emoji?: import("@amanda/discordtypings").GuildData, index?: number, array?: Array<string>) => unknown): Promise<GuildCache | null>;
+    find(fn: (emoji?: import("discord-typings").GuildData, index?: number, array?: Array<string>) => unknown): Promise<GuildCache | null>;
     /**
      * Add a guild to the guild index
      * @param id ids of the guilds

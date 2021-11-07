@@ -3,7 +3,7 @@ import BaseStorageEngine from "../storageEngine/BaseStorageEngine";
 /**
  * Cache responsible for caching users
  */
-declare class VoiceStateCache extends BaseCache<import("@amanda/discordtypings").VoiceStateData> {
+declare class VoiceStateCache extends BaseCache<import("discord-typings").VoiceStateData> {
     /**
      * Create a new VoiceStateCache
      *
@@ -11,7 +11,7 @@ declare class VoiceStateCache extends BaseCache<import("@amanda/discordtypings")
      * @param storageEngine Storage engine to use for this cache
      * @param boundObject Optional, may be used to bind a user object to the cache
      */
-    constructor(storageEngine: BaseStorageEngine<import("@amanda/discordtypings").VoiceStateData>, rain: import("../RainCache")<any, any>, boundObject?: import("@amanda/discordtypings").VoiceStateData);
+    constructor(storageEngine: BaseStorageEngine<import("discord-typings").VoiceStateData>, rain: import("../RainCache")<any, any>, boundObject?: import("discord-typings").VoiceStateData);
     /**
      * Loads a VoiceState from the cache via id
      * @param id discord id of the user
@@ -25,7 +25,7 @@ declare class VoiceStateCache extends BaseCache<import("@amanda/discordtypings")
      * @param guildId guild id
      * @param data updated data of the VoiceState, it will be merged with the old data
      */
-    update(id: string, guildId: string, data: import("@amanda/discordtypings").VoiceStateData): Promise<VoiceStateCache>;
+    update(id: string, guildId: string, data: import("discord-typings").VoiceStateData): Promise<VoiceStateCache>;
     /**
      * Remove a VoiceState from the cache
      * @param id discord id of the user
@@ -37,14 +37,14 @@ declare class VoiceStateCache extends BaseCache<import("@amanda/discordtypings")
      * @param fn filter function to use for the filtering
      * @param ids Array of user ids, if omitted the global user index will be used
      */
-    filter(fn: (state?: import("@amanda/discordtypings").VoiceStateData, index?: number, array?: Array<import("@amanda/discordtypings").VoiceStateData>) => unknown, ids?: Array<string> | undefined): Promise<Array<VoiceStateCache>>;
+    filter(fn: (state?: import("discord-typings").VoiceStateData, index?: number, array?: Array<import("discord-typings").VoiceStateData>) => unknown, ids?: Array<string> | undefined): Promise<Array<VoiceStateCache>>;
     /**
      * Find a VoiceState by providing a filter function which returns true upon success and false otherwise
      * @param fn filter function to use for filtering for a state
      * @param ids List of ids that should be used as the scope of the filter
      * @returns Returns a VoiceState Cache with a bound state or null if no state was found
      */
-    find(fn: (state?: import("@amanda/discordtypings").VoiceStateData, index?: number, array?: Array<string>) => unknown, ids?: Array<string> | undefined): Promise<VoiceStateCache | null>;
+    find(fn: (state?: import("discord-typings").VoiceStateData, index?: number, array?: Array<string>) => unknown, ids?: Array<string> | undefined): Promise<VoiceStateCache | null>;
     /**
      * Bind a user id to the cache
      * @param userId id of the user

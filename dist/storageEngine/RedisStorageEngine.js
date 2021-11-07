@@ -40,7 +40,6 @@ class RedisStorageEngine extends BaseStorageEngine_1.default {
         return new Promise((res, rej) => {
             var _a, _b;
             if (useHash) {
-                // @ts-ignore
                 return (_a = this.client) === null || _a === void 0 ? void 0 : _a.HGETALL(id, (err, data) => {
                     if (err)
                         rej(err);

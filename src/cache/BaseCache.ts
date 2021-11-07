@@ -1,11 +1,13 @@
-class BaseCache<T> {
+class _BaseCache<T> {
 	public storageEngine: import("../storageEngine/BaseStorageEngine")<T> | null;
 	public namespace: string;
 	public dataTimestamp?: Date;
-	public boundObject: T | null = null;
+	public boundObject: Partial<T> | null = null;
 	/** guild id bound to this cache */
 	public boundGuild?: string;
 	public rain: import("../RainCache")<any, any>;
+
+	public static readonly default = _BaseCache;
 
 	/**
 	 * Base class for all cache classes.
@@ -24,7 +26,7 @@ class BaseCache<T> {
 	 * Bind an object to the cache instance, you can read more on binding on the landing page of the documentation
 	 * @param boundObject - Object to bind to this cache instance
 	 */
-	public bindObject(boundObject: T): void {
+	public bindObject(boundObject: Partial<T>): void {
 		this.dataTimestamp = new Date();
 		this.boundObject = boundObject;
 		Object.assign(this, boundObject);
@@ -104,7 +106,7 @@ class BaseCache<T> {
 	 * Delete keys from data if necessary based on RainCache structureDefs options and return the cleaned data
 	 * @param data The data to possibly delete object entries from
 	 */
-	public structurize<T>(data: T): T {
+	public structurize<D>(data: Partial<D>): Partial<D> {
 		if (this.namespace === "base") throw new Error("Do not call structurize in BaseCache instances. Only extensions.");
 		let ns = this.namespace;
 		if (this.namespace === "permissionoverwrite") ns = "permOverwrite";
@@ -132,4 +134,8 @@ class BaseCache<T> {
 	}
 }
 
-export = BaseCache;
+type BaseCache<T> = _BaseCache<T> & Partial<T>;
+
+const BaseCacheWithProperTypes: new<T>(rain: import("../RainCache")<any, any>) => BaseCache<T> = _BaseCache as any;
+
+export = BaseCacheWithProperTypes;

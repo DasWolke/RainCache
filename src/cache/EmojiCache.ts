@@ -4,7 +4,7 @@ import BaseStorageEngine from "../storageEngine/BaseStorageEngine";
 /**
  * Cache responsible for storing emoji related data
  */
-class EmojiCache extends BaseCache<import("@amanda/discordtypings").EmojiData> {
+class EmojiCache extends BaseCache<import("discord-typings").EmojiData> {
 	public namespace: "emoji"
 
 	/**
@@ -14,7 +14,7 @@ class EmojiCache extends BaseCache<import("@amanda/discordtypings").EmojiData> {
 	 * @param storageEngine storage engine to use for this cache
 	 * @param boundObject Optional, may be used to bind an emoji object to the cache
 	 */
-	public constructor(storageEngine: BaseStorageEngine<import("@amanda/discordtypings").EmojiData>, rain: import("../RainCache")<any, any>, boundObject?: import("@amanda/discordtypings").EmojiData) {
+	public constructor(storageEngine: BaseStorageEngine<import("discord-typings").EmojiData>, rain: import("../RainCache")<any, any>, boundObject?: import("discord-typings").EmojiData) {
 		super(rain);
 		this.namespace = "emoji";
 		this.storageEngine = storageEngine;
@@ -35,7 +35,7 @@ class EmojiCache extends BaseCache<import("@amanda/discordtypings").EmojiData> {
 		}
 		const emoji = await this.storageEngine?.get(this.buildId(id, guildId));
 		if (emoji) {
-			return new EmojiCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").EmojiData>, this.rain, emoji);
+			return new EmojiCache(this.storageEngine as BaseStorageEngine<import("discord-typings").EmojiData>, this.rain, emoji);
 		} else {
 			return null;
 		}
@@ -48,14 +48,14 @@ class EmojiCache extends BaseCache<import("@amanda/discordtypings").EmojiData> {
 	 * @param data new data of the emoji, that will get merged with the old data
 	 * @returns returns a bound EmojiCache
 	 */
-	public async update(id: string, guildId: string | undefined = this.boundGuild, data: import("@amanda/discordtypings").EmojiData): Promise<EmojiCache> {
+	public async update(id: string, guildId: string | undefined = this.boundGuild, data: import("discord-typings").EmojiData): Promise<EmojiCache> {
 		if (this.boundObject) {
 			this.bindObject(data);
 		}
 		await this.addToIndex(id, guildId);
 		await this.storageEngine?.upsert(this.buildId(id, guildId), this.structurize(data));
 		if (this.boundObject) return this;
-		return new EmojiCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").EmojiData>, this.rain, data);
+		return new EmojiCache(this.storageEngine as BaseStorageEngine<import("discord-typings").EmojiData>, this.rain, data);
 	}
 
 	/**
@@ -80,11 +80,11 @@ class EmojiCache extends BaseCache<import("@amanda/discordtypings").EmojiData> {
 	 * @param ids
 	 * @returns array of bound emoji caches
 	 */
-	public async filter(fn: (emoji?: import("@amanda/discordtypings").EmojiData, index?: number, array?: Array<import("@amanda/discordtypings").EmojiData>) => unknown, guildId: string | undefined, ids?: Array<string> | undefined): Promise<Array<EmojiCache>> {
+	public async filter(fn: (emoji?: import("discord-typings").EmojiData, index?: number, array?: Array<import("discord-typings").EmojiData>) => unknown, guildId: string | undefined, ids?: Array<string> | undefined): Promise<Array<EmojiCache>> {
 		if (!guildId && this.boundGuild) guildId = this.boundGuild;
 		const emojis = await this.storageEngine?.filter(fn, ids, super.buildId(guildId as string));
 		if (!emojis) return [];
-		return emojis.map(e => new EmojiCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").EmojiData>, this.rain, e));
+		return emojis.map(e => new EmojiCache(this.storageEngine as BaseStorageEngine<import("discord-typings").EmojiData>, this.rain, e));
 	}
 
 	/**
@@ -94,11 +94,11 @@ class EmojiCache extends BaseCache<import("@amanda/discordtypings").EmojiData> {
 	 * @param ids
 	 * @returns bound emoji cache
 	 */
-	public async find(fn: (emoji?: import("@amanda/discordtypings").EmojiData, index?: number, array?: Array<string>) => unknown, guildId: string, ids: Array<string> | undefined): Promise<EmojiCache | null> {
+	public async find(fn: (emoji?: import("discord-typings").EmojiData, index?: number, array?: Array<string>) => unknown, guildId: string, ids: Array<string> | undefined): Promise<EmojiCache | null> {
 		if (!guildId && this.boundGuild) guildId = this.boundGuild;
 		const emoji = await this.storageEngine?.find(fn, ids, super.buildId(guildId));
 		if (!emoji) return null;
-		return new EmojiCache(this.storageEngine as BaseStorageEngine<import("@amanda/discordtypings").EmojiData>, this.rain, emoji);
+		return new EmojiCache(this.storageEngine as BaseStorageEngine<import("discord-typings").EmojiData>, this.rain, emoji);
 	}
 
 	/**

@@ -1,5 +1,4 @@
 import BaseStorageEngine from "./storageEngine/BaseStorageEngine";
-import BaseCache from "./cache/BaseCache";
 
 export interface Caches {
 	guild: import("./cache/GuildCache");
@@ -64,36 +63,36 @@ export interface RainCacheOptions {
 	 */
 	cacheClasses?: {
 		/** cache class to use for guilds, defaults to the GuildCache */
-		guild?: any;
+		guild?: typeof import("./cache/GuildCache");
 		/** cache class to use for channels, defaults to ChannelCache */
-		channel?: any;
+		channel?: typeof import("./cache/ChannelCache");
 		/** cache class to use for channels, defaults to ChannelMapCache */
-		member?: any;
+		member?: typeof import("./cache/MemberCache");
 		/** cache class to use for roles, defaults to RoleCache */
-		role?: any;
+		role?: typeof import("./cache/RoleCache");
 		/** cache class to use for users, defaults to UserCache */
-		user?: any;
+		user?: typeof import("./cache/UserCache");
 		/** cache class to use for emojis, defaults to EmojiCache */
-		emoji?: any;
+		emoji?: typeof import("./cache/EmojiCache");
 		/** cache class to use for channel relations, defaults to ChannelMapCache */
-		channelMap?: any;
+		channelMap?: typeof import("./cache/ChannelMapCache");
 		/** cache class to use for presences, defaults to PresenceCache */
-		presence?: any;
+		presence?: typeof import("./cache/PresenceCache");
 		/** cache class to use for permission overwrites, defaults to PermissionOverwriteCache */
-		permOverwrite?: any;
+		permOverwrite?: typeof import("./cache/PermissionOverwriteCache");
 		/** cache class to use for voice states, defaults to VoiceStateCache */
-		voiceState?: any;
+		voiceState?: typeof import("./cache/VoiceStateCache");
 	};
 	structureDefs?: {
-		guild?: StructureOptions<import("@amanda/discordtypings").GuildData>;
-		channel?: StructureOptions<import("@amanda/discordtypings").ChannelData>;
-		member?: StructureOptions<import("@amanda/discordtypings").MemberData>;
-		role?: StructureOptions<import("@amanda/discordtypings").RoleData>;
-		user?: StructureOptions<import("@amanda/discordtypings").UserData>;
-		emoji?: StructureOptions<import("@amanda/discordtypings").EmojiData>;
-		presence?: StructureOptions<import("@amanda/discordtypings").PresenceData>;
-		permOverwrite?: StructureOptions<import("@amanda/discordtypings").PermissionOverwriteData>;
-		voiceState?: StructureOptions<import("@amanda/discordtypings").VoiceStateData>;
+		guild?: StructureOptions<import("discord-typings").GuildData>;
+		channel?: StructureOptions<import("discord-typings").ChannelData>;
+		member?: StructureOptions<import("discord-typings").MemberData>;
+		role?: StructureOptions<import("discord-typings").RoleData>;
+		user?: StructureOptions<import("discord-typings").UserData>;
+		emoji?: StructureOptions<import("discord-typings").EmojiData>;
+		presence?: StructureOptions<import("discord-typings").PresenceData>;
+		permOverwrite?: StructureOptions<import("discord-typings").PermissionOverwriteData>;
+		voiceState?: StructureOptions<import("discord-typings").VoiceStateData>;
 	}
 }
 
@@ -119,7 +118,7 @@ export interface EventProcessorOptions {
 	cache?: Caches;
 }
 
-export type Channel = import("@amanda/discordtypings").ChannelData & { guild_id?: string, recipients?: Array<import("@amanda/discordtypings").UserData>, permission_overwrites?: Array<{ id: string }> };
+export type Channel = import("discord-typings").ChannelData & { guild_id?: string, recipients?: Array<import("discord-typings").UserData>, permission_overwrites?: Array<{ id: string }> };
 
 export type ChannelMap = { id: string, type: "guild" | "user", channels: Array<string> };
 

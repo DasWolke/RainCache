@@ -11,6 +11,7 @@ declare class MemoryStorageEngine<T> extends BaseStorageEngine<T> {
      * @param id id of the object
      */
     get(id: string): T | null;
+    get(id: string, DO_NOT_USE_THIS_OVERLOAD?: unknown): string | Promise<string>;
     /**
      * Upsert an object into the cache
      * @param id id of the object

@@ -54,16 +54,13 @@ class ChannelMapCache extends BaseCache<import("../types").ChannelMap> {
 		}
 		let oldCacheData = await this.get(id, type);
 		if (oldCacheData && !remove) {
-			// @ts-ignore
-			data = this._checkDupes(oldCacheData.channels, data);
+			data = this._checkDupes(oldCacheData.channels as Array<string>, data);
 		}
 		if (remove) {
 			if (!oldCacheData) {
-				// @ts-ignore
-				oldCacheData = { channels: [] };
+				oldCacheData = { channels: [] } as unknown as ChannelMapCache;
 			}
-			// @ts-ignore
-			data = this._removeOldChannels(oldCacheData.channels, data);
+			data = this._removeOldChannels(oldCacheData.channels as Array<string>, data);
 		}
 		const channelMapId = this.buildId(this._buildMapId(id, type));
 		await this.remove(id, type);

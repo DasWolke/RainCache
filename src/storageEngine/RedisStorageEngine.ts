@@ -57,10 +57,9 @@ class RedisStorageEngine<T> extends BaseStorageEngine<T> {
 	public get(id: string, useHash: boolean = this.useHash): any {
 		return new Promise((res, rej) => {
 			if (useHash) {
-				// @ts-ignore
-				return this.client?.HGETALL(id, (err, data: T) => {
+				return this.client?.HGETALL(id, (err, data) => {
 					if (err) rej(err);
-					else res(this.prepareData(data));
+					else res(this.prepareData(data as unknown as T));
 				});
 			} else {
 				return this.client?.GET(id, (err, data) => {

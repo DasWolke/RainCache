@@ -4,7 +4,7 @@ import BaseStorageEngine from "../storageEngine/BaseStorageEngine";
  * Cache responsible for caching users
  * @extends BaseCache
  */
-declare class UserCache extends BaseCache<import("@amanda/discordtypings").UserData> {
+declare class UserCache extends BaseCache<import("discord-typings").UserData> {
     /**
      * Create a new UserCache
      *
@@ -12,7 +12,7 @@ declare class UserCache extends BaseCache<import("@amanda/discordtypings").UserD
      * @param storageEngine Storage engine to use for this cache
      * @param boundObject Optional, may be used to bind a user object to the cache
      */
-    constructor(storageEngine: BaseStorageEngine<import("@amanda/discordtypings").UserData>, rain: import("../RainCache")<any, any>, boundObject?: import("@amanda/discordtypings").UserData);
+    constructor(storageEngine: BaseStorageEngine<import("discord-typings").UserData>, rain: import("../RainCache")<any, any>, boundObject?: import("discord-typings").UserData);
     /**
      * Loads a user from the cache via id
      * @param id discord id of the user
@@ -24,7 +24,7 @@ declare class UserCache extends BaseCache<import("@amanda/discordtypings").UserD
      * @param id discord id of the user
      * @param data updated data of the user, it will be merged with the old data
      */
-    update(id: string | undefined, data: import("@amanda/discordtypings").UserData): Promise<UserCache>;
+    update(id: string | undefined, data: import("discord-typings").UserData): Promise<UserCache>;
     /**
      * Remove a user from the cache
      * @param id discord id of the user
@@ -35,14 +35,14 @@ declare class UserCache extends BaseCache<import("@amanda/discordtypings").UserD
      * @param fn filter function to use for the filtering
      * @param ids Array of user ids, if omitted the global user index will be used
      */
-    filter(fn: (user?: import("@amanda/discordtypings").UserData, index?: number, array?: Array<import("@amanda/discordtypings").UserData>) => unknown, ids?: Array<string> | undefined): Promise<Array<UserCache>>;
+    filter(fn: (user?: import("discord-typings").UserData, index?: number, array?: Array<import("discord-typings").UserData>) => unknown, ids?: Array<string> | undefined): Promise<Array<UserCache>>;
     /**
      * Find a user by providing a filter function which returns true upon success and false otherwise
      * @param fn filter function to use for filtering for a user
      * @param ids List of ids that should be used as the scope of the filter
      * @returns Returns a User Cache with a bound user or null if no user was found
      */
-    find(fn: (user?: import("@amanda/discordtypings").UserData, index?: number, array?: Array<string>) => unknown, ids?: Array<string> | undefined): Promise<UserCache | null>;
+    find(fn: (user?: import("discord-typings").UserData, index?: number, array?: Array<string>) => unknown, ids?: Array<string> | undefined): Promise<UserCache | null>;
     /**
      * Bind a user id to the cache, used by the member cache
      * @param userId id of the user

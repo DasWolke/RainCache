@@ -3,9 +3,9 @@ import BaseStorageEngine from "../storageEngine/BaseStorageEngine";
 /**
  * Cache responsible for storing guild members
  */
-declare class MemberCache extends BaseCache<import("@amanda/discordtypings").MemberData> {
+declare class MemberCache extends BaseCache<import("discord-typings").MemberData> {
     namespace: "member";
-    user: import("./UserCache");
+    userCache: import("./UserCache");
     /**
      * Creates a new MemberCache
      *
@@ -14,7 +14,7 @@ declare class MemberCache extends BaseCache<import("@amanda/discordtypings").Mem
      * @param userCache user cache instance
      * @param boundObject Bind an object to this instance
      */
-    constructor(storageEngine: BaseStorageEngine<import("@amanda/discordtypings").MemberData>, userCache: import("./UserCache"), rain: import("../RainCache")<any, any>, boundObject?: import("@amanda/discordtypings").MemberData);
+    constructor(storageEngine: BaseStorageEngine<import("discord-typings").MemberData>, userCache: import("./UserCache"), rain: import("../RainCache")<any, any>, boundObject?: import("discord-typings").MemberData);
     /**
      * Get a member via id
      * @param id id of the member
@@ -28,7 +28,9 @@ declare class MemberCache extends BaseCache<import("@amanda/discordtypings").Mem
      * @param guildId id of the guild of the member, defaults to the bound guild of the cache
      * @param data updated guild member data
      */
-    update(id: string, guildId: string | undefined, data: import("@amanda/discordtypings").MemberData): Promise<MemberCache>;
+    update(id: string, guildId: string | undefined, data: Partial<import("discord-typings").MemberData & import("discord-typings").UserData & {
+        guild_id: string;
+    }>): Promise<MemberCache>;
     /**
      * Remove a member from the cache
      * @param id id of the member
@@ -40,13 +42,13 @@ declare class MemberCache extends BaseCache<import("@amanda/discordtypings").Mem
      * @param fn Filter function
      * @param guildId guild id the member is in
      */
-    filter(fn: (member?: import("@amanda/discordtypings").MemberData, index?: number, array?: Array<import("@amanda/discordtypings").MemberData>) => unknown, guildId: string | undefined, ids: Array<string>): Promise<Array<MemberCache>>;
+    filter(fn: (member?: import("discord-typings").MemberData, index?: number, array?: Array<import("discord-typings").MemberData>) => unknown, guildId: string | undefined, ids: Array<string>): Promise<Array<MemberCache>>;
     /**
      * Filter through the collection of members and return the first match
      * @param fn Filter function
      * @param guildId guild id the member is in
      */
-    find(fn: (member?: import("@amanda/discordtypings").MemberData, index?: number, array?: Array<string>) => boolean, guildId?: string | undefined, ids?: Array<string> | undefined): Promise<MemberCache | null>;
+    find(fn: (member?: import("discord-typings").MemberData, index?: number, array?: Array<string>) => boolean, guildId?: string | undefined, ids?: Array<string> | undefined): Promise<MemberCache | null>;
     /**
      * Build a unique key for storing member data
      * @param userId id of the user belonging to the member

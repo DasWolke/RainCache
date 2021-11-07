@@ -12,12 +12,7 @@ class MemoryStorageEngine extends BaseStorageEngine_1.default {
         this.map = new Map();
         this.index = new Map();
     }
-    /**
-     * Get an object from the cache via id
-     * @param id id of the object
-     */
-    // @ts-ignore
-    get(id) {
+    get(id, DO_NOT_USE_THIS_OVERLOAD) {
         const raw = this.map.get(id);
         return this.parseData(raw);
     }

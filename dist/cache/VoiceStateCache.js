@@ -28,8 +28,9 @@ class VoiceStateCache extends BaseCache_1.default {
      * @param guildId guild id
      * @returns Returns a VoiceState Cache with a bound user or null if no user was found
      */
-    async get(id = (_a = this.boundObject) === null || _a === void 0 ? void 0 : _a.user_id, guildId) {
+    async get(id, guildId) {
         var _a, _b;
+        if (id === void 0) { id = (_a = this.boundObject) === null || _a === void 0 ? void 0 : _a.user_id; }
         if (this.boundObject) {
             return this;
         }
@@ -63,8 +64,9 @@ class VoiceStateCache extends BaseCache_1.default {
      * @param id discord id of the user
      * @param guildId guild id
      */
-    async remove(id = (_a = this.boundObject) === null || _a === void 0 ? void 0 : _a.user_id, guildId) {
+    async remove(id, guildId) {
         var _a, _b;
+        if (id === void 0) { id = (_a = this.boundObject) === null || _a === void 0 ? void 0 : _a.user_id; }
         const state = await this.get(id, guildId);
         if (state) {
             await this.removeFromIndex(id, guildId);
@@ -105,7 +107,6 @@ class VoiceStateCache extends BaseCache_1.default {
      * @returns Returns a VoiceStateCache that has an id bound to it, which serves as the default argument to get, update and delete
      */
     bindUserId(userId) {
-        // @ts-ignore
         this.user_id = userId;
         return this;
     }

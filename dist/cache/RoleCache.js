@@ -54,9 +54,7 @@ class RoleCache extends BaseCache_1.default {
         if (!guildId) {
             return Promise.reject("Missing guild id");
         }
-        // @ts-ignore
         if (!data.guild_id) {
-            // @ts-ignore
             data.guild_id = guildId;
         }
         if (!data.id) {

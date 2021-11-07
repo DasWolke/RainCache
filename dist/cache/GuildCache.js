@@ -24,11 +24,11 @@ class GuildCache extends BaseCache_1.default {
         super(rain);
         this.storageEngine = storageEngine;
         this.namespace = "guild";
-        this.channels = channelCache;
-        this.roles = roleCache;
-        this.members = memberCache;
-        this.emojis = emojiCache;
-        this.presences = presenceCache;
+        this.channelCache = channelCache;
+        this.roleCache = roleCache;
+        this.memberCache = memberCache;
+        this.emojiCache = emojiCache;
+        this.presenceCache = presenceCache;
         this.guildChannelMap = guildToChannelCache;
         if (boundObject) {
             this.bindObject(boundObject);
@@ -46,7 +46,7 @@ class GuildCache extends BaseCache_1.default {
         }
         const guild = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.get(this.buildId(id)));
         if (guild) {
-            return new GuildCache(this.storageEngine, this.channels.bindGuild(guild.id), this.roles.bindGuild(guild.id), this.members.bindGuild(guild.id), this.emojis.bindGuild(guild.id), this.presences.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id), this.rain, guild);
+            return new GuildCache(this.storageEngine, this.channelCache.bindGuild(guild.id), this.roleCache.bindGuild(guild.id), this.memberCache.bindGuild(guild.id), this.emojiCache.bindGuild(guild.id), this.presenceCache.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id), this.rain, guild);
         }
         else {
             return null;
@@ -71,19 +71,16 @@ class GuildCache extends BaseCache_1.default {
         if (data.channels && data.channels.length > 0) {
             await this.guildChannelMap.update(id, data.channels.map(c => c.id));
             for (const channel of data.channels) {
-                // @ts-ignore
                 channel.guild_id = id;
-                await this.channels.update(channel.id, channel);
+                await this.channelCache.update(channel.id, channel);
                 // console.log(`Cached channel ${channel.id}|#"${channel.name}"|${typeof channel.name}`);
             }
         }
         if (data.members && data.members.length > 0) {
             const membersPromiseBatch = [];
             for (const member of data.members) {
-                // @ts-ignore
                 member.guild_id = id;
-                // @ts-ignore
-                membersPromiseBatch.push(this.members.update(member.user.id, id, member));
+                membersPromiseBatch.push(this.memberCache.update(member.user.id, id, member));
             }
             await Promise.all(membersPromiseBatch);
             // console.log(`Cached ${data.members.length} Guild Members from guild ${id}|${data.name}`);
@@ -91,8 +88,7 @@ class GuildCache extends BaseCache_1.default {
         if (data.presences && data.presences.length > 0) {
             const presencePromiseBatch = [];
             for (const presence of data.presences) {
-                // @ts-ignore
-                presencePromiseBatch.push(this.presences.update(presence.user.id, presence));
+                presencePromiseBatch.push(this.presenceCache.update(presence.user.id, presence));
             }
             await Promise.all(presencePromiseBatch);
             // console.log(`Cached ${data.presences.length} presences from guild ${id}|${data.name}`);
@@ -100,8 +96,7 @@ class GuildCache extends BaseCache_1.default {
         if (data.roles && data.roles.length > 0) {
             const rolePromiseBatch = [];
             for (const role of data.roles) {
-                // @ts-ignore
-                rolePromiseBatch.push(this.roles.update(role.id, id, role));
+                rolePromiseBatch.push(this.roleCache.update(role.id, id, role));
             }
             await Promise.all(rolePromiseBatch);
             // console.log(`Cached ${data.roles.length} roles from guild ${id}|${data.name}`);
@@ -109,7 +104,7 @@ class GuildCache extends BaseCache_1.default {
         if (data.emojis && data.emojis.length > 0) {
             const emojiPromiseBatch = [];
             for (const emoji of data.emojis) {
-                emojiPromiseBatch.push(this.emojis.update(emoji.id, id, emoji));
+                emojiPromiseBatch.push(this.emojiCache.update(emoji.id, id, emoji));
             }
             await Promise.all(emojiPromiseBatch);
         }
@@ -122,21 +117,13 @@ class GuildCache extends BaseCache_1.default {
             }
             await Promise.all(voicePromiseBatch);
         }
-        // @ts-ignore Shut up lmao
         delete data.members;
-        // @ts-ignore
         delete data.voice_states;
-        // @ts-ignore
         delete data.roles;
-        // @ts-ignore
         delete data.presences;
-        // @ts-ignore
         delete data.emojis;
-        // @ts-ignore
         delete data.features;
-        // @ts-ignore
         delete data.channels;
-        // @ts-ignore
         delete data.voice_states;
         await this.addToIndex(id);
         await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.upsert(this.buildId(id), this.structurize(data)));
@@ -145,35 +132,35 @@ class GuildCache extends BaseCache_1.default {
         const guild = await ((_b = this.storageEngine) === null || _b === void 0 ? void 0 : _b.get(this.buildId(id)));
         if (!guild)
             return this;
-        return new GuildCache(this.storageEngine, this.channels.bindGuild(guild.id), this.roles.bindGuild(guild.id), this.members.bindGuild(guild.id), this.emojis.bindGuild(guild.id), this.presences.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id), this.rain, guild);
+        return new GuildCache(this.storageEngine, this.channelCache.bindGuild(guild.id), this.roleCache.bindGuild(guild.id), this.memberCache.bindGuild(guild.id), this.emojiCache.bindGuild(guild.id), this.presenceCache.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id), this.rain, guild);
     }
     /**
      * Removes a guild and associated elements from the cache.
      * @param id id of the guild to remove
      */
     async remove(id) {
-        var _a, _b, _c, _d;
+        var _a, _b, _c;
         const guild = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.get(this.buildId(id)));
         if (guild) {
             const channelMap = await this.guildChannelMap.get(id);
-            const roles = await this.roles.getIndexMembers(id);
-            const emojis = await this.emojis.getIndexMembers(id);
-            const members = await this.members.getIndexMembers(id);
+            const roles = await this.roleCache.getIndexMembers(id);
+            const emojis = await this.emojiCache.getIndexMembers(id);
+            const members = await this.memberCache.getIndexMembers(id);
             for (const emoji of emojis) {
-                await this.emojis.remove(emoji, id);
+                await this.emojiCache.remove(emoji, id);
             }
             for (const role of roles) {
-                await this.roles.remove(role, id);
+                await this.roleCache.remove(role, id);
             }
-            for (const channel of ((_c = (_b = channelMap) === null || _b === void 0 ? void 0 : _b.boundObject) === null || _c === void 0 ? void 0 : _c.channels) || []) {
-                await this.channels.remove(channel);
+            for (const channel of ((_b = channelMap === null || channelMap === void 0 ? void 0 : channelMap.boundObject) === null || _b === void 0 ? void 0 : _b.channels) || []) {
+                await this.channelCache.remove(channel);
             }
             for (const member of members) {
-                await this.members.remove(member, id);
+                await this.memberCache.remove(member, id);
             }
             await this.guildChannelMap.remove(id);
             await this.removeFromIndex(id);
-            return (_d = this.storageEngine) === null || _d === void 0 ? void 0 : _d.remove(this.buildId(id));
+            return (_c = this.storageEngine) === null || _c === void 0 ? void 0 : _c.remove(this.buildId(id));
         }
         else {
             return undefined;
@@ -189,7 +176,7 @@ class GuildCache extends BaseCache_1.default {
         const guilds = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.filter(fn, undefined, this.namespace));
         if (!guilds)
             return [];
-        return guilds.map(g => new GuildCache(this.storageEngine, this.channels, this.roles.bindGuild(g.id), this.members.bindGuild(g.id), this.emojis.bindGuild(g.id), this.presences.bindGuild(g.id), this.guildChannelMap.bindGuild(g.id), this.rain, g));
+        return guilds.map(g => new GuildCache(this.storageEngine, this.channelCache, this.roleCache.bindGuild(g.id), this.memberCache.bindGuild(g.id), this.emojiCache.bindGuild(g.id), this.presenceCache.bindGuild(g.id), this.guildChannelMap.bindGuild(g.id), this.rain, g));
     }
     /**
      * Filter through the collection of guilds and return the first match
@@ -201,7 +188,7 @@ class GuildCache extends BaseCache_1.default {
         const guild = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.find(fn, undefined, this.namespace));
         if (!guild)
             return null;
-        return new GuildCache(this.storageEngine, this.channels.bindGuild(guild.id), this.roles.bindGuild(guild.id), this.members.bindGuild(guild.id), this.emojis.bindGuild(guild.id), this.presences.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id), this.rain, guild);
+        return new GuildCache(this.storageEngine, this.channelCache.bindGuild(guild.id), this.roleCache.bindGuild(guild.id), this.memberCache.bindGuild(guild.id), this.emojiCache.bindGuild(guild.id), this.presenceCache.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id), this.rain, guild);
     }
     /**
      * Add a guild to the guild index

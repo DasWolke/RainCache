@@ -5,8 +5,8 @@ import BaseStorageEngine from "../storageEngine/BaseStorageEngine";
  */
 declare class ChannelCache extends BaseCache<import("../types").Channel> {
     channelMap: import("./ChannelMapCache");
-    permissionOverwrites: import("./PermissionOverwriteCache");
-    recipients: import("./UserCache");
+    permissionOverwriteCache: import("./PermissionOverwriteCache");
+    recipientCache: import("./UserCache");
     namespace: "channel";
     /**
      * Create a new ChanneCache
@@ -49,7 +49,7 @@ declare class ChannelCache extends BaseCache<import("../types").Channel> {
      * @param channelMap Array of ids used for the filter
      * @returns First result bound to a channel cache
      */
-    find(fn: (channel?: import("@amanda/discordtypings").ChannelData) => unknown, channelMap: Array<string>): Promise<ChannelCache | null>;
+    find(fn: (channel?: import("discord-typings").ChannelData) => unknown, channelMap: Array<string>): Promise<ChannelCache | null>;
     /**
      * Add channels to the channel index
      * @param id ids of the channels

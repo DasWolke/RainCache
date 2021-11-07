@@ -16,9 +16,9 @@ declare class EventProcessor extends EventEmitter {
     presenceQueue: {
         [key: string]: {
             status: number;
-            game: import("@amanda/discordtypings").ActivityData;
+            activities: Array<import("discord-typings").ActivityData>;
             id: string;
-            user: import("@amanda/discordtypings").UserData;
+            user: import("discord-typings").UserData;
         };
     };
     presenceFlush: NodeJS.Timeout;

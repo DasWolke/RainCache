@@ -30,7 +30,7 @@ class EventProcessor extends events_1.EventEmitter {
         return event;
     }
     async process(event) {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s;
         switch (event.t) {
             case "READY":
                 await this.processReady(event);
@@ -94,18 +94,15 @@ class EventProcessor extends events_1.EventEmitter {
                     oldEmotes = [];
                 }
                 for (const emoji of event.d.emojis) {
-                    // @ts-ignore
                     const oldEmote = oldEmotes.find(e => e.id === emoji.id);
                     if (!oldEmote || oldEmote !== emoji) {
                         await ((_l = this.emojiCache) === null || _l === void 0 ? void 0 : _l.update(emoji.id, event.d.guild_id, emoji));
                     }
                 }
                 for (const oldEmote of oldEmotes) {
-                    // @ts-ignore
                     const newEmote = event.d.emojis.find(e => e.id === oldEmote.id);
                     if (!newEmote) {
-                        // @ts-ignore
-                        await this.emojiCache.remove(oldEmote.id, event.d.guild_id);
+                        await ((_m = this.emojiCache) === null || _m === void 0 ? void 0 : _m.remove(oldEmote.id, event.d.guild_id));
                     }
                 }
                 break;
@@ -114,9 +111,9 @@ class EventProcessor extends events_1.EventEmitter {
                 if (event.d.webhook_id)
                     return;
                 if (event.d.member && event.d.author)
-                    await ((_m = this.memberCache) === null || _m === void 0 ? void 0 : _m.update(event.d.author.id, event.d.guild_id, { guild_id: event.d.guild_id, user: event.d.author, id: event.d.author.id, ...event.d.member }));
+                    await ((_o = this.memberCache) === null || _o === void 0 ? void 0 : _o.update(event.d.author.id, event.d.guild_id, { guild_id: event.d.guild_id, user: event.d.author, id: event.d.author.id, ...event.d.member }));
                 else if (event.d.author)
-                    await ((_o = this.userCache) === null || _o === void 0 ? void 0 : _o.update(event.d.author.id, event.d.author));
+                    await ((_p = this.userCache) === null || _p === void 0 ? void 0 : _p.update(event.d.author.id, event.d.author));
                 if (event.d.mentions && event.d.mentions.length > 0 && event.d.guild_id) {
                     await Promise.all(event.d.mentions.map(user => {
                         var _a, _b;
@@ -132,11 +129,11 @@ class EventProcessor extends events_1.EventEmitter {
                 if (!event.d.guild_id)
                     return;
                 if (event.d.member && event.d.user_id && event.d.guild_id)
-                    await ((_p = this.memberCache) === null || _p === void 0 ? void 0 : _p.update(event.d.user_id, event.d.guild_id, { guild_id: event.d.guild_id, ...event.d.member }));
+                    await ((_q = this.memberCache) === null || _q === void 0 ? void 0 : _q.update(event.d.user_id, event.d.guild_id, { guild_id: event.d.guild_id, ...event.d.member }));
                 if (event.d.channel_id != null)
-                    await ((_q = this.voiceStateCache) === null || _q === void 0 ? void 0 : _q.update(event.d.user_id, event.d.guild_id, event.d));
+                    await ((_r = this.voiceStateCache) === null || _r === void 0 ? void 0 : _r.update(event.d.user_id, event.d.guild_id, event.d));
                 else
-                    await ((_r = this.voiceStateCache) === null || _r === void 0 ? void 0 : _r.remove(event.d.user_id, event.d.guild_id));
+                    await ((_s = this.voiceStateCache) === null || _s === void 0 ? void 0 : _s.remove(event.d.user_id, event.d.guild_id));
                 break;
             }
             default:
@@ -147,27 +144,26 @@ class EventProcessor extends events_1.EventEmitter {
         }
     }
     handlePresenceUpdate(presenceEvent) {
+        var _a, _b, _c, _d, _e, _f;
         if (presenceEvent.roles) {
-            // @ts-ignore
             delete presenceEvent.roles;
         }
         if (presenceEvent.guild_id) {
-            // @ts-ignore
             delete presenceEvent.guild_id;
         }
-        if (this.presenceQueue[presenceEvent.user.id]) {
-            this.presenceQueue[presenceEvent.user.id] = Object.assign(this.presenceQueue[presenceEvent.user.id], {
+        if (this.presenceQueue[(_a = presenceEvent.user) === null || _a === void 0 ? void 0 : _a.id]) {
+            this.presenceQueue[(_b = presenceEvent.user) === null || _b === void 0 ? void 0 : _b.id] = Object.assign(this.presenceQueue[(_c = presenceEvent.user) === null || _c === void 0 ? void 0 : _c.id], {
                 status: presenceEvent.status,
-                game: presenceEvent.game,
-                id: presenceEvent.user.id,
+                activities: presenceEvent.activities,
+                id: (_d = presenceEvent.user) === null || _d === void 0 ? void 0 : _d.id,
                 user: presenceEvent.user
             });
         }
         else {
-            this.presenceQueue[presenceEvent.user.id] = {
+            this.presenceQueue[(_e = presenceEvent.user) === null || _e === void 0 ? void 0 : _e.id] = {
                 status: presenceEvent.status,
-                game: presenceEvent.game,
-                id: presenceEvent.user.id,
+                activities: presenceEvent.activities,
+                id: (_f = presenceEvent.user) === null || _f === void 0 ? void 0 : _f.id,
                 user: presenceEvent.user
             };
         }
@@ -175,7 +171,6 @@ class EventProcessor extends events_1.EventEmitter {
     async processReady(readyEvent) {
         var _a, _b, _c;
         const updates = [];
-        // @ts-ignore
         updates.push((_a = this.userCache) === null || _a === void 0 ? void 0 : _a.update("self", { id: readyEvent.d.user.id }));
         updates.push((_b = this.userCache) === null || _b === void 0 ? void 0 : _b.update(readyEvent.d.user.id, readyEvent.d.user));
         for (const guild of readyEvent.d.guilds) {
@@ -232,9 +227,7 @@ class EventProcessor extends events_1.EventEmitter {
         this.presenceQueue = {};
         const presenceUpdatePromises = [];
         for (const key in queue) {
-            // eslint-disable-next-line no-prototype-builtins
-            if (queue.hasOwnProperty(key)) {
-                // @ts-ignore
+            if (Object.hasOwnProperty.call(queue, key)) {
                 presenceUpdatePromises.push((_a = this.presenceCache) === null || _a === void 0 ? void 0 : _a.update(key, queue[key]));
             }
         }

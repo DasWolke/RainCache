@@ -3,9 +3,9 @@ import BaseStorageEngine from "../storageEngine/BaseStorageEngine";
 /**
  * Cache responsible for storing presence related data
  */
-declare class PresenceCache extends BaseCache<import("@amanda/discordtypings").PresenceData> {
+declare class PresenceCache extends BaseCache<import("discord-typings").PresenceData> {
     namespace: "presence";
-    users: import("./UserCache");
+    userCache: import("./UserCache");
     /**
      * Create a new Presence Cache
      *
@@ -13,7 +13,7 @@ declare class PresenceCache extends BaseCache<import("@amanda/discordtypings").P
      * @param storageEngine Storage engine to use for this cache
      * @param boundObject Optional, may be used to bind a presence object to the cache
      */
-    constructor(storageEngine: BaseStorageEngine<import("@amanda/discordtypings").PresenceData>, userCache: import("./UserCache"), rain: import("../RainCache")<any, any>, boundObject?: import("@amanda/discordtypings").PresenceData);
+    constructor(storageEngine: BaseStorageEngine<import("discord-typings").PresenceData>, userCache: import("./UserCache"), rain: import("../RainCache")<any, any>, boundObject?: import("discord-typings").PresenceData);
     /**
      * Get a presence via user id
      * @param id id of a discord user
@@ -28,7 +28,7 @@ declare class PresenceCache extends BaseCache<import("@amanda/discordtypings").P
      * @param data updated presence data of the user
      * @returns returns a bound presence cache
      */
-    update(id: string, data: import("@amanda/discordtypings").PresenceData): Promise<PresenceCache>;
+    update(id: string, data: Partial<import("discord-typings").PresenceData>): Promise<PresenceCache>;
     /**
      * Remove a stored presence from the cache
      * @param id id of the user the presence belongs to

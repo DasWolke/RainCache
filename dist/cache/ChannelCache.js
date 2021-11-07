@@ -22,8 +22,8 @@ class ChannelCache extends BaseCache_1.default {
         this.storageEngine = storageEngine;
         this.namespace = "channel";
         this.channelMap = channelMap;
-        this.permissionOverwrites = permissionOverwriteCache;
-        this.recipients = userCache;
+        this.permissionOverwriteCache = permissionOverwriteCache;
+        this.recipientCache = userCache;
         if (boundObject) {
             this.bindObject(boundObject);
         }
@@ -40,7 +40,7 @@ class ChannelCache extends BaseCache_1.default {
         }
         const channel = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.get(this.buildId(id)));
         if (channel) {
-            return new ChannelCache(this.storageEngine, this.channelMap, this.permissionOverwrites.bindChannel(channel.id), this.recipients, this.rain, channel);
+            return new ChannelCache(this.storageEngine, this.channelMap, this.permissionOverwriteCache.bindChannel(channel.id), this.recipientCache, this.rain, channel);
         }
         else {
             return null;
@@ -66,7 +66,7 @@ class ChannelCache extends BaseCache_1.default {
         }
         if (data.permission_overwrites) {
             for (const overwrite of data.permission_overwrites) {
-                await this.permissionOverwrites.update(overwrite.id, id, overwrite);
+                await this.permissionOverwriteCache.update(overwrite.id, id, overwrite);
             }
         }
         delete data.permission_overwrites;
@@ -77,7 +77,7 @@ class ChannelCache extends BaseCache_1.default {
             return this;
         const channel = await ((_b = this.storageEngine) === null || _b === void 0 ? void 0 : _b.get(this.buildId(id)));
         if (channel)
-            return new ChannelCache(this.storageEngine, this.channelMap, this.permissionOverwrites.bindChannel(channel.id), this.recipients, this.rain, channel);
+            return new ChannelCache(this.storageEngine, this.channelMap, this.permissionOverwriteCache.bindChannel(channel.id), this.recipientCache, this.rain, channel);
         else
             return this;
     }
@@ -105,7 +105,7 @@ class ChannelCache extends BaseCache_1.default {
     async filter(fn, channelMap) {
         var _a;
         const channels = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.filter(fn, channelMap, this.namespace)) || [];
-        return channels.map(c => new ChannelCache(this.storageEngine, this.channelMap, this.permissionOverwrites.bindChannel(c.id), this.recipients, this.rain, c));
+        return channels.map(c => new ChannelCache(this.storageEngine, this.channelMap, this.permissionOverwriteCache.bindChannel(c.id), this.recipientCache, this.rain, c));
     }
     /**
      * Filter through the collection of channels and return on the first result
@@ -118,7 +118,7 @@ class ChannelCache extends BaseCache_1.default {
         const channel = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.find(fn, channelMap, this.namespace));
         if (!channel)
             return null;
-        return new ChannelCache(this.storageEngine, this.channelMap, this.permissionOverwrites.bindChannel(channel.id), this.recipients, this.rain, channel);
+        return new ChannelCache(this.storageEngine, this.channelMap, this.permissionOverwriteCache.bindChannel(channel.id), this.recipientCache, this.rain, channel);
     }
     /**
      * Add channels to the channel index

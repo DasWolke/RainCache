@@ -1,14 +1,14 @@
 /**
  * Base Storage engine class defining the methods being used by RainCache that a storage engine is supposed to have
  */
-declare class BaseStorageEngine<T> {
+declare abstract class BaseStorageEngine<T> {
     ready: boolean;
     constructor();
     /** Initializes the engine, e.g. db connection, etc.. */
     initialize(): void | Promise<void>;
     get(id: string): T | null | Promise<T | null>;
     get(id: string, useHash?: boolean): string | Promise<string>;
-    upsert(id: string, data: T): void | Promise<void>;
+    upsert(id: string, data: Partial<T>): void | Promise<void>;
     remove(id: string, useHash?: boolean): void | Promise<void>;
     getListMembers(listId: string): Array<string> | Promise<Array<string>>;
     addToList(listId: string, id: string): void | Promise<void>;

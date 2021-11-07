@@ -15,8 +15,9 @@ class MemoryStorageEngine<T> extends BaseStorageEngine<T> {
 	 * Get an object from the cache via id
 	 * @param id id of the object
 	 */
-	// @ts-ignore
-	public get(id: string): T | null {
+	public get(id: string): T | null;
+	public get(id: string, DO_NOT_USE_THIS_OVERLOAD?: unknown): string | Promise<string>;
+	public get(id: string, DO_NOT_USE_THIS_OVERLOAD?: unknown): T | string | null | Promise<T | string | null> {
 		const raw = this.map.get(id);
 		return this.parseData(raw);
 	}

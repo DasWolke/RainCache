@@ -54,15 +54,12 @@ class ChannelMapCache extends BaseCache_1.default {
         }
         let oldCacheData = await this.get(id, type);
         if (oldCacheData && !remove) {
-            // @ts-ignore
             data = this._checkDupes(oldCacheData.channels, data);
         }
         if (remove) {
             if (!oldCacheData) {
-                // @ts-ignore
                 oldCacheData = { channels: [] };
             }
-            // @ts-ignore
             data = this._removeOldChannels(oldCacheData.channels, data);
         }
         const channelMapId = this.buildId(this._buildMapId(id, type));

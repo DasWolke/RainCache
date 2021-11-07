@@ -28,30 +28,23 @@ class RainCache extends events_1.EventEmitter {
      */
     constructor(options, inboundConnector, outboundConnector) {
         super();
+        this.ready = false;
+        this.Connectors = RainCache.Connectors;
+        this.Engines = RainCache.Engines;
         if (!options.storage) {
             throw new Error("No storage engines were passed");
         }
         if (!options.cacheClasses) {
             options.cacheClasses = {
-                // @ts-ignore
                 guild: GuildCache_1.default,
-                // @ts-ignore
                 channel: ChannelCache_1.default,
-                // @ts-ignore
                 channelMap: ChannelMapCache_1.default,
-                // @ts-ignore
                 member: MemberCache_1.default,
-                // @ts-ignore
                 user: UserCache_1.default,
-                // @ts-ignore
                 role: RoleCache_1.default,
-                // @ts-ignore
                 emoji: EmojiCache_1.default,
-                // @ts-ignore
                 presence: PresenceCache_1.default,
-                // @ts-ignore
                 permOverwrite: PermissionOverwriteCache_1.default,
-                // @ts-ignore
                 voiceState: VoiceStateCache_1.default
             };
         }
@@ -79,29 +72,10 @@ class RainCache extends events_1.EventEmitter {
         this.inbound = inboundConnector;
         this.outbound = outboundConnector;
     }
-    static get Connectors() {
-        return {
-            AmqpConnector: AmqpConnector_1.default,
-            DirectConnector: DirectConnector_1.default
-        };
-    }
-    get Connectors() {
-        return RainCache.Connectors;
-    }
-    static get Engines() {
-        return {
-            RedisStorageEngine: RedisStorageEngine_1.default,
-            MemoryStorageEngine: MemoryStorageEngine_1.default
-        };
-    }
-    get Engines() {
-        return RainCache.Engines;
-    }
     async initialize() {
         try {
             for (const engine in this.options.storage) {
-                // eslint-disable-next-line no-prototype-builtins
-                if (this.options.storage.hasOwnProperty(engine)) {
+                if (Object.hasOwnProperty.call(this.options.storage, engine)) {
                     if (!this.options.storage[engine].ready) {
                         await this.options.storage[engine].initialize();
                     }
@@ -111,7 +85,6 @@ class RainCache extends events_1.EventEmitter {
         catch (e) {
             throw new Error("Failed to initialize storage engines");
         }
-        // @ts-ignore
         this.cache = this._createCaches(this.options.storage, this.options.cacheClasses);
         Object.assign(this, this.cache);
         this.eventProcessor = new EventProcessor_1.default({
@@ -201,4 +174,6 @@ class RainCache extends events_1.EventEmitter {
         return engines[engine] || engines["default"];
     }
 }
+RainCache.Connectors = { AmqpConnector: AmqpConnector_1.default, DirectConnector: DirectConnector_1.default };
+RainCache.Engines = { RedisStorageEngine: RedisStorageEngine_1.default, MemoryStorageEngine: MemoryStorageEngine_1.default };
 module.exports = RainCache;

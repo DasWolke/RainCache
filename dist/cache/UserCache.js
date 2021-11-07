@@ -28,8 +28,9 @@ class UserCache extends BaseCache_1.default {
      * @param id discord id of the user
      * @returns Returns a User Cache with a bound user or null if no user was found
      */
-    async get(id = (_a = this.boundObject) === null || _a === void 0 ? void 0 : _a.id) {
+    async get(id) {
         var _a, _b;
+        if (id === void 0) { id = (_a = this.boundObject) === null || _a === void 0 ? void 0 : _a.id; }
         if (this.boundObject) {
             return this;
         }
@@ -44,8 +45,9 @@ class UserCache extends BaseCache_1.default {
      * @param id discord id of the user
      * @param data updated data of the user, it will be merged with the old data
      */
-    async update(id = (_a = this.boundObject) === null || _a === void 0 ? void 0 : _a.id, data) {
+    async update(id, data) {
         var _a, _b;
+        if (id === void 0) { id = (_a = this.boundObject) === null || _a === void 0 ? void 0 : _a.id; }
         if (this.boundObject) {
             this.bindObject(data);
         }
@@ -59,8 +61,9 @@ class UserCache extends BaseCache_1.default {
      * Remove a user from the cache
      * @param id discord id of the user
      */
-    async remove(id = (_a = this.boundObject) === null || _a === void 0 ? void 0 : _a.id) {
+    async remove(id) {
         var _a, _b, _c;
+        if (id === void 0) { id = (_a = this.boundObject) === null || _a === void 0 ? void 0 : _a.id; }
         const user = await ((_b = this.storageEngine) === null || _b === void 0 ? void 0 : _b.get(this.buildId(id)));
         if (user) {
             await this.removeFromIndex(id);
@@ -101,7 +104,6 @@ class UserCache extends BaseCache_1.default {
      * @returns Returns a UserCache that has an id bound to it, which serves as the default argument to get, update and delete
      */
     bindUserId(userId) {
-        // @ts-ignore
         this.id = userId;
         return this;
     }

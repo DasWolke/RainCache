@@ -1,10 +1,9 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 /**
  * Base Storage engine class defining the methods being used by RainCache that a storage engine is supposed to have
  */
-class BaseStorageEngine<T> {
+abstract class BaseStorageEngine<T> {
 	public ready: boolean;
 
 	public constructor() {
@@ -12,25 +11,25 @@ class BaseStorageEngine<T> {
 	}
 
 	/** Initializes the engine, e.g. db connection, etc.. */
-	public initialize(): void | Promise<void> {}
+	public initialize(): void | Promise<void> { void 0; }
 
-	public get(id: string): T | null | Promise<T | null>
-	public get(id: string, useHash?: boolean): string | Promise<string>
+	public get(id: string): T | null | Promise<T | null>;
+	public get(id: string, useHash?: boolean): string | Promise<string>;
 	public get(id: string, useHash?: boolean): T | string | null | Promise<T | string | null> { return null; }
 
-	public upsert(id: string, data: T): void | Promise<void> {}
+	public upsert(id: string, data: Partial<T>): void | Promise<void> { void 0; }
 
-	public remove(id: string, useHash?: boolean): void | Promise<void> {}
+	public remove(id: string, useHash?: boolean): void | Promise<void> { void 0; }
 
 	public getListMembers(listId: string): Array<string> | Promise<Array<string>> { return ["null"]; }
 
-	public addToList(listId: string, id: string): void | Promise<void> {}
+	public addToList(listId: string, id: string): void | Promise<void> { void 0; }
 
 	public isListMember(listId: string, id: string): boolean | Promise<boolean> { return false; }
 
-	public removeFromList(listId: string, id: string): void | Promise<void> {}
+	public removeFromList(listId: string, id: string): void | Promise<void> { void 0; }
 
-	public removeList(listId: string): void | Promise<void> {}
+	public removeList(listId: string): void | Promise<void> { void 0; }
 
 	public getListCount(listId: string): number | Promise<number> { return 0; }
 

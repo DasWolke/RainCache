@@ -1,5 +1,5 @@
 "use strict";
-class BaseCache {
+class _BaseCache {
     /**
      * Base class for all cache classes.
      *
@@ -122,4 +122,6 @@ class BaseCache {
         return data;
     }
 }
-module.exports = BaseCache;
+_BaseCache.default = _BaseCache;
+const BaseCacheWithProperTypes = _BaseCache;
+module.exports = BaseCacheWithProperTypes;

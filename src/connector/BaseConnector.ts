@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import { EventEmitter } from "events";
 
 /**
@@ -19,7 +16,7 @@ class BaseConnector extends EventEmitter {
 		return Promise.resolve();
 	}
 
-	public send(event: any) {}
+	public send(event: any) { void event; }
 }
 
 export = BaseConnector;

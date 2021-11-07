@@ -19,7 +19,7 @@ class MemberCache extends BaseCache_1.default {
         super(rain);
         this.storageEngine = storageEngine;
         this.namespace = "member";
-        this.user = userCache;
+        this.userCache = userCache;
         this.boundGuild = "";
         if (boundObject) {
             this.bindObject(boundObject);
@@ -40,8 +40,7 @@ class MemberCache extends BaseCache_1.default {
         if (!member) {
             return null;
         }
-        // @ts-ignore
-        return new MemberCache(this.storageEngine, this.user.bindUserId(member.id), this.rain, member);
+        return new MemberCache(this.storageEngine, this.userCache.bindUserId(id), this.rain, member);
     }
     /**
      * Update data of a guild member
@@ -57,29 +56,21 @@ class MemberCache extends BaseCache_1.default {
         if (!guildId) {
             throw new Error(`Empty guild id for member ${id}`);
         }
-        // @ts-ignore
         if (!data.guild_id) {
-            // @ts-ignore
             data.guild_id = guildId;
         }
-        // @ts-ignore
         if (!data.id) {
-            // @ts-ignore
             data.id = id;
         }
-        // @ts-ignore
         if (data.user) {
-            // @ts-ignore
-            await this.user.update(data.user.id, data.user);
-            // @ts-ignore
+            await this.userCache.update(data.user.id, data.user);
             delete data.user;
         }
         await this.addToIndex(id, guildId);
         await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.upsert(this.buildId(id, guildId), this.structurize(data)));
         if (this.boundObject)
             return this;
-        // @ts-ignore
-        return new MemberCache(this.storageEngine, this.user.bindUserId(data.id), this.rain, data);
+        return new MemberCache(this.storageEngine, this.userCache.bindUserId(data.id), this.rain, data);
     }
     /**
      * Remove a member from the cache
@@ -105,8 +96,9 @@ class MemberCache extends BaseCache_1.default {
     async filter(fn, guildId = this.boundGuild, ids) {
         var _a;
         const members = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.filter(fn, ids, super.buildId(guildId)));
-        // @ts-ignore
-        return members.map(m => new MemberCache(this.storageEngine, this.user.bindUserId(m.id), this.rain, m).bindGuild(this.boundGuild));
+        if (!members)
+            return [];
+        return members.map(m => new MemberCache(this.storageEngine, this.userCache.bindUserId(m.id), this.rain, m).bindGuild(this.boundGuild));
     }
     /**
      * Filter through the collection of members and return the first match
@@ -118,8 +110,7 @@ class MemberCache extends BaseCache_1.default {
         const member = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.find(fn, ids, super.buildId(guildId)));
         if (!member)
             return null;
-        // @ts-ignore
-        return new MemberCache(this.storageEngine, this.user.bindUserId(member.id), this.rain, member);
+        return new MemberCache(this.storageEngine, this.userCache.bindUserId(member.id), this.rain, member);
     }
     /**
      * Build a unique key for storing member data

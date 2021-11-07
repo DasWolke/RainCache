@@ -18,7 +18,7 @@ class PresenceCache extends BaseCache_1.default {
         super(rain);
         this.storageEngine = storageEngine;
         this.namespace = "presence";
-        this.users = userCache;
+        this.userCache = userCache;
         if (boundObject) {
             this.bindObject(boundObject);
         }
@@ -35,7 +35,7 @@ class PresenceCache extends BaseCache_1.default {
         }
         const presence = await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.get(this.buildId(id)));
         if (presence) {
-            return new PresenceCache(this.storageEngine, this.users.bindUserId(id), this.rain, presence);
+            return new PresenceCache(this.storageEngine, this.userCache.bindUserId(id), this.rain, presence);
         }
         else {
             return null;
@@ -55,22 +55,19 @@ class PresenceCache extends BaseCache_1.default {
             this.bindObject(data);
         }
         if (data.guild_id) {
-            // @ts-ignore It MUST? Watch me. Remove this ignore. It's funny.
             delete data.guild_id;
         }
         if (data.roles) {
-            // @ts-ignore
             delete data.roles;
         }
         if (data.user) {
-            await this.users.update(data.user.id, data.user);
-            // @ts-ignore
+            await this.userCache.update(data.user.id, data.user);
             delete data.user;
         }
         await ((_a = this.storageEngine) === null || _a === void 0 ? void 0 : _a.upsert(this.buildId(id), this.structurize(data)));
         if (this.boundObject)
             return this;
-        return new PresenceCache(this.storageEngine, this.users, this.rain, data);
+        return new PresenceCache(this.storageEngine, this.userCache, this.rain, data);
     }
     /**
      * Remove a stored presence from the cache
