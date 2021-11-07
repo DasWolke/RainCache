@@ -6,3 +6,4 @@ package-lock.json
 raincache.iml
 yarn.lock
 RainCache
+dist/
