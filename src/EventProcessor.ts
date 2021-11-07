@@ -67,8 +67,6 @@ class EventProcessor extends EventEmitter {
 			break;
 		case "CHANNEL_CREATE":
 		case "CHANNEL_UPDATE":
-			// console.log(event);
-			// console.log(event.d.permission_overwrites);
 			await this.onChannelCreate(event);
 			break;
 		case "CHANNEL_DELETE":
@@ -194,7 +192,6 @@ class EventProcessor extends EventEmitter {
 		case 5:
 		case 6:
 			await this.channelMapCache?.update(channelCreateEvent.d.guild_id, [channelCreateEvent.d.id], "guild");
-			// this.emit('debug', `Caching guild channel ${channelCreateEvent.d.id}`);
 			return this.channelCache?.update(channelCreateEvent.d.id, channelCreateEvent.d);
 		default:
 			break;
@@ -204,7 +201,6 @@ class EventProcessor extends EventEmitter {
 				this.emit("debug", `Empty Recipients array for dm ${channelCreateEvent.d.id}`);
 				return;
 			}
-			// this.emit('debug', `Caching dm channel ${channelCreateEvent.d.id}`);
 			await this.channelMapCache?.update(channelCreateEvent.d.recipients[0].id, [channelCreateEvent.d.id], "user");
 			return this.channelCache?.update(channelCreateEvent.d.id, channelCreateEvent.d);
 		}

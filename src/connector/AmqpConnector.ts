@@ -35,7 +35,6 @@ class AmqpConnector extends BaseConnector {
 		this.channel.assertQueue(this.options.amqpQueue, {durable: false, autoDelete: true});
 		this.channel.consume(this.options.amqpQueue, (event) => {
 			if (event) this.channel?.ack(event);
-			// console.log(event.content.toString());
 			if (event) this.emit("event", JSON.parse(event.content.toString()));
 		});
 	}

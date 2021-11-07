@@ -1,7 +1,7 @@
 class _BaseCache<T> {
-	public storageEngine: import("../storageEngine/BaseStorageEngine")<T> | null;
-	public namespace: string;
-	public dataTimestamp?: Date;
+	public storageEngine: import("../storageEngine/BaseStorageEngine")<T> | null = null;
+	public namespace = "base";
+	public dataTimestamp: Date | null = null;
 	public boundObject: Partial<T> | null = null;
 	/** guild id bound to this cache */
 	public boundGuild?: string;
@@ -17,8 +17,6 @@ class _BaseCache<T> {
 	 * **All Methods from BaseCache are also available on every class that is extending it.**
 	 */
 	public constructor(rain: import("../RainCache")<any, any>) {
-		this.storageEngine = null;
-		this.namespace = "base";
 		this.rain = rain;
 	}
 

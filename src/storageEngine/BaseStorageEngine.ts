@@ -35,7 +35,7 @@ abstract class BaseStorageEngine<T> {
 
 	public filter(fn: (value?: T, index?: number, array?: Array<T>) => unknown, ids?: Array<string>, namespace?: string): Array<T> | Promise<Array<T>> { return []; }
 
-	public find(fn: (value?: T, index?: number, array?: Array<any>) => unknown, ids?: Array<string>, namespace?: string): T | null | Promise<T | null> { return null; }
+	public find(fn: (value?: T, index?: number, array?: Array<string>) => unknown, ids?: Array<string>, namespace?: string): T | null | Promise<T | null> { return null; }
 }
 
 export = BaseStorageEngine;

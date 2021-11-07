@@ -4,11 +4,10 @@ import { EventEmitter } from "events";
  * BaseConnector class, provides a common structure for connectors
  */
 class BaseConnector extends EventEmitter {
-	public ready: boolean;
+	public ready = false;
 
 	public constructor() {
 		super();
-		this.ready = false;
 	}
 
 	public initialize() {
