@@ -2,10 +2,11 @@
   "name": "raincache",
   "version": "0.5.0",
   "description": "A pluggable discord cache worker",
-  "main": "./dist/RainCache.js",
-  "types": "./dist/RainCache.d.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
-    "build:src": "tsc -p ."
+    "build:src": "tsc -p .",
+    "build:docs": "typedoc --name RainCache --excludeExternals --sort static-first --sort alphabetical"
   },
   "author": "wolke <wolke@weeb.sh>",
   "license": "MIT",
@@ -23,6 +24,9 @@
     "@typescript-eslint/eslint-plugin": "^5.3.0",
     "@typescript-eslint/parser": "^5.3.0",
     "eslint": "^8.2.0",
+    "typedoc": "^0.22.8",
+    "typedoc-plugin-mdn-links": "^1.0.4",
+    "typedoc-plugin-missing-exports": "^0.22.4",
     "typescript": "~4.4.4"
   },
   "files": [
