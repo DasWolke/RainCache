@@ -18,35 +18,33 @@ Then RainCache is the right tool for the job!
 You can find the docs at [https://daswolke.github.io/RainCache/](https://daswolke.github.io/RainCache/)
 
 #### Installation:
-To install RainCache, make sure that you have node 8 or higher and npm installed on your computer.
+To install RainCache, make sure that you have node 12 or higher and npm installed on your computer.
 Then run the following command in a terminal `npm install raincache`
 
 #### Example:
 ```js
-let RainCache = require('raincache');
-// Load the Amqp Connector
-let AmqpConnector = RainCache.Connectors.AmqpConnector; 
-// Load the redis storage engine class
-let RedisStorageEngine = RainCache.Engines.RedisStorageEngine; 
+const { RainCache, AmqpConnector, RedisStorageEngine } = require("raincache");
 // Use the default options and create a new connector which isn't connected yet
-let con = new AmqpConnector(); 
-// Create a new uninitialized RainCache instance, set redis as the default storage engine, 
+const con = new AmqpConnector();
+// Create a new uninitialized RainCache instance, set redis as the default storage engine,
 // disable debugging mode and pass an inbound and an outbound connector to receive and forward events
-let cache = new RainCache({
-    storage: {
-        default: new RedisStorageEngine({
-            host: 'localhost'
-        })
-    }, debug: false}, 
-    con, con);
+const cache = new RainCache({
+	storage: {
+		default: new RedisStorageEngine({
+			redisOptions: {
+				host: "localhost"
+			}
+		})
+	}, debug: false},
+	con, /* THIS PARAM IS FOR SENDING DATA OFF SOMEWHERE ELSE AFTER PROCESSING IS DONE */);
 
-let init = async () => {
-    // initialize the cache, the connector and the database connection
-    await cache.initialize(); 
+const init = async () => {
+	// initialize the cache, the connector and the database connection
+	await cache.initialize();
 };
 // Declare an asynchronous init method
 init().then(() => {
-    console.log('Cache initialized');
+	console.log("Cache initialized");
 }).catch(e => console.error(e));
 // Run the init function
 ```
@@ -59,7 +57,7 @@ init().then(() => {
 ---
 
 #### Notable Difference to normal caches
-RainCache generally does not have any differences in comparison with general discord library caches, but there is one notable difference: 
+RainCache generally does not have any differences in comparison with general discord library caches, but there is one notable difference:
 
 **Presences are stored per user and not per guild**
 
@@ -74,10 +72,10 @@ Apart from that it allows RainCache to minimize the storage usage a lot, since a
 RainCache returns the data received as a cache object with additional properties found in the retrieved data.
  This way you can easily retrieve additional properties of received data (e.g. permission overwrites of a channel).
 ```js
-let cache = new RainCache(someOptions);
-let channel = await cache.channel.get('channel id') 
+const cache = new RainCache(someOptions);
+const channel = await cache.channel.get('channel id')
 // The received object is a channel cache with the properties of the retrieved channel object (id, name, type, etc..) attached to it
-let overwrites = await channel.permissionOverwrites.getIndexMembers() 
+const overwrites = await channel.permissionOverwrites.getIndexMembers()
 //this would load all permission overwrites for the channel previously loaded
 ```
 ---
