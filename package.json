@@ -4,6 +4,9 @@
   "description": "A pluggable discord cache worker",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "engines": {
+    "node": ">=12.0.0"
+  },
   "scripts": {
     "build:src": "tsc -p .",
     "build:docs": "typedoc --name RainCache --excludeExternals --sort static-first --sort alphabetical"
