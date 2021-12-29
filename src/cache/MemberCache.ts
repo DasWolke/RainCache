@@ -51,7 +51,6 @@ class MemberCache extends BaseCache<import("discord-typings").MemberData & { gui
 		if (!data.id) data.id = id;
 		if (data.user) {
 			await this.userCache.update(data.user.id, data.user);
-			delete data.user;
 		}
 		if (this.boundObject) this.bindObject(data);
 		await this.addToIndex(id, guildId);
