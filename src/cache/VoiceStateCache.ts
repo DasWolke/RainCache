@@ -45,7 +45,7 @@ class VoiceStateCache extends BaseCache<import("discord-typings").VoiceStateData
 		if (!data.guild_id) data.guild_id = guildId;
 		if (this.boundObject) this.bindObject(data);
 
-		await this.addToIndex(id);
+		await this.addToIndex(id, guildId);
 		await this.storageEngine.upsert(this.buildId(id, guildId), this.structurize(data));
 		if (this.boundObject) return this;
 		return new VoiceStateCache(this.storageEngine, this.rain, data);
@@ -95,26 +95,29 @@ class VoiceStateCache extends BaseCache<import("discord-typings").VoiceStateData
 
 	/**
 	 * Add a voice state to the voicestates index
-	 * @param id id of the voice state
+	 * @param id id of the user
+	 * @param guildId id of the guild
 	 */
-	public async addToIndex(id: string): Promise<void> {
-		return this.storageEngine.addToList(this.namespace, id);
+	public async addToIndex(id: string, guildId: string): Promise<void> {
+		return this.storageEngine.addToList(this.namespace, this.buildId(id, guildId));
 	}
 
 	/**
 	 * Remove a VoiceState from the index
 	 * @param id id of the user
+	 * @param guildId id of the guild
 	 */
-	public async removeFromIndex(id: string, guildId?: string): Promise<void> {
+	public async removeFromIndex(id: string, guildId: string): Promise<void> {
 		return this.storageEngine.removeFromList(this.namespace, this.buildId(id, guildId));
 	}
 
 	/**
 	 * Check if a VoiceState is indexed
 	 * @param id id of the user
+	 * @param guildId id of the guild
 	 * @return True if the state is indexed, false otherwise
 	 */
-	public async isIndexed(id: string, guildId?: string): Promise<boolean> {
+	public async isIndexed(id: string, guildId: string): Promise<boolean> {
 		return this.storageEngine.isListMember(this.namespace, this.buildId(id, guildId));
 	}
 
@@ -147,8 +150,8 @@ class VoiceStateCache extends BaseCache<import("discord-typings").VoiceStateData
 	 * @param userId id of the user
 	 * @param guildId id of the guild
 	 */
-	public buildId(userId: string, guildId?: string): string {
-		if (!guildId) return super.buildId(userId);
+	// @ts-ignore
+	public buildId(userId: string, guildId: string): string {
 		return `${this.namespace}.${guildId}.${userId}`;
 	}
 }
