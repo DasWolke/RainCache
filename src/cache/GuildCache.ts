@@ -4,15 +4,14 @@ import BaseStorageEngine from "../storageEngine/BaseStorageEngine";
 /**
  * Cache responsible for guilds
  */
-class GuildCache extends BaseCache<import("discord-typings").GuildData> {
-	public channelCache: import("./ChannelCache");
-	public roleCache: import("./RoleCache");
-	public memberCache: import("./MemberCache");
-	public emojiCache: import("./EmojiCache");
-	public presenceCache: import("./PresenceCache");
-	public guildChannelMap: import("./ChannelMapCache");
-	public namespace: "guild" = "guild";
-	public storageEngine: BaseStorageEngine<import("discord-typings").GuildData>;
+class GuildCache extends BaseCache<import("discord-typings").Guild> {
+	public channelCache: import("./ChannelCache").default;
+	public roleCache: import("./RoleCache").default;
+	public memberCache: import("./MemberCache").default;
+	public emojiCache: import("./EmojiCache").default;
+	public presenceCache: import("./PresenceCache").default;
+	public guildChannelMap: import("./ChannelMapCache").default;
+	public namespace = "guild" as const;
 
 	/**
 	 * Create a new GuildCache
@@ -25,10 +24,9 @@ class GuildCache extends BaseCache<import("discord-typings").GuildData> {
 	 * @param emojiCache Instantiated EmojiCache class
 	 * @param presenceCache Instantiated PresenceCache class
 	 * @param guildToChannelCache Instantiated ChannelMap class
-	 * @param boundObject Optional, may be used to bind a guild object to the cache
 	 */
-	public constructor(storageEngine: BaseStorageEngine<import("discord-typings").GuildData>, channelCache: import("./ChannelCache"), roleCache: import("./RoleCache"), memberCache: import("./MemberCache"), emojiCache: import("./EmojiCache"), presenceCache: import("./PresenceCache"), guildToChannelCache: import("./ChannelMapCache"), rain: import("../RainCache")<any, any>, boundObject?: Partial<import("discord-typings").GuildData>) {
-		super(rain);
+	public constructor(storageEngine: BaseStorageEngine<import("discord-typings").Guild>, rain: import("../RainCache").default<any, any>, channelCache: import("./ChannelCache").default, roleCache: import("./RoleCache").default, memberCache: import("./MemberCache").default, emojiCache: import("./EmojiCache").default, presenceCache: import("./PresenceCache").default, guildToChannelCache: import("./ChannelMapCache").default) {
+		super(storageEngine, rain);
 		this.storageEngine = storageEngine;
 		this.channelCache = channelCache;
 		this.roleCache = roleCache;
@@ -36,7 +34,6 @@ class GuildCache extends BaseCache<import("discord-typings").GuildData> {
 		this.emojiCache = emojiCache;
 		this.presenceCache = presenceCache;
 		this.guildChannelMap = guildToChannelCache;
-		if (boundObject) this.bindObject(boundObject);
 	}
 
 	/**
@@ -47,23 +44,20 @@ class GuildCache extends BaseCache<import("discord-typings").GuildData> {
 	public async get(id: string): Promise<GuildCache | null> {
 		if (this.boundObject) return this;
 		const guild = await this.storageEngine.get(this.buildId(id));
-		if (guild) return new GuildCache(this.storageEngine, this.channelCache.bindGuild(guild.id), this.roleCache.bindGuild(guild.id), this.memberCache.bindGuild(guild.id), this.emojiCache.bindGuild(guild.id), this.presenceCache.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id), this.rain, guild);
-		else return null;
+		if (!guild) return null;
+		return new GuildCache(this.storageEngine, this.rain, this.channelCache.bindGuild(guild.id), this.roleCache.bindGuild(guild.id), this.memberCache.bindGuild(guild.id), this.emojiCache.bindGuild(guild.id), this.presenceCache.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id)).bindObject(guild);
 	}
 
 	/**
 	 * Upsert a guild object
 	 * @param id id of the guild
-	 * @param data data received from the event
-	 * @param data.channels Array of channels
-	 * @param data.members Array of members
-	 * @param data.presences Array of presences
-	 * @param data.roles Array of roles
-	 * @param data.emojis Array of emojis
+	 * @param guildData data received from the event
 	 * @returns returns a bound guild cache
 	 */
-	public async update(id: string, data: Partial<import ("discord-typings").GuildData>): Promise<GuildCache> {
-		if (this.boundObject) this.bindObject(data); //using bindobject() to assure the data of the class is valid
+	public async update(id: string, guildData: Partial<import ("discord-typings").Guild>): Promise<GuildCache> {
+		if (this.rain.options.disabledCaches.guild) return this;
+		const data = Object.assign({}, guildData);
+		if (this.boundObject) this.bindObject(data); // using bindobject() to assure the data of the class is valid
 		if (data.channels && data.channels.length > 0) {
 			await this.guildChannelMap.update(id, data.channels.map(c => c.id));
 			for (const channel of data.channels) {
@@ -71,28 +65,32 @@ class GuildCache extends BaseCache<import("discord-typings").GuildData> {
 				await this.channelCache.update(channel.id, channel);
 			}
 		}
+
 		if (data.members && data.members.length > 0) {
-			const membersPromiseBatch = [] as Array<Promise<import("./MemberCache")>>;
+			const membersPromiseBatch = [] as Array<Promise<import("./MemberCache").default>>;
 			for (const member of data.members) {
-				(member as import("discord-typings").MemberData & import("discord-typings").UserData & { guild_id: string }).guild_id = id;
-				membersPromiseBatch.push(this.memberCache.update(member.user.id, id, member));
+				(member as import("discord-typings").Member & import("discord-typings").User & { guild_id: string }).guild_id = id;
+				membersPromiseBatch.push(this.memberCache.update(member.user!.id, id, member));
 			}
 			await Promise.all(membersPromiseBatch);
 		}
+
 		if (data.presences && data.presences.length > 0) {
-			const presencePromiseBatch = [] as Array<Promise<import("./PresenceCache")>>;
+			const presencePromiseBatch = [] as Array<Promise<import("./PresenceCache").default>>;
 			for (const presence of data.presences) {
 				presencePromiseBatch.push(this.presenceCache.update(presence.user.id, presence));
 			}
 			await Promise.all(presencePromiseBatch);
 		}
+
 		if (data.roles && data.roles.length > 0) {
-			const rolePromiseBatch = [] as Array<Promise<import("./RoleCache")>>;
+			const rolePromiseBatch = [] as Array<Promise<import("./RoleCache").default>>;
 			for (const role of data.roles) {
 				rolePromiseBatch.push(this.roleCache.update(role.id, id, role));
 			}
 			await Promise.all(rolePromiseBatch);
 		}
+
 		if (data.emojis && data.emojis.length > 0) {
 			const emojiPromiseBatch: Array<Promise<any>> = [];
 			for (const emoji of data.emojis) {
@@ -100,6 +98,7 @@ class GuildCache extends BaseCache<import("discord-typings").GuildData> {
 			}
 			await Promise.all(emojiPromiseBatch);
 		}
+
 		if (data.voice_states && data.voice_states.length > 0) {
 			const voicePromiseBatch: Array<Promise<any>> = [];
 			for (const state of data.voice_states) {
@@ -108,20 +107,18 @@ class GuildCache extends BaseCache<import("discord-typings").GuildData> {
 			}
 			await Promise.all(voicePromiseBatch);
 		}
+
 		delete data.members;
 		delete data.voice_states;
 		delete data.roles;
 		delete data.presences;
 		delete data.emojis;
-		delete data.features;
 		delete data.channels;
 		delete data.voice_states;
-		await this.addToIndex(id);
-		await this.storageEngine.upsert(this.buildId(id), this.structurize(data));
+		await this.addToIndex([id]);
+		const old = await this.storageEngine.upsert(this.buildId(id), this.structurize(data));
 		if (this.boundObject) return this;
-		const guild = await this.storageEngine.get(this.buildId(id));
-		if (!guild) return this;
-		return new GuildCache(this.storageEngine, this.channelCache.bindGuild(guild.id), this.roleCache.bindGuild(guild.id), this.memberCache.bindGuild(guild.id), this.emojiCache.bindGuild(guild.id), this.presenceCache.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id), this.rain, guild);
+		return new GuildCache(this.storageEngine, this.rain, this.channelCache.bindGuild(id), this.roleCache.bindGuild(id), this.memberCache.bindGuild(id), this.emojiCache.bindGuild(id), this.presenceCache.bindGuild(id), this.guildChannelMap.bindGuild(id)).bindObject(data, old);
 	}
 
 	/**
@@ -136,18 +133,22 @@ class GuildCache extends BaseCache<import("discord-typings").GuildData> {
 		for (const emoji of emojis) {
 			await this.emojiCache.remove(emoji, id);
 		}
+
 		for (const role of roles) {
 			await this.roleCache.remove(role, id);
 		}
-		for (const channel of channelMap?.boundObject?.channels || []) {
+
+		for (const channel of channelMap?.boundObject!.channels || []) {
 			await this.channelCache.remove(channel);
 		}
+
 		for (const member of members) {
 			await this.memberCache.remove(member, id);
 		}
+
 		await this.guildChannelMap.remove(id);
 		await this.removeFromIndex(id);
-		return this.storageEngine.remove(this.buildId(id));
+		await this.storageEngine.remove(this.buildId(id));
 	}
 
 	/**
@@ -155,9 +156,9 @@ class GuildCache extends BaseCache<import("discord-typings").GuildData> {
 	 * @param fn Filter function
 	 * @returns array of bound guild caches
 	 */
-	public async filter(fn: (emoji?: import("discord-typings").GuildData, index?: number, array?: Array<import("discord-typings").GuildData>) => unknown): Promise<Array<GuildCache>> {
-		const guilds = await this.storageEngine.filter(fn, undefined, this.namespace);
-		return guilds.map(g => new GuildCache(this.storageEngine, this.channelCache, this.roleCache.bindGuild(g.id), this.memberCache.bindGuild(g.id), this.emojiCache.bindGuild(g.id), this.presenceCache.bindGuild(g.id), this.guildChannelMap.bindGuild(g.id), this.rain, g));
+	public async filter(fn: (guild: import("discord-typings").Guild, index: number) => boolean): Promise<Array<GuildCache>> {
+		const guilds = await this.storageEngine.filter(fn, null, this.namespace);
+		return guilds.map(g => new GuildCache(this.storageEngine, this.rain, this.channelCache, this.roleCache.bindGuild(g.id), this.memberCache.bindGuild(g.id), this.emojiCache.bindGuild(g.id), this.presenceCache.bindGuild(g.id), this.guildChannelMap.bindGuild(g.id)).bindObject(g));
 	}
 
 	/**
@@ -165,18 +166,18 @@ class GuildCache extends BaseCache<import("discord-typings").GuildData> {
 	 * @param fn Filter function
 	 * @returns returns a bound guild cache
 	 */
-	public async find(fn: (emoji?: import("discord-typings").GuildData, index?: number, array?: Array<string>) => unknown): Promise<GuildCache | null> {
-		const guild = await this.storageEngine.find(fn, undefined, this.namespace);
+	public async find(fn: (guild: import("discord-typings").Guild, index: number) => boolean): Promise<GuildCache | null> {
+		const guild = await this.storageEngine.find(fn, null, this.namespace);
 		if (!guild) return null;
-		return new GuildCache(this.storageEngine, this.channelCache.bindGuild(guild.id), this.roleCache.bindGuild(guild.id), this.memberCache.bindGuild(guild.id), this.emojiCache.bindGuild(guild.id), this.presenceCache.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id), this.rain, guild);
+		return new GuildCache(this.storageEngine, this.rain, this.channelCache.bindGuild(guild.id), this.roleCache.bindGuild(guild.id), this.memberCache.bindGuild(guild.id), this.emojiCache.bindGuild(guild.id), this.presenceCache.bindGuild(guild.id), this.guildChannelMap.bindGuild(guild.id)).bindObject(guild);
 	}
 
 	/**
 	 * Add a guild to the guild index
-	 * @param id ids of the guilds
+	 * @param ids ids of the guilds
 	 */
-	public async addToIndex(id: string): Promise<void> {
-		return this.storageEngine.addToList(this.namespace, id);
+	public async addToIndex(ids: Array<string>): Promise<void> {
+		await this.storageEngine.addToList(this.namespace, ids);
 	}
 
 	/**
@@ -184,7 +185,7 @@ class GuildCache extends BaseCache<import("discord-typings").GuildData> {
 	 * @param id id of the guild
 	 */
 	public async removeFromIndex(id: string): Promise<void> {
-		return this.storageEngine.removeFromList(this.namespace, id);
+		await this.storageEngine.removeFromList(this.namespace, [id]);
 	}
 
 	/**
@@ -208,7 +209,7 @@ class GuildCache extends BaseCache<import("discord-typings").GuildData> {
 	 * Remove the guild index, you should probably not call this at all :<
 	 */
 	public async removeIndex(): Promise<void> {
-		return this.storageEngine.removeList(this.namespace);
+		await this.storageEngine.removeList(this.namespace);
 	}
 
 	/**
@@ -220,4 +221,4 @@ class GuildCache extends BaseCache<import("discord-typings").GuildData> {
 	}
 }
 
-export = GuildCache;
+export default GuildCache;

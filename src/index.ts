@@ -20,6 +20,8 @@ import RoleCache from "./cache/RoleCache";
 import UserCache from "./cache/UserCache";
 import VoiceStateCache from "./cache/VoiceStateCache";
 
+export * from "./types";
+
 export {
 	BaseCache,
 	ChannelCache,

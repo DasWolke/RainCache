@@ -5,34 +5,17 @@ import BaseConnector from "./BaseConnector";
  */
 class DirectConnector extends BaseConnector {
 	/**
-	 * Create a new Direct Connector
-	 */
-	constructor() {
-		super();
-		this.ready = false;
-	}
-
-	/**
 	 * Init Method, initializes this connector
 	 */
-	initialize(): Promise<void> {
+	public initialize(): void {
 		this.ready = true;
-		return Promise.resolve(undefined);
-	}
-
-	/**
-	 * Forward a discord event to RainCache
-	 * @param event received event
-	 */
-	receive(event: any) {
-		this.emit("event", event);
 	}
 
 	/**
 	 * Called when RainCache finishes processing of an event
 	 * @param event received event
 	 */
-	send(event: any) {
+	public send(event: any): void {
 		/**
 		 * @event DirectConnector#send
 		 * @description Emitted once an event was fully processed by RainCache, you can now forward that event somewhere else
@@ -41,4 +24,4 @@ class DirectConnector extends BaseConnector {
 	}
 }
 
-export = DirectConnector;
+export default DirectConnector;

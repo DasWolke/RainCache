@@ -1,27 +1,11 @@
 import BaseCache from "./BaseCache";
-import BaseStorageEngine from "../storageEngine/BaseStorageEngine";
 
 /**
  * Cache used for saving overwrites of permissions belonging to channels
- * @extends BaseCache
  */
-class PermissionOverwriteCache extends BaseCache<import("discord-typings").PermissionOverwriteData> {
+class PermissionOverwriteCache extends BaseCache<import("discord-typings").Overwrite> {
 	public boundChannel = "";
-	public namespace: "permissionoverwrite" = "permissionoverwrite";
-	public storageEngine: BaseStorageEngine<import("discord-typings").PermissionOverwriteData>;
-
-	/**
-	 * Create a new PermissionOverwriteCache
-	 *
-	 * **This class is automatically instantiated by RainCache**
-	 * @param storageEngine Storage engine to use for this cache
-	 * @param boundObject Optional, may be used to bind a permission overwrite object to this cache
-	 */
-	public constructor(storageEngine: BaseStorageEngine<import("discord-typings").PermissionOverwriteData>, rain: import("../RainCache")<any, any>, boundObject?: Partial<import("discord-typings").PermissionOverwriteData>) {
-		super(rain);
-		this.storageEngine = storageEngine;
-		if (boundObject) this.bindObject(boundObject);
-	}
+	public namespace = "permissionoverwrite" as const;
 
 	/**
 	 * Get a permission overwrite via id
@@ -32,8 +16,8 @@ class PermissionOverwriteCache extends BaseCache<import("discord-typings").Permi
 	public async get(id: string, channelId: string = this.boundChannel): Promise<PermissionOverwriteCache | null> {
 		if (this.boundObject) return this;
 		const permissionOverwrite = await this.storageEngine.get(this.buildId(id, channelId));
-		if (permissionOverwrite) return new PermissionOverwriteCache(this.storageEngine, this.rain, permissionOverwrite);
-		else return null;
+		if (!permissionOverwrite) return null;
+		return new PermissionOverwriteCache(this.storageEngine, this.rain).bindObject(permissionOverwrite);
 	}
 
 	/**
@@ -43,12 +27,13 @@ class PermissionOverwriteCache extends BaseCache<import("discord-typings").Permi
 	 * @param data updated permission overwrite data, will be merged with the old data
 	 * @returns returns a bound permission overwrite cache
 	 */
-	public async update(id: string, channelId: string = this.boundChannel, data: Partial<import("discord-typings").PermissionOverwriteData>): Promise<PermissionOverwriteCache> {
+	public async update(id: string, channelId: string = this.boundChannel, data: Partial<import("discord-typings").Overwrite>): Promise<PermissionOverwriteCache> {
+		if (this.rain.options.disabledCaches.permOverwrite) return this;
 		if (this.boundObject) this.bindObject(data);
-		await super.addToIndex(id, channelId);
-		await this.storageEngine.upsert(this.buildId(id, channelId), this.structurize(data));
+		await super.addToIndex([id], channelId);
+		const old = await this.storageEngine.upsert(this.buildId(id, channelId), this.structurize(data));
 		if (this.boundObject) return this;
-		return new PermissionOverwriteCache(this.storageEngine, this.rain, data);
+		return new PermissionOverwriteCache(this.storageEngine, this.rain).bindObject(data, old);
 	}
 
 	/**
@@ -58,7 +43,7 @@ class PermissionOverwriteCache extends BaseCache<import("discord-typings").Permi
 	 */
 	public async remove(id: string, channelId: string = this.boundChannel): Promise<void> {
 		await super.removeFromIndex(id, channelId);
-		return this.storageEngine.remove(this.buildId(id, channelId));
+		await this.storageEngine.remove(this.buildId(id, channelId));
 	}
 
 	/**
@@ -68,9 +53,9 @@ class PermissionOverwriteCache extends BaseCache<import("discord-typings").Permi
 	 * @param ids Array of permission overwrite ids, if omitted the permission overwrite index will be used
 	 * @returns returns an array of bound permission overwrite caches
 	 */
-	public async filter(fn: (overwrite?: import("discord-typings").PermissionOverwriteData, index?: number, array?: Array<import("discord-typings").PermissionOverwriteData>) => unknown, channelId: string = this.boundChannel, ids: Array<string> | undefined = undefined): Promise<Array<PermissionOverwriteCache>> {
-		const permissionOverwrites = await this.storageEngine.filter(fn, ids, super.buildId(channelId));
-		return permissionOverwrites.map(p => new PermissionOverwriteCache(this.storageEngine, this.rain, p));
+	public async filter(fn: (overwrite: import("discord-typings").Overwrite, index: number) => boolean, channelId: string = this.boundChannel, ids?: Array<string>): Promise<Array<PermissionOverwriteCache>> {
+		const permissionOverwrites = await this.storageEngine.filter(fn, ids || null, super.buildId(channelId));
+		return permissionOverwrites.map(p => new PermissionOverwriteCache(this.storageEngine, this.rain).bindObject(p));
 	}
 
 	/**
@@ -80,10 +65,10 @@ class PermissionOverwriteCache extends BaseCache<import("discord-typings").Permi
 	 * @param ids Array of permission overwrite ids, if omitted the permission overwrite index will be used
 	 * @returns returns a bound permission overwrite cache
 	 */
-	public async find(fn: (overwrite?: import("discord-typings").PermissionOverwriteData, index?: number, array?: Array<string>) => unknown, channelId: string = this.boundChannel, ids: Array<string> | undefined = undefined): Promise<PermissionOverwriteCache | null> {
-		const permissionOverwrite = await this.storageEngine.find(fn, ids, super.buildId(channelId));
+	public async find(fn: (overwrite: import("discord-typings").Overwrite, index: number) => boolean, channelId: string = this.boundChannel, ids?: Array<string>): Promise<PermissionOverwriteCache | null> {
+		const permissionOverwrite = await this.storageEngine.find(fn, ids || null, super.buildId(channelId));
 		if (!permissionOverwrite) return null;
-		return new PermissionOverwriteCache(this.storageEngine, this.rain, permissionOverwrite);
+		return new PermissionOverwriteCache(this.storageEngine, this.rain).bindObject(permissionOverwrite);
 	}
 
 	/**
@@ -108,4 +93,4 @@ class PermissionOverwriteCache extends BaseCache<import("discord-typings").Permi
 	}
 }
 
-export = PermissionOverwriteCache;
+export default PermissionOverwriteCache;
