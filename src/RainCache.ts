@@ -20,6 +20,27 @@ import PresenceCache from "./cache/PresenceCache";
 import PermissionsOverwriteCache from "./cache/PermissionOverwriteCache";
 import VoiceStateCache from "./cache/VoiceStateCache";
 
+interface RainCacheEvents {
+	error: [Error];
+	debug: [string];
+}
+
+interface RainCache<Inbound extends BaseConnector, Outbound extends BaseConnector> {
+	addListener<E extends keyof RainCacheEvents>(event: E, listener: (...args: RainCacheEvents[E]) => any): this;
+	emit<E extends keyof RainCacheEvents>(event: E, ...args: RainCacheEvents[E]): boolean;
+	eventNames(): Array<keyof RainCacheEvents>;
+	listenerCount(event: keyof RainCacheEvents): number;
+	listeners(event: keyof RainCacheEvents): Array<(...args: Array<any>) => any>;
+	off<E extends keyof RainCacheEvents>(event: E, listener: (...args: RainCacheEvents[E]) => any): this;
+	on<E extends keyof RainCacheEvents>(event: E, listener: (...args: RainCacheEvents[E]) => any): this;
+	once<E extends keyof RainCacheEvents>(event: E, listener: (...args: RainCacheEvents[E]) => any): this;
+	prependListener<E extends keyof RainCacheEvents>(event: E, listener: (...args: RainCacheEvents[E]) => any): this;
+	prependOnceListener<E extends keyof RainCacheEvents>(event: E, listener: (...args: RainCacheEvents[E]) => any): this;
+	rawListeners(event: keyof RainCacheEvents): Array<(...args: Array<any>) => any>;
+	removeAllListeners(event?: keyof RainCacheEvents): this;
+	removeListener<E extends keyof RainCacheEvents>(event: E, listener: (...args: RainCacheEvents[E]) => any): this;
+}
+
 /**
  * RainCache - Main class used for accessing caches via subclasses and initializing the whole library
  */
@@ -43,9 +64,7 @@ class RainCache<Inbound extends BaseConnector, Outbound extends BaseConnector> e
 	 */
 	public constructor(options: import("./types").RainCacheOptions, inboundConnector: Inbound, outboundConnector: Outbound) {
 		super();
-		if (!options.storage) {
-			throw new Error("No storage engines were passed");
-		}
+		if (!options.storage) throw new Error("No storage engines were passed");
 		if (!options.cacheClasses) {
 			options.cacheClasses = {
 				guild: GuildCache,
@@ -60,12 +79,9 @@ class RainCache<Inbound extends BaseConnector, Outbound extends BaseConnector> e
 				voiceState: VoiceStateCache
 			};
 		}
-		if (!options.storage.default) {
-			// maybe warn that no default engine was passed ? :thunkong:
-		}
-		if (!options.disabledEvents) {
-			options.disabledEvents = {};
-		}
+		// if (!options.storage.default) maybe warn that no default engine was passed ? :thunkong:
+		if (!options.disabledEvents) options.disabledEvents = {};
+		if (!options.disabledCaches) options.disabledCaches = {};
 		if (!options.structureDefs) {
 			options.structureDefs = {
 				guild: { whitelist: [], blacklist: [] },
@@ -89,16 +105,13 @@ class RainCache<Inbound extends BaseConnector, Outbound extends BaseConnector> e
 		try {
 			for (const engine in this.options.storage) {
 				if (Object.hasOwnProperty.call(this.options.storage, engine)) {
-					if (!this.options.storage[engine].ready) {
-						await this.options.storage[engine].initialize();
-					}
+					if (!this.options.storage[engine].ready) await this.options.storage[engine].initialize();
 				}
 			}
 		} catch (e) {
 			throw new Error("Failed to initialize storage engines");
 		}
-		this.cache = this._createCaches(this.options.storage, this.options.cacheClasses as import("./types").CacheTypes);
-		Object.assign(this, this.cache);
+		this.cache = this._createCaches(this.options.storage as Required<import("./types").RainCacheOptions["storage"]>, this.options.cacheClasses as import("./types").CacheTypes);
 		this.eventProcessor = new EventProcessor({
 			disabledEvents: this.options.disabledEvents || {},
 			cache: {
@@ -114,32 +127,23 @@ class RainCache<Inbound extends BaseConnector, Outbound extends BaseConnector> e
 				voiceState: this.cache.voiceState
 			}
 		});
-		if (this.inbound && !this.inbound.ready) {
-			await this.inbound.initialize();
-		}
-		if (this.outbound && !this.outbound.ready) {
-			await this.outbound.initialize();
-		}
+		if (this.inbound && !this.inbound.ready) await this.inbound.initialize();
+		if (this.outbound && !this.outbound.ready) await this.outbound.initialize();
 		if (this.inbound) {
-			this.inbound.on("event", async (event) => {
+			this.inbound.on("event", async event => {
 				try {
 					await this.eventProcessor.inbound(event);
-					if (this.outbound) {
-						this.outbound.send(event);
-					}
-				}
-				catch (e) {
+					if (this.outbound) this.outbound.send(event);
+				} catch (e) {
 					this.emit("error", e);
 				}
 			});
 		}
-		if (this.options.debug) {
-			this.eventProcessor.on("debug", (log) => this.emit("debug", log));
-		}
+		if (this.options.debug) this.eventProcessor.on("debug", (log) => this.emit("debug", log));
 		this.ready = true;
 	}
 
-	private _createCaches(engines: import("./types").RainCacheOptions["storage"], cacheClasses: import("./types").CacheTypes) {
+	private _createCaches(engines: Required<import("./types").RainCacheOptions["storage"]>, cacheClasses: import("./types").CacheTypes) {
 		const caches: import("./types").Caches = {} as import("./types").Caches;
 		if (cacheClasses["role"]) {
 			const engine = this._getEngine(engines, "role");
@@ -159,11 +163,11 @@ class RainCache<Inbound extends BaseConnector, Outbound extends BaseConnector> e
 		}
 		if (cacheClasses["member"]) {
 			const engine = this._getEngine(engines, "member");
-			caches["member"] = new cacheClasses["member"](engine, caches["user"], this);
+			caches["member"] = new cacheClasses["member"](engine, this, caches["user"]);
 		}
 		if (cacheClasses["presence"]) {
 			const engine = this._getEngine(engines, "presence");
-			caches["presence"] = new cacheClasses["presence"](engine, caches["user"], this);
+			caches["presence"] = new cacheClasses["presence"](engine, this, caches["user"]);
 		}
 		if (cacheClasses["channelMap"]) {
 			const engine = this._getEngine(engines, "channelMap");
@@ -171,22 +175,22 @@ class RainCache<Inbound extends BaseConnector, Outbound extends BaseConnector> e
 		}
 		if (cacheClasses["channel"]) {
 			const engine = this._getEngine(engines, "channel");
-			caches["channel"] = new cacheClasses["channel"](engine, caches["channelMap"], caches["permOverwrite"], caches["user"], this);
+			caches["channel"] = new cacheClasses["channel"](engine, this, caches["channelMap"], caches["permOverwrite"], caches["user"]);
 		}
 		if (cacheClasses["guild"]) {
 			const engine = this._getEngine(engines, "guild");
-			caches["guild"] = new cacheClasses["guild"](engine, caches["channel"], caches["role"], caches["member"], caches["emoji"], caches["presence"], caches["channelMap"], this);
+			caches["guild"] = new cacheClasses["guild"](engine, this, caches["channel"], caches["role"], caches["member"], caches["emoji"], caches["presence"], caches["channelMap"]);
 		}
 		if (cacheClasses["voiceState"]) {
 			const engine = this._getEngine(engines, "voiceState");
-			caches["voiceState"] = new cacheClasses["voiceState"](engine, this);
+			caches["voiceState"] = new cacheClasses["voiceState"](engine, this, caches["member"]);
 		}
 		return caches;
 	}
 
-	private _getEngine(engines: import("./types").RainCacheOptions["storage"], engine: keyof import("./types").RainCacheOptions["storage"]) {
-		return engines[engine] || engines["default"];
+	private _getEngine<E extends Required<import("./types").RainCacheOptions["storage"]>, N extends Exclude<keyof E, "default">>(engines: E, engine: N): E[N] {
+		return engines[engine] || engines["default"] as E[N];
 	}
 }
 
-export = RainCache;
+export default RainCache;

@@ -4,21 +4,19 @@ import BaseStorageEngine from "../storageEngine/BaseStorageEngine";
 /**
  * Cache responsible for caching users
  */
-class VoiceStateCache extends BaseCache<import("discord-typings").VoiceStateData> {
-	public namespace: "voicestates" = "voicestates";
-	public storageEngine: BaseStorageEngine<import("discord-typings").VoiceStateData>;
+class VoiceStateCache extends BaseCache<import("discord-typings").VoiceState> {
+	public namespace = "voicestates" as const;
+	public memberCache: import("./MemberCache").default;
 
 	/**
 	 * Create a new VoiceStateCache
 	 *
 	 * **This class is automatically instantiated by RainCache**
 	 * @param storageEngine Storage engine to use for this cache
-	 * @param boundObject Optional, may be used to bind a user object to the cache
 	 */
-	public constructor(storageEngine: BaseStorageEngine<import("discord-typings").VoiceStateData>, rain: import("../RainCache")<any, any>, boundObject?: Partial<import("discord-typings").VoiceStateData>) {
-		super(rain);
-		this.storageEngine = storageEngine;
-		if (boundObject) this.bindObject(boundObject);
+	public constructor(storageEngine: BaseStorageEngine<import("discord-typings").VoiceState>, rain: import("../RainCache").default<any, any>, memberCache: import("./MemberCache").default) {
+		super(storageEngine, rain);
+		this.memberCache = memberCache;
 	}
 
 	/**
@@ -31,24 +29,29 @@ class VoiceStateCache extends BaseCache<import("discord-typings").VoiceStateData
 		if (this.boundObject) return this;
 		const state = await this.storageEngine.get(this.buildId(id, guildId));
 		if (!state) return null;
-		return new VoiceStateCache(this.storageEngine, this.rain, state);
+		return new VoiceStateCache(this.storageEngine, this.rain, this.memberCache).bindObject(state);
 	}
 
 	/**
 	 * Update a VoiceState entry in the cache
 	 * @param id discord id of the user
 	 * @param guildId guild id
-	 * @param data updated data of the VoiceState, it will be merged with the old data
+	 * @param stateData updated data of the VoiceState, it will be merged with the old data
 	 */
-	public async update(id: string, guildId: string, data: Partial<import("discord-typings").VoiceStateData>): Promise<VoiceStateCache> {
-		delete data.member;
+	public async update(id: string, guildId: string, stateData: Partial<import("discord-typings").VoiceState>): Promise<VoiceStateCache> {
+		if (this.rain.options.disabledCaches.voiceState) return this;
+		const data = Object.assign({}, stateData);
 		if (!data.guild_id) data.guild_id = guildId;
 		if (this.boundObject) this.bindObject(data);
+		if (data.member) {
+			this.memberCache.update(id, guildId, data.member);
+			delete data.member;
+		}
 
-		await this.addToIndex(id);
-		await this.storageEngine.upsert(this.buildId(id, guildId), this.structurize(data));
+		await this.addToIndex([this.buildId(id, guildId)]);
+		const old = await this.storageEngine.upsert(this.buildId(id, guildId), this.structurize(data));
 		if (this.boundObject) return this;
-		return new VoiceStateCache(this.storageEngine, this.rain, data);
+		return new VoiceStateCache(this.storageEngine, this.rain, this.memberCache).bindObject(data, old);
 	}
 
 	/**
@@ -58,7 +61,7 @@ class VoiceStateCache extends BaseCache<import("discord-typings").VoiceStateData
 	 */
 	public async remove(id = this.boundObject?.user_id as string, guildId: string): Promise<void> {
 		await this.removeFromIndex(id, guildId);
-		return this.storageEngine.remove(this.buildId(id, guildId));
+		await this.storageEngine.remove(this.buildId(id, guildId));
 	}
 
 	/**
@@ -66,9 +69,9 @@ class VoiceStateCache extends BaseCache<import("discord-typings").VoiceStateData
 	 * @param fn filter function to use for the filtering
 	 * @param ids Array of user ids, if omitted the global user index will be used
 	 */
-	public async filter(fn: (state?: import("discord-typings").VoiceStateData, index?: number, array?: Array<import("discord-typings").VoiceStateData>) => unknown, ids: Array<string> | undefined = undefined): Promise<Array<VoiceStateCache>> {
-		const states = await this.storageEngine.filter(fn, ids, this.namespace);
-		return states.map(s => new VoiceStateCache(this.storageEngine, this.rain, s));
+	public async filter(fn: (state: import("discord-typings").VoiceState, index: number) => boolean, ids?: Array<string>): Promise<Array<VoiceStateCache>> {
+		const states = await this.storageEngine.filter(fn, ids || null, this.namespace);
+		return states.map(s => new VoiceStateCache(this.storageEngine, this.rain, this.memberCache).bindObject(s));
 	}
 
 	/**
@@ -77,28 +80,18 @@ class VoiceStateCache extends BaseCache<import("discord-typings").VoiceStateData
 	 * @param ids List of ids that should be used as the scope of the filter
 	 * @returns Returns a VoiceState Cache with a bound state or null if no state was found
 	 */
-	public async find(fn: (state?: import("discord-typings").VoiceStateData, index?: number, array?: Array<string>) => unknown, ids: Array<string> | undefined = undefined): Promise<VoiceStateCache | null> {
-		const state = await this.storageEngine.find(fn, ids, this.namespace);
+	public async find(fn: (state: import("discord-typings").VoiceState, index: number) => boolean, ids?: Array<string>): Promise<VoiceStateCache | null> {
+		const state = await this.storageEngine.find(fn, ids || null, this.namespace);
 		if (!state) return null;
-		return new VoiceStateCache(this.storageEngine, this.rain, state);
-	}
-
-	/**
-	 * Bind a user id to the cache
-	 * @param userId id of the user
-	 * @returns Returns a VoiceStateCache that has an id bound to it, which serves as the default argument to get, update and delete
-	 */
-	public bindUserId(userId: string): VoiceStateCache {
-		this.user_id = userId;
-		return this;
+		return new VoiceStateCache(this.storageEngine, this.rain, this.memberCache).bindObject(state);
 	}
 
 	/**
 	 * Add a voice state to the voicestates index
-	 * @param id id of the voice state
+	 * @param ids ids of the voice states
 	 */
-	public async addToIndex(id: string): Promise<void> {
-		return this.storageEngine.addToList(this.namespace, id);
+	public async addToIndex(ids: Array<string>): Promise<void> {
+		await this.storageEngine.addToList(this.namespace, ids);
 	}
 
 	/**
@@ -106,7 +99,7 @@ class VoiceStateCache extends BaseCache<import("discord-typings").VoiceStateData
 	 * @param id id of the user
 	 */
 	public async removeFromIndex(id: string, guildId?: string): Promise<void> {
-		return this.storageEngine.removeFromList(this.namespace, this.buildId(id, guildId));
+		await this.storageEngine.removeFromList(this.namespace, [this.buildId(id, guildId)]);
 	}
 
 	/**
@@ -131,7 +124,7 @@ class VoiceStateCache extends BaseCache<import("discord-typings").VoiceStateData
 	 * Delete the VoiceState index, you should probably **not** use this function, but I won't stop you.
 	 */
 	public async removeIndex(): Promise<void> {
-		return this.storageEngine.removeList(this.namespace);
+		await this.storageEngine.removeList(this.namespace);
 	}
 
 	/**
@@ -153,4 +146,4 @@ class VoiceStateCache extends BaseCache<import("discord-typings").VoiceStateData
 	}
 }
 
-export = VoiceStateCache;
+export default VoiceStateCache;

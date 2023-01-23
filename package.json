@@ -1,6 +1,6 @@
 {
   "name": "raincache",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "A pluggable discord cache worker",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -11,23 +11,22 @@
   "author": "wolke <wolke@weeb.sh>",
   "license": "MIT",
   "optionalDependencies": {
-    "amqplib": "^0.8.0",
-    "redis": "^3.1.2"
+    "amqplib": "^0.10.3",
+    "redis": "^4.3.0"
   },
   "dependencies": {
-    "discord-typings": "9.0.x"
+    "discord-typings": "10.4.1"
   },
   "devDependencies": {
-    "@types/amqplib": "^0.8.2",
-    "@types/node": "^15.3.0",
-    "@types/redis": "^2.8.32",
-    "@typescript-eslint/eslint-plugin": "^5.3.0",
-    "@typescript-eslint/parser": "^5.3.0",
-    "eslint": "^8.2.0",
-    "typedoc": "^0.22.8",
-    "typedoc-plugin-mdn-links": "^1.0.4",
-    "typedoc-plugin-missing-exports": "^0.22.4",
-    "typescript": "~4.4.4"
+    "@types/amqplib": "^0.10.1",
+    "@types/node": "^18.11.18",
+    "@typescript-eslint/eslint-plugin": "^5.48.2",
+    "@typescript-eslint/parser": "^5.48.2",
+    "eslint": "^8.32.0",
+    "typedoc": "^0.23.24",
+    "typedoc-plugin-mdn-links": "^2.0.2",
+    "typedoc-plugin-missing-exports": "^1.0.0",
+    "typescript": "^4.9.4"
   },
   "files": [
     "dist",

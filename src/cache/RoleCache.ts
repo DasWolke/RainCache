@@ -1,25 +1,12 @@
 import BaseCache from "./BaseCache";
-import BaseStorageEngine from "../storageEngine/BaseStorageEngine";
+
+export type Role = import("discord-typings").Role & { guild_id?: string }
 
 /**
  * Cache responsible for storing role related data
  */
-class RoleCache extends BaseCache<import("discord-typings").RoleData> {
-	public namespace: "role" = "role";
-	public storageEngine: BaseStorageEngine<import("discord-typings").RoleData>;
-
-	/**
-	 * Create a new RoleCache
-	 *
-	 * **This class is automatically instantiated by RainCache**
-	 * @param storageEngine Storage engine to use for this cache
-	 * @param boundObject Optional, may be used to bind a role object to the cache
-	 */
-	public constructor(storageEngine: BaseStorageEngine<import("discord-typings").RoleData>, rain: import("../RainCache")<any, any>, boundObject?: Partial<import("discord-typings").RoleData & { guild_id: string }>) {
-		super(rain);
-		this.storageEngine = storageEngine;
-		if (boundObject) this.bindObject(boundObject);
-	}
+class RoleCache extends BaseCache<Role> {
+	public namespace = "role" as const;
 
 	/**
 	 * Get a role via id and guild id of the role
@@ -31,25 +18,27 @@ class RoleCache extends BaseCache<import("discord-typings").RoleData> {
 		if (this.boundObject) return this;
 		const role = await this.storageEngine.get(this.buildId(id, guildId));
 		if (!role) return null;
-		return new RoleCache(this.storageEngine, this.rain, role);
+		return new RoleCache(this.storageEngine, this.rain).bindObject(role);
 	}
 
 	/**
 	 * Update a role
 	 * @param id - id of the role
 	 * @param guildId - id of the guild belonging to the role
-	 * @param data - new role data
+	 * @param roleData - new role data
 	 * @returns returns a bound RoleCache once the data was updated.
 	 */
-	public async update(id: string, guildId: string, data: Partial<import("discord-typings").RoleData & { guild_id: string }>): Promise<RoleCache> {
+	public async update(id: string, guildId: string, roleData: Partial<Role>): Promise<RoleCache> {
+		if (this.rain.options.disabledCaches.role) return this;
+		const data = Object.assign({}, roleData);
 		if (!guildId) return Promise.reject("Missing guild id");
 		if (!data.guild_id) data.guild_id = guildId;
 		if (!data.id) data.id = id;
 		if (this.boundObject) this.bindObject(data);
-		await this.addToIndex(id, guildId);
-		await this.storageEngine.upsert(this.buildId(id, guildId), this.structurize(data));
+		await this.addToIndex([id], guildId);
+		const old = await this.storageEngine.upsert(this.buildId(id, guildId), this.structurize(data));
 		if (this.boundObject) return this;
-		return new RoleCache(this.storageEngine, this.rain, data);
+		return new RoleCache(this.storageEngine, this.rain).bindObject(data, old);
 	}
 
 	/**
@@ -59,7 +48,7 @@ class RoleCache extends BaseCache<import("discord-typings").RoleData> {
 	 */
 	public async remove(id: string, guildId: string): Promise<void> {
 		await this.removeFromIndex(id, guildId);
-		return this.storageEngine.remove(this.buildId(id, guildId));
+		await this.storageEngine.remove(this.buildId(id, guildId));
 	}
 
 	/**
@@ -69,9 +58,9 @@ class RoleCache extends BaseCache<import("discord-typings").RoleData> {
 	 * @param ids array of role ids that should be used for the filtering
 	 * @returns array of bound role caches
 	 */
-	public async filter(fn: (role?: import("discord-typings").RoleData, index?: number, array?: Array<import("discord-typings").RoleData>) => unknown, guildId = this.boundGuild, ids: Array<string> | undefined = undefined): Promise<Array<RoleCache>> {
-		const roles = await this.storageEngine.filter(fn, ids, super.buildId(guildId as string));
-		return roles.map(r => new RoleCache(this.storageEngine, this.rain, r));
+	public async filter(fn: (role: Role, index: number) => boolean, guildId = this.boundGuild, ids?: Array<string>): Promise<Array<RoleCache>> {
+		const roles = await this.storageEngine.filter(fn, ids || null, super.buildId(guildId as string));
+		return roles.map(r => new RoleCache(this.storageEngine, this.rain).bindObject(r));
 	}
 
 	/**
@@ -81,10 +70,10 @@ class RoleCache extends BaseCache<import("discord-typings").RoleData> {
 	 * @param ids array of role ids that should be used for the filtering
 	 * @returns bound role cache
 	 */
-	public async find(fn: (role?: import("discord-typings").RoleData, index?: number, array?: Array<string>) => unknown, guildId = this.boundGuild, ids: Array<string> | undefined = undefined): Promise<RoleCache | null> {
-		const role = await this.storageEngine.find(fn, ids, super.buildId(guildId as string));
+	public async find(fn: (role: Role, index: number) => boolean, guildId = this.boundGuild, ids?: Array<string>): Promise<RoleCache | null> {
+		const role = await this.storageEngine.find(fn, ids || null, super.buildId(guildId as string));
 		if (!role) return null;
-		return new RoleCache(this.storageEngine, this.rain, role);
+		return new RoleCache(this.storageEngine, this.rain).bindObject(role);
 	}
 
 	/**
@@ -99,4 +88,4 @@ class RoleCache extends BaseCache<import("discord-typings").RoleData> {
 	}
 }
 
-export = RoleCache;
+export default RoleCache;

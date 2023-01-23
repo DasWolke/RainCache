@@ -4,22 +4,17 @@ import BaseStorageEngine from "./BaseStorageEngine";
  * StorageEngine which uses a Map in the process memory space as a datasource
  */
 class MemoryStorageEngine<T> extends BaseStorageEngine<T> {
-	public map: Map<string, string> = new Map();
+	public map: Map<string, T> = new Map();
 	public index: Map<string, Array<string>> = new Map();
 
-	public constructor() {
-		super();
-	}
+	public initialize() { void 0; }
 
 	/**
 	 * Get an object from the cache via id
 	 * @param id id of the object
 	 */
-	public get(id: string): T | null;
-	public get(id: string, DO_NOT_USE_THIS_OVERLOAD?: unknown): string | Promise<string>;
-	public get(id: string, DO_NOT_USE_THIS_OVERLOAD?: unknown): T | string | null | Promise<T | string | null> {
-		const raw = this.map.get(id);
-		return this.parseData(raw);
+	public get(id: string): T | null {
+		return this.map.get(id) ?? null;
 	}
 
 	/**
@@ -27,12 +22,11 @@ class MemoryStorageEngine<T> extends BaseStorageEngine<T> {
 	 * @param id id of the object
 	 * @param updateData the new Data which get's merged with the old
 	 */
-	public upsert(id: string, updateData: T): void {
+	public upsert(id: string, updateData: Partial<T>): T | null {
 		const data = this.get(id);
-		const newData = data || {};
-		Object.assign(newData, updateData);
-		const prepared = this.prepareData(newData as T);
+		const prepared = Object.assign(data || {}, updateData) as T;
 		this.map.set(id, prepared);
+		return data;
 	}
 
 	/**
@@ -50,20 +44,19 @@ class MemoryStorageEngine<T> extends BaseStorageEngine<T> {
 	 * @param namespace namespace of the filter
 	 * @returns filtered data
 	 */
-	public filter(fn: (value?: T, index?: number, array?: Array<T>) => unknown, ids: Array<string>, namespace: string): Array<T> {
+	public filter(fn: (value: T, index: number) => unknown, ids: Array<string> | null, namespace: string): Array<T> {
 		const resolvedDataArray: Array<T> = [];
 		let data: Array<string> = [];
-		if (!ids) {
-			data = this.getListMembers(namespace);
-		} else {
-			data = ids;
-		}
+		if (!ids) data = this.getListMembers(namespace);
+		else data = ids;
 		data = data.map(id => `${namespace}.${id}`);
+		let index = 0;
 		for (const key of data) {
-			const resolvedData = this.get(key);
-			if (resolvedData) resolvedDataArray.push(resolvedData);
+			const resolvedData = this.get(key) as T;
+			if (fn(resolvedData, index)) resolvedDataArray.push(resolvedData);
+			index++;
 		}
-		return resolvedDataArray.filter(fn);
+		return resolvedDataArray;
 	}
 
 	/**
@@ -73,24 +66,15 @@ class MemoryStorageEngine<T> extends BaseStorageEngine<T> {
 	 * @param namespace namespace of the filter
 	 * @returns the first result or null if nothing was found
 	 */
-	public find(fn: (value?: T, index?: number, array?: Array<string>) => boolean, ids: Array<string> | null = null, namespace: string): T | null {
+	public find(fn: (value: T, index: number) => boolean, ids: Array<string> | null = null, namespace: string): T | null {
 		let data: Array<string> = [];
-		if (typeof ids === "string" && !namespace) {
-			namespace = ids;
-			ids = null;
-		}
-		if (!ids) {
-			data = this.getListMembers(namespace);
-		} else {
-			data = ids;
-		}
+		if (!ids) data = this.getListMembers(namespace);
+		else data = ids;
 		data = data.map(id => `${namespace}.${id}`);
 		let index = 0;
 		for (const key of data) {
-			const resolvedData = this.get(key);
-			if (resolvedData && fn(resolvedData, index, data)) {
-				return resolvedData;
-			}
+			const resolvedData = this.get(key) as T;
+			if (fn(resolvedData, index)) return resolvedData;
 			index++;
 		}
 		return null;
@@ -108,12 +92,14 @@ class MemoryStorageEngine<T> extends BaseStorageEngine<T> {
 	/**
 	 * Add an id (or a list of them) to a list
 	 * @param listId id of the list
-	 * @param id array of ids that should be added
+	 * @param ids array of ids that should be added
 	 */
-	public addToList(listId: string, id: string): void {
+	public addToList(listId: string, ids: Array<string>): void {
 		const list = this.getListMembers(listId);
-		if (list.includes(id)) return;
-		else list.push(id);
+		for (const id of ids) {
+			if (list.includes(id)) return;
+			else list.push(id);
+		}
 		const listExists = !!this.index.get(listId);
 		if (!listExists) this.index.set(listId, list);
 	}
@@ -130,13 +116,15 @@ class MemoryStorageEngine<T> extends BaseStorageEngine<T> {
 	/**
 	 * Remove an id from a list
 	 * @param listId id of the list
-	 * @param id id that should be removed
+	 * @param ids array of ids that should be removed
 	 */
-	public removeFromList(listId: string, id: string): void {
+	public removeFromList(listId: string, ids: Array<string>): void {
 		const list = this.getListMembers(listId);
-		const index = list.indexOf(id);
-		if (index === -1) return;
-		list.splice(index, 1);
+		for (const id of ids) {
+			const index = list.indexOf(id);
+			if (index === -1) return;
+			list.splice(index, 1);
+		}
 	}
 
 	/**
@@ -154,20 +142,6 @@ class MemoryStorageEngine<T> extends BaseStorageEngine<T> {
 	public getListCount(listId: string): number {
 		return this.getListMembers(listId).length;
 	}
-
-	/**
-	 * Prepare data for storage inside redis
-	 */
-	private prepareData(data: T): string {
-		return JSON.stringify(data);
-	}
-
-	/**
-	 * Parse loaded data
-	 */
-	private parseData(data: string | null | undefined): T | null {
-		return data ? JSON.parse(data) : null;
-	}
 }
 
-export = MemoryStorageEngine;
+export default MemoryStorageEngine;

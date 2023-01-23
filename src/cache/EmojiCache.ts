@@ -1,25 +1,10 @@
 import BaseCache from "./BaseCache";
-import BaseStorageEngine from "../storageEngine/BaseStorageEngine";
 
 /**
  * Cache responsible for storing emoji related data
  */
-class EmojiCache extends BaseCache<import("discord-typings").EmojiData> {
-	public namespace: "emoji" = "emoji";
-	public storageEngine: BaseStorageEngine<import("discord-typings").EmojiData> ;
-
-	/**
-	 * Create a new EmojiCache
-	 *
-	 * **This class is automatically instantiated by RainCache**
-	 * @param storageEngine storage engine to use for this cache
-	 * @param boundObject Optional, may be used to bind an emoji object to the cache
-	 */
-	public constructor(storageEngine: BaseStorageEngine<import("discord-typings").EmojiData>, rain: import("../RainCache")<any, any>, boundObject?: Partial<import("discord-typings").EmojiData>) {
-		super(rain);
-		this.storageEngine = storageEngine;
-		if (boundObject) this.bindObject(boundObject);
-	}
+class EmojiCache extends BaseCache<import("discord-typings").Emoji> {
+	public namespace = "emoji" as const;
 
 	/**
 	 * Get an emoji via id
@@ -30,8 +15,8 @@ class EmojiCache extends BaseCache<import("discord-typings").EmojiData> {
 	public async get(id: string, guildId: string | undefined = this.boundGuild): Promise<EmojiCache | null> {
 		if (this.boundObject) return this;
 		const emoji = await this.storageEngine.get(this.buildId(id, guildId));
-		if (emoji) return new EmojiCache(this.storageEngine, this.rain, emoji);
-		else return null;
+		if (!emoji) return null;
+		return new EmojiCache(this.storageEngine, this.rain).bindObject(emoji);
 	}
 
 	/**
@@ -41,12 +26,13 @@ class EmojiCache extends BaseCache<import("discord-typings").EmojiData> {
 	 * @param data new data of the emoji, that will get merged with the old data
 	 * @returns returns a bound EmojiCache
 	 */
-	public async update(id: string, guildId: string | undefined = this.boundGuild, data: Partial<import("discord-typings").EmojiData>): Promise<EmojiCache> {
+	public async update(id: string, guildId: string | undefined = this.boundGuild, data: Partial<import("discord-typings").Emoji>): Promise<EmojiCache> {
+		if (this.rain.options.disabledCaches.emoji) return this;
 		if (this.boundObject) this.bindObject(data);
-		await this.addToIndex(id, guildId);
-		await this.storageEngine.upsert(this.buildId(id, guildId), this.structurize(data));
+		await this.addToIndex([id], guildId);
+		const old = await this.storageEngine.upsert(this.buildId(id, guildId), this.structurize(data));
 		if (this.boundObject) return this;
-		return new EmojiCache(this.storageEngine, this.rain, data);
+		return new EmojiCache(this.storageEngine, this.rain).bindObject(data, old);
 	}
 
 	/**
@@ -56,7 +42,7 @@ class EmojiCache extends BaseCache<import("discord-typings").EmojiData> {
 	 */
 	public async remove(id: string, guildId: string | undefined = this.boundGuild): Promise<void> {
 		await this.removeFromIndex(id, guildId);
-		return this.storageEngine.remove(this.buildId(id, guildId));
+		await this.storageEngine.remove(this.buildId(id, guildId));
 	}
 
 	/**
@@ -66,10 +52,10 @@ class EmojiCache extends BaseCache<import("discord-typings").EmojiData> {
 	 * @param ids
 	 * @returns array of bound emoji caches
 	 */
-	public async filter(fn: (emoji?: import("discord-typings").EmojiData, index?: number, array?: Array<import("discord-typings").EmojiData>) => unknown, guildId: string | undefined, ids?: Array<string> | undefined): Promise<Array<EmojiCache>> {
+	public async filter(fn: (emoji: import("discord-typings").Emoji, index: number) => boolean, guildId: string | undefined, ids?: Array<string>): Promise<Array<EmojiCache>> {
 		if (!guildId && this.boundGuild) guildId = this.boundGuild;
-		const emojis = await this.storageEngine.filter(fn, ids, super.buildId(guildId as string));
-		return emojis.map(e => new EmojiCache(this.storageEngine, this.rain, e));
+		const emojis = await this.storageEngine.filter(fn, ids || null, super.buildId(guildId as string));
+		return emojis.map(e => new EmojiCache(this.storageEngine, this.rain).bindObject(e));
 	}
 
 	/**
@@ -79,11 +65,11 @@ class EmojiCache extends BaseCache<import("discord-typings").EmojiData> {
 	 * @param ids
 	 * @returns bound emoji cache
 	 */
-	public async find(fn: (emoji?: import("discord-typings").EmojiData, index?: number, array?: Array<string>) => unknown, guildId: string, ids: Array<string> | undefined): Promise<EmojiCache | null> {
+	public async find(fn: (emoji: import("discord-typings").Emoji, index: number) => boolean, guildId: string, ids: Array<string> | undefined): Promise<EmojiCache | null> {
 		if (!guildId && this.boundGuild) guildId = this.boundGuild;
-		const emoji = await this.storageEngine.find(fn, ids, super.buildId(guildId));
+		const emoji = await this.storageEngine.find(fn, ids || null, super.buildId(guildId));
 		if (!emoji) return null;
-		return new EmojiCache(this.storageEngine, this.rain, emoji);
+		return new EmojiCache(this.storageEngine, this.rain).bindObject(emoji);
 	}
 
 	/**
@@ -98,4 +84,4 @@ class EmojiCache extends BaseCache<import("discord-typings").EmojiData> {
 	}
 }
 
-export = EmojiCache;
+export default EmojiCache;

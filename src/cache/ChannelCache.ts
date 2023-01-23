@@ -4,12 +4,11 @@ import BaseStorageEngine from "../storageEngine/BaseStorageEngine";
 /**
  * Cache responsible for storing channel related data
  */
-class ChannelCache extends BaseCache<import("../types").Channel> {
-	public channelMap: import("./ChannelMapCache");
-	public permissionOverwriteCache: import("./PermissionOverwriteCache");
-	public recipientCache: import("./UserCache");
-	public namespace: "channel" = "channel";
-	public storageEngine: BaseStorageEngine<import("../types").Channel>;
+class ChannelCache extends BaseCache<import("discord-typings").Channel> {
+	public channelMap: import("./ChannelMapCache").default;
+	public permissionOverwriteCache: import("./PermissionOverwriteCache").default;
+	public recipientCache: import("./UserCache").default;
+	public namespace = "channel" as const;
 
 	/**
 	 * Create a new ChanneCache
@@ -19,15 +18,12 @@ class ChannelCache extends BaseCache<import("../types").Channel> {
 	 * @param channelMap Instantiated ChannelMap class
 	 * @param permissionOverwriteCache Instantiated PermissionOverwriteCache class
 	 * @param userCache Instantiated UserCache class
-	 * @param boundObject Optional, may be used to bind a channel object to this cache
 	 */
-	public constructor(storageEngine: BaseStorageEngine<import("../types").Channel>, channelMap: import("./ChannelMapCache"), permissionOverwriteCache: import("./PermissionOverwriteCache"), userCache: import("./UserCache"), rain: import("../RainCache")<any, any>, boundObject?: Partial<import("../types").Channel>) {
-		super(rain);
-		this.storageEngine = storageEngine;
+	public constructor(storageEngine: BaseStorageEngine<import("discord-typings").Channel>, rain: import("../RainCache").default<any, any>, channelMap: import("./ChannelMapCache").default, permissionOverwriteCache: import("./PermissionOverwriteCache").default, userCache: import("./UserCache").default) {
+		super(storageEngine, rain);
 		this.channelMap = channelMap;
 		this.permissionOverwriteCache = permissionOverwriteCache;
 		this.recipientCache = userCache;
-		if (boundObject) this.bindObject(boundObject);
 	}
 
 	/**
@@ -38,8 +34,8 @@ class ChannelCache extends BaseCache<import("../types").Channel> {
 	public async get(id: string): Promise<ChannelCache | null> {
 		if (this.boundObject) return this;
 		const channel = await this.storageEngine.get(this.buildId(id));
-		if (channel) return new ChannelCache(this.storageEngine, this.channelMap, this.permissionOverwriteCache.bindChannel(channel.id), this.recipientCache, this.rain, channel);
-		else return null;
+		if (!channel) return null;
+		return new ChannelCache(this.storageEngine, this.rain, this.channelMap, this.permissionOverwriteCache.bindChannel(channel.id), this.recipientCache).bindObject(channel);
 	}
 
 	/**
@@ -47,25 +43,25 @@ class ChannelCache extends BaseCache<import("../types").Channel> {
 	 * @param id id of the channel
 	 * @param data data to insert
 	 */
-	public async update(id: string, data: Partial<import("../types").Channel>) {
-		if (data.guild_id) await this.channelMap.update(data.guild_id, [id]);
-		else if (data.recipients) {
-			if (data.recipients[0]) await this.channelMap.update(data.recipients[0].id, [id], "user");
+	public async update(id: string, data: Partial<import("discord-typings").Channel>): Promise<ChannelCache> {
+		if (this.rain.options.disabledCaches.channel) return this;
+		const copy = Object.assign({}, data) as Partial<import("discord-typings").Channel>;
+		if ((data as import("discord-typings").GuildChannel).guild_id) await this.channelMap.update((data as import("discord-typings").GuildChannel).guild_id, [id]);
+		else if ((data as import("discord-typings").DMChannel).recipients) {
+			if ((data as import("discord-typings").DMChannel).recipients[0]) await this.channelMap.update((data as import("discord-typings").DMChannel).recipients[0].id, [id], "user");
 		}
-		if (data.permission_overwrites) {
-			for (const overwrite of data.permission_overwrites) {
+		if ((data as import("discord-typings").GuildChannel).permission_overwrites) {
+			for (const overwrite of (data as import("discord-typings").GuildChannel).permission_overwrites) {
 				await this.permissionOverwriteCache.update(overwrite.id, id, overwrite);
 			}
 		}
-		delete data.permission_overwrites;
-		delete data.recipients;
-		if (this.boundObject) this.bindObject(data); //using bindobject() to assure the data of the class is valid
-		await this.addToIndex(id);
-		await this.storageEngine.upsert(this.buildId(id), this.structurize(data));
+		delete (copy as Partial<import("discord-typings").GuildChannel>).permission_overwrites;
+		delete (copy as Partial<import("discord-typings").DMChannel>).recipients;
+		if (this.boundObject) this.bindObject(copy); //using bindobject() to assure the data of the class is valid
+		await this.addToIndex([id]);
+		const old = await this.storageEngine.upsert(this.buildId(id), this.structurize(copy));
 		if (this.boundObject) return this;
-		const channel = await this.storageEngine.get(this.buildId(id));
-		if (channel) return new ChannelCache(this.storageEngine, this.channelMap, this.permissionOverwriteCache.bindChannel(channel.id), this.recipientCache, this.rain, channel);
-		else return this;
+		return new ChannelCache(this.storageEngine, this.rain, this.channelMap, this.permissionOverwriteCache.bindChannel(id), this.recipientCache).bindObject(copy, old);
 	}
 
 	/**
@@ -74,7 +70,7 @@ class ChannelCache extends BaseCache<import("../types").Channel> {
 	 */
 	public async remove(id: string): Promise<void> {
 		await this.removeFromIndex(id);
-		return this.storageEngine.remove(this.buildId(id));
+		await this.storageEngine.remove(this.buildId(id));
 	}
 
 	/**
@@ -83,9 +79,9 @@ class ChannelCache extends BaseCache<import("../types").Channel> {
 	 * @param channelMap Array of ids used for the filter
 	 * @returns array of channel caches with bound results
 	 */
-	public async filter(fn: (channel?: import("../types").Channel, index?: number, array?: Array<import("../types").Channel>) => unknown, channelMap?: Array<string>): Promise<Array<ChannelCache>> {
-		const channels = await this.storageEngine.filter(fn, channelMap, this.namespace);
-		return channels.map(c => new ChannelCache(this.storageEngine, this.channelMap, this.permissionOverwriteCache.bindChannel(c.id), this.recipientCache, this.rain, c));
+	public async filter(fn: (channel: import("discord-typings").Channel, index: number) => boolean, channelMap?: Array<string>): Promise<Array<ChannelCache>> {
+		const channels = await this.storageEngine.filter(fn, channelMap || null, this.namespace);
+		return channels.map(c => new ChannelCache(this.storageEngine, this.rain, this.channelMap, this.permissionOverwriteCache.bindChannel(c.id), this.recipientCache).bindObject(c));
 	}
 
 	/**
@@ -94,18 +90,18 @@ class ChannelCache extends BaseCache<import("../types").Channel> {
 	 * @param channelMap Array of ids used for the filter
 	 * @returns First result bound to a channel cache
 	 */
-	public async find(fn: (channel?: import("discord-typings").ChannelData) => unknown, channelMap: Array<string>): Promise<ChannelCache | null> {
-		const channel = await this.storageEngine.find(fn, channelMap, this.namespace);
+	public async find(fn: (channel: import("discord-typings").Channel, index: number) => boolean, channelMap?: Array<string>): Promise<ChannelCache | null> {
+		const channel = await this.storageEngine.find(fn, channelMap || null, this.namespace);
 		if (!channel) return null;
-		return new ChannelCache(this.storageEngine, this.channelMap, this.permissionOverwriteCache.bindChannel(channel.id), this.recipientCache, this.rain, channel);
+		return new ChannelCache(this.storageEngine, this.rain, this.channelMap, this.permissionOverwriteCache.bindChannel(channel.id), this.recipientCache).bindObject(channel);
 	}
 
 	/**
 	 * Add channels to the channel index
-	 * @param id ids of the channels
+	 * @param ids ids of the channels
 	 */
-	public async addToIndex(id: string): Promise<void> {
-		return this.storageEngine.addToList(this.namespace, id);
+	public async addToIndex(ids: Array<string>): Promise<void> {
+		await this.storageEngine.addToList(this.namespace, ids);
 	}
 
 	/**
@@ -113,7 +109,7 @@ class ChannelCache extends BaseCache<import("../types").Channel> {
 	 * @param id id of the channel
 	 */
 	public async removeFromIndex(id: string): Promise<void> {
-		return this.storageEngine.removeFromList(this.namespace, id);
+		await this.storageEngine.removeFromList(this.namespace, [id]);
 	}
 
 	/**
@@ -135,7 +131,7 @@ class ChannelCache extends BaseCache<import("../types").Channel> {
 	 * Remove the channel index, you should probably not call this at all :<
 	 */
 	public async removeIndex(): Promise<void> {
-		return this.storageEngine.removeList(this.namespace);
+		await this.storageEngine.removeList(this.namespace);
 	}
 
 	/**
@@ -147,4 +143,4 @@ class ChannelCache extends BaseCache<import("../types").Channel> {
 	}
 }
 
-export = ChannelCache;
+export default ChannelCache;

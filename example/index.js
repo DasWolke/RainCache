@@ -1,13 +1,11 @@
 "use strict";
 
-const { RainCache, AmqpConnector, RedisStorageEngine: Redis } = require("../");
+const { RainCache, DirectConnector, MemoryStorageEngine } = require("../");
 
-const con = new AmqpConnector();
-const cache = new RainCache({ storage: { default: new Redis() }, debug: false }, con, con);
+const con = new DirectConnector();
+const cache = new RainCache({ storage: { default: new MemoryStorageEngine() }, debug: false }, con, con);
 
-cache.on("debug", (data) => {
-	console.log(data);
-});
+cache.on("debug", console.log);
 
 const init = async () => {
 	await cache.initialize();

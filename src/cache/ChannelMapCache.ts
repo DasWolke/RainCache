@@ -1,25 +1,10 @@
 import BaseCache from "./BaseCache";
-import BaseStorageEngine from "../storageEngine/BaseStorageEngine";
 
 /**
  * Cache for providing a guild/user -> channels map
  */
 class ChannelMapCache extends BaseCache<import("../types").ChannelMap> {
-	public namespace: "channelmap" = "channelmap";
-	public storageEngine: BaseStorageEngine<import("../types").ChannelMap> ;
-
-	/**
-	 * Create a new ChannelMapCache
-	 *
-	 * **This class is automatically instantiated by RainCache**
-	 * @param storageEngine storage engine to use for this cache
-	 * @param boundObject Optional, may be used to bind the map object to the cache
-	 */
-	public constructor(storageEngine: BaseStorageEngine<import("../types").ChannelMap>, rain: import("../RainCache")<any, any>, boundObject?: import("../types").ChannelMap) {
-		super(rain);
-		this.storageEngine = storageEngine;
-		if (boundObject) this.bindObject(boundObject);
-	}
+	public namespace = "channelmap" as const;
 
 	/**
 	 * Get a ChannelMap via id of the guild or the user
@@ -30,8 +15,8 @@ class ChannelMapCache extends BaseCache<import("../types").ChannelMap> {
 		if (this.boundObject) return this;
 		const channelMapId = this.buildId(this._buildMapId(id, type));
 		const channelMap = await this.storageEngine.getListMembers(channelMapId);
-		if (channelMap) return new ChannelMapCache(this.storageEngine, this.rain, this._buildMap(id, channelMap, type));
-		else return null;
+		if (!channelMap) return null;
+		return new ChannelMapCache(this.storageEngine, this.rain).bindObject(this._buildMap(id, channelMap, type));
 	}
 
 	/**
@@ -42,29 +27,29 @@ class ChannelMapCache extends BaseCache<import("../types").ChannelMap> {
 	 * @param remove Remove old channels that don't exist anymore
 	 */
 	public async update(id: string, data: Array<string>, type: "guild" | "user" = "guild", remove = false): Promise<ChannelMapCache> {
+		if (this.rain.options.disabledCaches.channelMap) return this;
 		if (this.boundObject) this.bindObject(this._buildMap(id, data, type)); //using bindobject() to assure the data of the class is valid
 		let oldCacheData = await this.get(id, type);
-		if (oldCacheData && !remove) data = this._checkDupes(oldCacheData.channels as Array<string>, data);
+		if (oldCacheData && !remove) data = this._checkDupes(oldCacheData.boundObject!.channels as Array<string>, data);
 		if (remove) {
 			if (!oldCacheData) oldCacheData = { channels: [] } as unknown as ChannelMapCache;
-			data = this._removeOldChannels(oldCacheData.channels as Array<string>, data);
+			data = this._removeOldChannels(oldCacheData.boundObject!.channels as Array<string>, data);
 		}
 		const channelMapId = this.buildId(this._buildMapId(id, type));
 		await this.remove(id, type);
-		await Promise.all(data.map(i => this.storageEngine.addToList(channelMapId, i)));
+		await Promise.all(data.map(i => this.storageEngine.addToList(channelMapId, [i])));
 		if (this.boundObject) return this;
-		return new ChannelMapCache(this.storageEngine, this.rain, this._buildMap(id, data, type));
+		return new ChannelMapCache(this.storageEngine, this.rain).bindObject(this._buildMap(id, data, type));
 	}
 
 	/**
 	 * Remove a ChannelMap
-	 * @param {string} id Id of the user or the guild
-	 * @param {string} [type=guild] Type of the map to remove
-	 * @returns {Promise<null>}
+	 * @param id Id of the user or the guild
+	 * @param type Type of the map to remove
 	 */
 	public async remove(id: string, type: "guild" | "user" = "guild"): Promise<void> {
 		const channelMapId = this.buildId(this._buildMapId(id, type));
-		void this.storageEngine.remove(channelMapId);
+		await this.storageEngine.remove(channelMapId);
 	}
 
 	/**
@@ -113,4 +98,4 @@ class ChannelMapCache extends BaseCache<import("../types").ChannelMap> {
 	}
 }
 
-export = ChannelMapCache;
+export default ChannelMapCache;

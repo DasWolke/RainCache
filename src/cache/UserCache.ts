@@ -1,26 +1,10 @@
 import BaseCache from "./BaseCache";
-import BaseStorageEngine from "../storageEngine/BaseStorageEngine";
 
 /**
  * Cache responsible for caching users
- * @extends BaseCache
  */
-class UserCache extends BaseCache<import("discord-typings").UserData> {
-	public namespace: "user" = "user";
-	public storageEngine: BaseStorageEngine<import("discord-typings").UserData>;
-
-	/**
-	 * Create a new UserCache
-	 *
-	 * **This class is automatically instantiated by RainCache**
-	 * @param storageEngine Storage engine to use for this cache
-	 * @param boundObject Optional, may be used to bind a user object to the cache
-	 */
-	public constructor(storageEngine: BaseStorageEngine<import("discord-typings").UserData>, rain: import("../RainCache")<any, any>, boundObject?: Partial<import("discord-typings").UserData>) {
-		super(rain);
-		this.storageEngine = storageEngine;
-		if (boundObject) this.bindObject(boundObject);
-	}
+class UserCache extends BaseCache<import("discord-typings").User> {
+	public namespace = "user" as const;
 
 	/**
 	 * Loads a user from the cache via id
@@ -31,7 +15,7 @@ class UserCache extends BaseCache<import("discord-typings").UserData> {
 		if (this.boundObject) return this;
 		const user = await this.storageEngine.get(this.buildId(id as string));
 		if (!user) return null;
-		return new UserCache(this.storageEngine, this.rain, user);
+		return new UserCache(this.storageEngine, this.rain).bindObject(user);
 	}
 
 	/**
@@ -39,12 +23,13 @@ class UserCache extends BaseCache<import("discord-typings").UserData> {
 	 * @param id discord id of the user
 	 * @param data updated data of the user, it will be merged with the old data
 	 */
-	public async update(id = this.boundObject?.id, data: Partial<import("discord-typings").UserData>): Promise<UserCache> {
+	public async update(id = this.boundObject?.id, data: Partial<import("discord-typings").User>): Promise<UserCache> {
+		if (this.rain.options.disabledCaches.user) return this;
 		if (this.boundObject) this.bindObject(data);
-		await this.addToIndex(id as string);
-		await this.storageEngine.upsert(this.buildId(id as string), this.structurize(data));
+		await this.addToIndex([id as string]);
+		const old = await this.storageEngine.upsert(this.buildId(id as string), this.structurize(data));
 		if (this.boundObject) return this;
-		return new UserCache(this.storageEngine, this.rain, data);
+		return new UserCache(this.storageEngine, this.rain).bindObject(data, old);
 	}
 
 	/**
@@ -53,7 +38,7 @@ class UserCache extends BaseCache<import("discord-typings").UserData> {
 	 */
 	public async remove(id = this.boundObject?.id): Promise<void> {
 		await this.removeFromIndex(id as string);
-		return this.storageEngine.remove(this.buildId(id as string));
+		await this.storageEngine.remove(this.buildId(id as string));
 	}
 
 	/**
@@ -61,9 +46,9 @@ class UserCache extends BaseCache<import("discord-typings").UserData> {
 	 * @param fn filter function to use for the filtering
 	 * @param ids Array of user ids, if omitted the global user index will be used
 	 */
-	public async filter(fn: (user?: import("discord-typings").UserData, index?: number, array?: Array<import("discord-typings").UserData>) => unknown, ids: Array<string> | undefined = undefined): Promise<Array<UserCache>> {
-		const users = await this.storageEngine.filter(fn, ids, this.namespace);
-		return users.map(u => new UserCache(this.storageEngine, this.rain, u));
+	public async filter(fn: (user: import("discord-typings").User, index: number) => boolean, ids?: Array<string>): Promise<Array<UserCache>> {
+		const users = await this.storageEngine.filter(fn, ids || null, this.namespace);
+		return users.map(u => new UserCache(this.storageEngine, this.rain).bindObject(u));
 	}
 
 	/**
@@ -72,28 +57,18 @@ class UserCache extends BaseCache<import("discord-typings").UserData> {
 	 * @param ids List of ids that should be used as the scope of the filter
 	 * @returns Returns a User Cache with a bound user or null if no user was found
 	 */
-	public async find(fn: (user?: import("discord-typings").UserData, index?: number, array?: Array<string>) => unknown, ids: Array<string> | undefined = undefined): Promise<UserCache | null> {
-		const user = await this.storageEngine.find(fn, ids, this.namespace);
+	public async find(fn: (user: import("discord-typings").User, index: number) => boolean, ids?: Array<string>): Promise<UserCache | null> {
+		const user = await this.storageEngine.find(fn, ids || null, this.namespace);
 		if (!user) return null;
-		return new UserCache(this.storageEngine, this.rain, user);
-	}
-
-	/**
-	 * Bind a user id to the cache, used by the member cache
-	 * @param userId id of the user
-	 * @returns Returns a UserCache that has an id bound to it, which serves as the default argument to get, update and delete
-	 */
-	public bindUserId(userId: string): UserCache {
-		this.id = userId;
-		return this;
+		return new UserCache(this.storageEngine, this.rain).bindObject(user);
 	}
 
 	/**
 	 * Add users to the index
-	 * @param id ids of the users
+	 * @param ids ids of the users
 	 */
-	public async addToIndex(id: string): Promise<void> {
-		return this.storageEngine.addToList(this.namespace, id);
+	public async addToIndex(ids: Array<string>): Promise<void> {
+		await this.storageEngine.addToList(this.namespace, ids);
 	}
 
 	/**
@@ -101,7 +76,7 @@ class UserCache extends BaseCache<import("discord-typings").UserData> {
 	 * @param id id of the user
 	 */
 	public async removeFromIndex(id: string): Promise<void> {
-		return this.storageEngine.removeFromList(this.namespace, id);
+		await this.storageEngine.removeFromList(this.namespace, [id]);
 	}
 
 	/**
@@ -126,7 +101,7 @@ class UserCache extends BaseCache<import("discord-typings").UserData> {
 	 * Delete the user index, you should probably **not** use this function, but I won't stop you.
 	 */
 	public async removeIndex(): Promise<void> {
-		return this.storageEngine.removeList(this.namespace);
+		await this.storageEngine.removeList(this.namespace);
 	}
 
 	/**
@@ -138,4 +113,4 @@ class UserCache extends BaseCache<import("discord-typings").UserData> {
 	}
 }
 
-export = UserCache;
+export default UserCache;

@@ -4,23 +4,19 @@ import BaseStorageEngine from "../storageEngine/BaseStorageEngine";
 /**
  * Cache responsible for storing presence related data
  */
-class PresenceCache extends BaseCache<import("discord-typings").PresenceData> {
-	public namespace: "presence" = "presence";
-	public userCache: import("./UserCache");
-	public storageEngine: BaseStorageEngine<import("discord-typings").PresenceData>;
+class PresenceCache extends BaseCache<import("discord-typings").PresenceUpdate> {
+	public namespace = "presence" as const;
+	public userCache: import("./UserCache").default;
 
 	/**
 	 * Create a new Presence Cache
 	 *
 	 * **This class is automatically instantiated by RainCache**
 	 * @param storageEngine Storage engine to use for this cache
-	 * @param boundObject Optional, may be used to bind a presence object to the cache
 	 */
-	public constructor(storageEngine: BaseStorageEngine<import("discord-typings").PresenceData>, userCache: import("./UserCache"), rain: import("../RainCache")<any, any>, boundObject?: Partial<import("discord-typings").PresenceData>) {
-		super(rain);
-		this.storageEngine = storageEngine;
+	public constructor(storageEngine: BaseStorageEngine<import("discord-typings").PresenceUpdate>, rain: import("../RainCache").default<any, any>, userCache: import("./UserCache").default) {
+		super(storageEngine, rain);
 		this.userCache = userCache;
-		if (boundObject) this.bindObject(boundObject);
 	}
 
 	/**
@@ -31,7 +27,7 @@ class PresenceCache extends BaseCache<import("discord-typings").PresenceData> {
 	public async get(id: string): Promise<PresenceCache | null> {
 		if (this.boundObject) return this;
 		const presence = await this.storageEngine.get(this.buildId(id));
-		if (presence) return new PresenceCache(this.storageEngine, this.userCache.bindUserId(id), this.rain, presence);
+		if (presence) return new PresenceCache(this.storageEngine, this.rain, this.userCache).bindObject(presence);
 		else return null;
 	}
 
@@ -40,20 +36,21 @@ class PresenceCache extends BaseCache<import("discord-typings").PresenceData> {
 	 *
 	 * **This function automatically removes the guild_id, roles and user of a presence update before saving it**
 	 * @param id id of the user the presence belongs to
-	 * @param data updated presence data of the user
+	 * @param presenceData updated presence data of the user
 	 * @returns returns a bound presence cache
 	 */
-	public async update(id: string, data: Partial<import("discord-typings").PresenceData>): Promise<PresenceCache> {
+	public async update(id: string, presenceData: Partial<import("discord-typings").PresenceUpdate>): Promise<PresenceCache> {
+		if (this.rain.options.disabledCaches.presence) return this;
+		const data = Object.assign({}, presenceData);
 		if (this.boundObject) this.bindObject(data);
 		if (data.guild_id) delete data.guild_id;
-		if (data.roles) delete data.roles;
 		if (data.user) {
 			await this.userCache.update(data.user.id, data.user);
 			delete data.user;
 		}
-		await this.storageEngine.upsert(this.buildId(id), this.structurize(data));
+		const old = await this.storageEngine.upsert(this.buildId(id), this.structurize(data));
 		if (this.boundObject) return this;
-		return new PresenceCache(this.storageEngine, this.userCache, this.rain, data);
+		return new PresenceCache(this.storageEngine, this.rain, this.userCache).bindObject(data, old);
 	}
 
 	/**
@@ -61,8 +58,8 @@ class PresenceCache extends BaseCache<import("discord-typings").PresenceData> {
 	 * @param id id of the user the presence belongs to
 	 */
 	public async remove(id: string): Promise<void> {
-		return this.storageEngine.remove(this.buildId(id));
+		await this.storageEngine.remove(this.buildId(id));
 	}
 }
 
-export = PresenceCache;
+export default PresenceCache;
