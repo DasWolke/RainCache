@@ -52,7 +52,7 @@ class AmqpConnector extends BaseConnector {
 		 * @description Emitted once an event was fully processed by RainCache, you can now forward that event somewhere else
 		 */
 		this.emit("send", event);
-		this.channel.sendToQueue(this.options.sendQueue, Buffer.from(JSON.stringify(event)));
+		if (this.options.sendQueue) this.channel.sendToQueue(this.options.sendQueue, Buffer.from(JSON.stringify(event)));
 	}
 }
 

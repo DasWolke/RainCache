@@ -60,7 +60,7 @@ type EventTypeMap = {
 
 type UnpackRecord<T> = T extends Record<string | number | symbol, infer V> ? V : never;
 
-type Dispatch = UnpackRecord<{ [event in keyof EventTypeMap]: { op: 0; t: event; d: EventTypeMap[event]; s: number; } }>
+type Dispatch = UnpackRecord<{ [event in keyof EventTypeMap]: { op: 0; t: event; d: EventTypeMap[event]; s: number; } }>;
 
 interface EventProcessorEvents {
 	debug: [string];
@@ -124,7 +124,7 @@ class EventProcessor extends EventEmitter {
 	}
 
 	public async inbound(event: import("discord-typings").GatewayPayload) {
-		if (!this.options.disabledEvents[event.t]) await this.process(event as Dispatch);
+		if (event.op === 0 && !this.options.disabledEvents[event.t]) await this.process(event as Dispatch);
 		return event;
 	}
 

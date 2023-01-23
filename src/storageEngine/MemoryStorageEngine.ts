@@ -4,7 +4,7 @@ import BaseStorageEngine from "./BaseStorageEngine";
  * StorageEngine which uses a Map in the process memory space as a datasource
  */
 class MemoryStorageEngine<T> extends BaseStorageEngine<T> {
-	public map: Map<string, string> = new Map();
+	public map: Map<string, T> = new Map();
 	public index: Map<string, Array<string>> = new Map();
 
 	public initialize() { void 0; }
@@ -14,8 +14,7 @@ class MemoryStorageEngine<T> extends BaseStorageEngine<T> {
 	 * @param id id of the object
 	 */
 	public get(id: string): T | null {
-		const raw = this.map.get(id);
-		return this.parseData(raw);
+		return this.map.get(id) ?? null;
 	}
 
 	/**
@@ -25,7 +24,7 @@ class MemoryStorageEngine<T> extends BaseStorageEngine<T> {
 	 */
 	public upsert(id: string, updateData: Partial<T>): T | null {
 		const data = this.get(id);
-		const prepared = this.prepareData(Object.assign(data || {}, updateData));
+		const prepared = Object.assign(data || {}, updateData) as T;
 		this.map.set(id, prepared);
 		return data;
 	}
@@ -142,20 +141,6 @@ class MemoryStorageEngine<T> extends BaseStorageEngine<T> {
 	 */
 	public getListCount(listId: string): number {
 		return this.getListMembers(listId).length;
-	}
-
-	/**
-	 * Prepare data for storage inside redis
-	 */
-	private prepareData(data: Partial<T>): string {
-		return JSON.stringify(data);
-	}
-
-	/**
-	 * Parse loaded data
-	 */
-	private parseData(data: string | null | undefined): T | null {
-		return data ? JSON.parse(data) : null;
 	}
 }
 

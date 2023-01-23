@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import BaseCache from "./BaseCache";
 import BaseStorageEngine from "../storageEngine/BaseStorageEngine";
 
@@ -58,9 +59,9 @@ class GuildCache extends BaseCache<import("discord-typings").Guild> {
 		if (this.rain.options.disabledCaches.guild) return this;
 		const data = Object.assign({}, guildData);
 		if (this.boundObject) this.bindObject(data); // using bindobject() to assure the data of the class is valid
-		if (data.channels && data.channels.length > 0) {
-			await this.guildChannelMap.update(id, data.channels.map(c => c.id));
-			for (const channel of data.channels) {
+		if ((data.channels && data.channels.length > 0) || (data.threads && data.threads.length)) {
+			await this.guildChannelMap.update(id, (data.channels || data.threads)!.map((c: import("discord-typings").GuildChannel | import("discord-typings").ThreadChannel) => c.id));
+			for (const channel of (data.channels || data.threads)!) {
 				channel.guild_id = id;
 				await this.channelCache.update(channel.id, channel);
 			}

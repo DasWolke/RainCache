@@ -12,10 +12,8 @@ export type AMQPOptions = {
 	/**
 	 * amqp queue to use for sending events
 	 */
-	sendQueue: string;
+	sendQueue?: string;
 }
-
-type k = keyof NonNullable<RainCacheOptions["cacheClasses"]>
 
 export type ChannelMap = {
 	id: string;
